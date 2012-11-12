@@ -17,18 +17,26 @@ let b:did_C_ftplugin = 1
 
 set colorcolumn=81
 set keywordprg=man\ -S\ 2:3
-set tags=tags;/
+"set tags=tags;/
 
 function! LoadCscope()
-  let db = findfile("cscope.out", ".;")
+  let db = findfile("cscope.out", "**", -1)
   if (!empty(db))
-    let path = strpart(db, 0, match(db, "/cscope.out$"))
     set nocscopeverbose " suppress 'duplicate connection' error
-    exe "cs add " . db . " " . path
+    for item in db
+	    let path = strpart(item, 0, match(item, "/cscope.out$"))
+	    exe "cs add " . item . " " . path
+    endfor
     set cscopeverbose
   endif
+  let tagfile = findfile("tags", "**", -1)
+  if (!empty(tagfile))
+	  let taglist = join(tagfile, ",")
+	  exec "set tags=" . taglist
+  endif
 endfunction
-au BufEnter /* call LoadCscope()
+
+autocmd VimEnter /* call LoadCscope()
 "
 "-------------------------------------------------------------------------------
 " ADDITIONAL MAPPING : complete a classical C comment: '/*' => '/* | */'
