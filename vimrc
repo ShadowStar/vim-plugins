@@ -182,6 +182,60 @@ endif " has("autocmd")
 
 " vim: set fenc=utf-8 tw=80 sw=2 sts=2 et foldmethod=marker :
 
+" Find file in current directory and edit it.
+function! FindEdit(...)
+  if a:0 > 1
+    let path = a:1
+    let query = a:2
+  else
+    let path = "./"
+    if a:0 == 0
+      let query = expand("<cfile>")
+    else
+      let query = a:1
+    endif
+  endif
+
+  if !exists("g:FindIgnore")
+    let g:FindIgnore = ['.swp', '.pyc', '.class', '.git', '.svn', 'SCCS', 'BitKeeper', 'CVS', '.pc', '.hg']
+  endif
+  let ignore = " | egrep -v '" . join(g:FindIgnore, "|") . "'"
+
+  let l:list = system("find " . path . " -type f -iname '*" . query . "*'" . ignore)
+  let l:num = strlen(substitute(l:list, "[^\n]", "", "g"))
+
+  if l:num < 1
+    echo "'" . query . "' not found"
+    return
+  endif
+
+  if l:num == 1
+    exe "open " . substitute(l:list, "\n", "", "g")
+  else
+    let tmpfile = tempname()
+    exe "redir! > " . tmpfile
+    silent echon l:list
+    redir END
+    let old_efm = &efm
+    set efm = %f
+
+    if exists(":cgetfile")
+      execute "silent! cgetfile " . tmpfile
+    else
+      execute "silent! cfile " . tmpfile
+    endif
+
+    let &efm = old_efm
+
+    " Open the quickfix window below the current window
+    botright copen
+
+    call delete(tmpfile)
+  endif
+endfunction
+
+command! -nargs=* FindEdit call FindEdit(<f-args>)
+
 filetype plugin on
 filetype indent on
 syntax on
