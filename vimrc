@@ -234,7 +234,7 @@ function! FindEdit(...)
   endif
 endfunction
 
-command! -nargs=* FindEdit call FindEdit(<f-args>)
+command! -nargs=* -complete=file FindEdit call FindEdit(<f-args>)
 
 filetype plugin on
 filetype indent on
