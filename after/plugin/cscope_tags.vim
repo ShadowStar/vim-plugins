@@ -23,12 +23,20 @@ function! s:Find(name, dir)
   return split(files)
 endfunction
 
-function! s:LoadCscope(dir)
-  if (index(g:dir_list, a:dir) >= 0)
+function! s:LoadCscope(...)
+  if a:0 < 1
+      let l:dir = expand('%:p:h')
+    if empty(l:dir)
+      let l:dir = getcwd()
+    endif
+  else
+    let l:dir = a:1
+  endif
+  if (index(g:dir_list, l:dir) >= 0)
     return
   endif
-  call add(g:dir_list, a:dir)
-  let db = s:Find('cscope.out', a:dir)
+  call add(g:dir_list, l:dir)
+  let db = s:Find('cscope.out',l:dir)
 "  let db = findfile("cscope.out", "**", -1)
   if (!empty(db))
     set nocscopeverbose " suppress 'duplicate connection' error
@@ -42,7 +50,7 @@ function! s:LoadCscope(dir)
     set cscopeverbose
   endif
 "  let tagfile = findfile("tags", "**", -1)
-  let tagfile = s:Find('tags', a:dir)
+  let tagfile = s:Find('tags', l:dir)
   if (!empty(tagfile))
     for item in tagfile
       if (index(g:db_list, item) >= 0)
@@ -55,16 +63,8 @@ function! s:LoadCscope(dir)
   endif
 endfunction
 
-function! s:LoadCscope_dir()
-  if (!empty(expand('%:p:h')))
-    call s:LoadCscope(expand('%:p:h'))
-  endif
-endfunction
+autocmd BufEnter /*.[chS] call s:LoadCscope(expand('%:p:h'))
+autocmd VimEnter /*.[chS] call s:LoadCscope(getcwd())
 
-function! s:LoadCscope_cwd()
-  call s:LoadCscope(getcwd())
-endfunction
-
-autocmd BufEnter /* call s:LoadCscope_dir()
-autocmd VimEnter /* call s:LoadCscope_cwd()
+command! -nargs=* -complete=dir LoadCscope call s:LoadCscope(<f-args>)
 
