@@ -9,7 +9,7 @@ elseif exists("b:current_syntax")
   finish
 endif
 
-setlocal iskeyword+=-
+setlocal iskeyword+=-,$
 syntax case match
 
 syntax keyword	mipsTodo	contained TODO
