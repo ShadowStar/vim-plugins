@@ -12,23 +12,32 @@ endif
 setlocal iskeyword+=-,$
 syntax case match
 
-syntax keyword	mipsTodo	contained TODO
-syntax match	mipsComment	"#.*"
+syntax keyword	mipsTodo	COMBAK XXX FIXME TODO contained containedin=mipsComment
 syntax match	mipsComment	"\/\/.*"
 syntax region	mipsComment	start="\/\*" end="\*\/"
-syntax match	mipsNumber	"\<\(0\|-\?[1-9]\d*\)\>" " Dec numbers
+syntax match	mipsNumber	"\<\(0\|-\?[1-9]\d*\)\(U\|UL\|ULL\)\=\>" " Dec numbers
 syntax match	mipsNumber	"\<0[0-7]\+\>" " Oct numbers
-syntax match	mipsNumber	"\<0x[0-9a-fA-F]\+\>" " Hex numbers
+syntax match	mipsNumber	"\<0x[0-9a-fA-F]\+\(U\|UL\|ULL\)\=\>" " Hex numbers
 syntax region	mipsString	start=+"+ end=+"+ skip=+\\"+
-syntax match	mipsLabelColon	":" contained
-syntax match	mipsLabel	"\w\+:" contains=mipsLabelColon
-syntax match	mipsFunction	"\<\h\w*\>\(\s\|\n\)*("me=e-1
-syntax match	mipsIdentifier	"\<[a-z_][a-z0-9_]*\>"
+syntax match	mipsString	"'\p'"
+syntax match	mipsLabel	"^\s+\w\+:"
+syntax match	mipsFunction	"\<\h\w*\>\ze\(\s\|\n\)*("
 syntax match	mipsMacro	"\<[A-Z_][A-Z0-9_]*\>" contains=mipsFunction
-syntax region	mipsIncluded	start=+"+ skip=+\\\\\|\\"+ end=+"+
-syntax match	mipsIncluded	"<[^>]*>"
+syntax match	mipsMacro	"\\\w\+\>"
+syntax cluster	mipsOperator	contains=mipsOperator1,mipsOperator2
+syntax match	mipsOperator2	"\((\|)\|{\|}\)"
+syntax match	mipsOperator1	"\(?\|:\|\~\||\|&\|=\|>\|<\|+\|-\d\@!\|/\@!\*\|/\@!/\|\[\|]\|,\|;\)"
+syntax match	mipsOperator1	"\s#\h\w*\>"he=s+2 contained
+syntax match	mipsOperator1	"#@\w\>"he=s+2 contained
+syntax match	mipsOperator1	"##\h\w*\>"he=s+2 contained
+syntax region	mipsIncluded	start=+"+ skip=+\\\\\|\\"+ end=+"+ contained
+syntax match	mipsIncluded	"<[^>]*>" contained
 syntax match	mipsInclude	"^\s*#\s*include\>\s*["<]" contains=mipsIncluded
-syntax region	mipsDefine	start="^\s*#\s*\(define\|undef\|ifdef\|endif\|else\|ifndef\|if\)\>" skip="\\$" end="$" contains=ALLBUT,mipsComment,mipsIdentifier
+syntax region	mipsDefine	start="^\s*#\s*define\>" skip="\\$" end="$" contains=ALLBUT,mipsDefined keepend
+syntax region	mipsDefine	start="^\s*#\s*\(undef\|ifdef\|endif\|else\|ifndef\)\>" skip="\\$" end="$" contains=mipsComment,mipsOperator,mipsNumber keepend
+syntax region	mipsDefine	start="^\s*#\s*\(elif\>\|if\)\>" skip="\\$" end="$" contains=mipsComment,mipsOperator,mipsNumber,mipsDefined keepend
+syntax match	mipsDefined	"\<defined\>" contained
+syntax match	mipsPreProc	"^\s*#\s*\(pragma\|line\|warning\|warn\|error\)\>"
 
 " Registers
 syntax match	mipsRegister	"\<\$\?pc\>"
@@ -87,63 +96,64 @@ while i < 32
 endwhile
 
 " Directives
-syntax match	mipsDirective	"\<\.2byte\>"
-syntax match	mipsDirective	"\<\.4byte\>"
-syntax match	mipsDirective	"\<\.8byte\>"
-syntax match	mipsDirective	"\<\.aent\>"
-syntax match	mipsDirective	"\<\.align\>"
-syntax match	mipsDirective	"\<\.aascii\>"
-syntax match	mipsDirective	"\<\.ascii\>"
-syntax match	mipsDirective	"\<\.asciiz\>"
-syntax match	mipsDirective	"\<\.byte\>"
-syntax match	mipsDirective	"\<\.comm\>"
-syntax match	mipsDirective	"\<\.cpadd\>"
-syntax match	mipsDirective	"\<\.cpload\>"
-syntax match	mipsDirective	"\<\.cplocal\>"
-syntax match	mipsDirective	"\<\.cprestore\>"
-syntax match	mipsDirective	"\<\.cpreturn\>"
-syntax match	mipsDirective	"\<\.cpsetup\>"
-syntax match	mipsDirective	"\<\.data\>"
-syntax match	mipsDirective	"\<\.double\>"
-syntax match	mipsDirective	"\<\.dword\>"
-syntax match	mipsDirective	"\<\.dynsym\>"
-syntax match	mipsDirective	"\<\.end\>"
-syntax match	mipsDirective	"\<\.endr\>"
-syntax match	mipsDirective	"\<\.ent\>"
-syntax match	mipsDirective	"\<\.extern\>"
-syntax match	mipsDirective	"\<\.file\>"
-syntax match	mipsDirective	"\<\.float\>"
-syntax match	mipsDirective	"\<\.fmask\>"
-syntax match	mipsDirective	"\<\.frame\>"
-syntax match	mipsDirective	"\<\.globl\>"
-syntax match	mipsDirective	"\<\.gpvalue\>"
-syntax match	mipsDirective	"\<\.gpword\>"
-syntax match	mipsDirective	"\<\.half\>"
-syntax match	mipsDirective	"\<\.irp\>"
-syntax match	mipsDirective	"\<\.kdata\>"
-syntax match	mipsDirective	"\<\.ktext\>"
-syntax match	mipsDirective	"\<\.lab\>"
-syntax match	mipsDirective	"\<\.lcomm\>"
-syntax match	mipsDirective	"\<\.loc\>"
-syntax match	mipsDirective	"\<\.mask\>"
-syntax match	mipsDirective	"\<\.nada\>"
-syntax match	mipsDirective	"\<\.nop\>"
-syntax match	mipsDirective	"\<\.option\>"
-syntax match	mipsDirective	"\<\.origin\>"
-syntax match	mipsDirective	"\<\.repeat\>"
-syntax match	mipsDirective	"\<\.rdata\>"
-syntax match	mipsDirective	"\<\.sdata\>"
-syntax match	mipsDirective	"\<\.section\>"
-syntax match	mipsDirective	"\<\.set\>"
-syntax match	mipsDirective	"\<\.size\>"
-syntax match	mipsDirective	"\<\.space\>"
-syntax match	mipsDirective	"\<\.string\>"
-syntax match	mipsDirective	"\<\.struct\>"
-syntax match	mipsDirective	"\<\.text\>"
-syntax match	mipsDirective	"\<\.type\>"
-syntax match	mipsDirective	"\<\.verstamp\>"
-syntax match	mipsDirective	"\<\.weakext\>"
-syntax match	mipsDirective	"\<\.word\>"
+syntax match	mipsDirective	"^\s\.2byte\>"
+syntax match	mipsDirective	"^\s\.4byte\>"
+syntax match	mipsDirective	"^\s\.8byte\>"
+syntax match	mipsDirective	"^\s\.aent\>"
+syntax match	mipsDirective	"^\s\.align\>"
+syntax match	mipsDirective	"^\s\.aascii\>"
+syntax match	mipsDirective	"^\s\.ascii\>"
+syntax match	mipsDirective	"^\s\.asciiz\>"
+syntax match	mipsDirective	"^\s\.byte\>"
+syntax match	mipsDirective	"^\s\.comm\>"
+syntax match	mipsDirective	"^\s\.cpadd\>"
+syntax match	mipsDirective	"^\s\.cpload\>"
+syntax match	mipsDirective	"^\s\.cplocal\>"
+syntax match	mipsDirective	"^\s\.cprestore\>"
+syntax match	mipsDirective	"^\s\.cpreturn\>"
+syntax match	mipsDirective	"^\s\.cpsetup\>"
+syntax match	mipsDirective	"^\s\.data\>"
+syntax match	mipsDirective	"^\s\.double\>"
+syntax match	mipsDirective	"^\s\.dword\>"
+syntax match	mipsDirective	"^\s\.dynsym\>"
+syntax match	mipsDirective	"^\s\.end\>"
+syntax match	mipsDirective	"^\s\.endr\>"
+syntax match	mipsDirective	"^\s\.ent\>"
+syntax match	mipsDirective	"^\s\.extern\>"
+syntax match	mipsDirective	"^\s\.file\>"
+syntax match	mipsDirective	"^\s\.float\>"
+syntax match	mipsDirective	"^\s\.fmask\>"
+syntax match	mipsDirective	"^\s\.frame\>"
+syntax match	mipsDirective	"^\s\.globl\>"
+syntax match	mipsDirective	"^\s\.gpvalue\>"
+syntax match	mipsDirective	"^\s\.gpword\>"
+syntax match	mipsDirective	"^\s\.half\>"
+syntax match	mipsDirective	"^\s\.irp\>"
+syntax match	mipsDirective	"^\s\.kdata\>"
+syntax match	mipsDirective	"^\s\.ktext\>"
+syntax match	mipsDirective	"^\s\.lab\>"
+syntax match	mipsDirective	"^\s\.lcomm\>"
+syntax match	mipsDirective	"^\s\.loc\>"
+syntax match	mipsDirective	"^\s\.mask\>"
+syntax match	mipsDirective	"^\s\.nada\>"
+syntax match	mipsDirective	"^\s\.nop\>"
+syntax match	mipsDirective	"^\s\.option\>"
+syntax match	mipsDirective	"^\s\.origin\>"
+syntax match	mipsDirective	"^\s\.repeat\>"
+syntax match	mipsDirective	"^\s\.rdata\>"
+syntax match	mipsDirective	"^\s\.sdata\>"
+syntax match	mipsDirective	"^\s\.section\>"
+syntax match	mipsDirective	"^\s*\.set\>"
+syntax match	mipsDirective	"^\s\.size\>"
+syntax match	mipsDirective	"^\s\.space\>"
+syntax match	mipsDirective	"^\s\.string\>"
+syntax match	mipsDirective	"^\s\.struct\>"
+syntax match	mipsDirective	"^\s\.text\>"
+syntax match	mipsDirective	"^\s\.type\>"
+syntax match	mipsDirective	"^\s\.verstamp\>"
+syntax match	mipsDirective	"^\s\.weakext\>"
+syntax match	mipsDirective	"^\s\.word\>"
+syntax match	mipsDirective	"^\s\.\w\+\>"
 
 " Arithmetic Instructions
 syntax keyword	mipsInstruction	add addi addiu addu clo clz dadd daddi daddiu
@@ -309,22 +319,25 @@ syntax keyword	cvm2Instruction	cvm_mt_sms4_iv cvm_mt_sms4_key cvm_mt_sms4_resnip
 
 syntax keyword	PseuInstruction	li move dli la dla negu not beqz bnez blt bge bgt
 
-hi def link	mipsTodo	Todo
-hi def link	mipsComment	Comment
-hi def link	mipsNumber	Number
-hi def link	mipsString	String
-hi def link	mipsLabel	Label
-hi def link	mipsFunction	Function
-hi def link	mipsIdentifier	Identifier
-hi def link	mipsDefine	Macro
-hi def link	mipsMacro	Macro
-hi def link	mipsIncluded	String
-hi def link	mipsInclude	Include
-hi def link	mipsRegister	Type
-hi def link	mipsDirective	Type
-hi def link	mipsInstruction	Statement
-hi def link	cvmInstruction	Statement
-hi def link	cvm2Instruction	Statement
-hi def link	PseuInstruction	Identifier
+hi def link	mipsTodo	YellowR
+hi def link	mipsComment	Blue
+hi def link	mipsNumber	Red
+hi def link	mipsString	Red
+hi def link	mipsLabel	Yellow
+hi def link	mipsFunction	Cyan
+hi def link	mipsOperator2	Magenta
+hi def link	mipsOperator1	Yellow
+hi def link	mipsDefined	Magenta
+hi def link	mipsDefine	Magenta
+hi def link	mipsPreProc	RedR
+hi def link	mipsMacro	Magenta
+hi def link	mipsIncluded	Red
+hi def link	mipsInclude	Magenta
+hi def link	mipsRegister	Green
+hi def link	mipsDirective	Green
+hi def link	mipsInstruction	Cyan
+hi def link	cvmInstruction	Cyan
+hi def link	cvm2Instruction	Cyan
+hi def link	PseuInstruction	CyanU
 
 let b:current_syntax = "mips"
