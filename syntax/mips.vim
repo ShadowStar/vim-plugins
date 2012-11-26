@@ -51,6 +51,10 @@ syntax match	mipsRegister	"\<\$\?a0\>"
 syntax match	mipsRegister	"\<\$\?a1\>"
 syntax match	mipsRegister	"\<\$\?a2\>"
 syntax match	mipsRegister	"\<\$\?a3\>"
+syntax match	mipsRegister	"\<\$\?a4\>"
+syntax match	mipsRegister	"\<\$\?a5\>"
+syntax match	mipsRegister	"\<\$\?a6\>"
+syntax match	mipsRegister	"\<\$\?a7\>"
 syntax match	mipsRegister	"\<\$\?t0\>"
 syntax match	mipsRegister	"\<\$\?t1\>"
 syntax match	mipsRegister	"\<\$\?t2\>"
@@ -269,7 +273,7 @@ syntax keyword	mipsInstruction	deret sdbbp
 " cnMIPS Instructions
 syntax keyword	cvmInstruction	baddu dmul exts exts32 cins cins32 mtm0 mtm1 mtm2 mtp0
 syntax keyword	cvmInstruction	mtp1 mtp2 v3mulu vmm0 vmulu dpop pop seq seqi sne snei
-syntax keyword	cvmInstruction	bbit0 bbit32 bbit1 bbit132 pref4 pref5 pref28 pref29
+syntax keyword	cvmInstruction	bbit0 bbit032 bbit1 bbit132 pref4 pref5 pref28 pref29
 syntax keyword	cvmInstruction	pref30 saa saad synciobdma syncs syncw syncws uld ulw
 syntax keyword	cvmInstruction	usd usw rdhwr30 rdhwr31 cvm_mf_crc_iv
 syntax keyword	cvmInstruction	cvm_mf_crc_iv_reflect cvm_mf_crc_len
