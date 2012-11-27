@@ -12,20 +12,20 @@ let color_list = ["Black", "Red", "Green", "Gray", "Yellow", "Blue", "Magenta", 
 " Careful with "cterm=bold", it changes the color to bright for some terminals.
 " There are two sets of defaults: for a dark and a light background.
 for i in color_list
-    execute 'hi def ' . i . ' term=NONE cterm=NONE ctermfg=' . i . ' ctermbg=NONE'
-    execute 'hi def ' . i . 'U term=underline cterm=underline ctermfg=' . i . ' ctermbg=NONE'
-    execute 'hi def ' . i . 'B term=bold cterm=bold ctermfg=' . i . ' ctermbg=NONE'
+    execute 'hi ' . i . ' term=none cterm=none ctermfg=' . i . ' ctermbg=none'
+    execute 'hi ' . i . 'U term=underline cterm=underline ctermfg=' . i . ' ctermbg=none'
+    execute 'hi ' . i . 'B term=bold cterm=bold ctermfg=' . i . ' ctermbg=none'
     if &background == "dark"
       if i == "White"
-        execute 'hi def ' . i . 'R term=reverse cterm=NONE ctermfg=Black ctermbg=' . i
+        execute 'hi ' . i . 'R term=reverse cterm=none ctermfg=Black ctermbg=' . i
       else
-        execute 'hi def ' . i . 'R term=reverse cterm=NONE ctermfg=White ctermbg=' . i
+        execute 'hi ' . i . 'R term=reverse cterm=none ctermfg=White ctermbg=' . i
       endif
     else
       if i == "Black"
-        execute 'hi def ' . i . 'R term=reverse cterm=NONE ctermfg=White ctermbg=' . i
+        execute 'hi ' . i . 'R term=reverse cterm=none ctermfg=White ctermbg=' . i
       else
-        execute 'hi def ' . i . 'R term=reverse cterm=NONE ctermfg=Black ctermbg=' . i
+        execute 'hi ' . i . 'R term=reverse cterm=none ctermfg=Black ctermbg=' . i
       endif
     endif
 endfor
