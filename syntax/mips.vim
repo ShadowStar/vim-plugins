@@ -9,6 +9,7 @@ elseif exists("b:current_syntax")
   finish
 endif
 
+runtime! syntax/style.vim
 setlocal iskeyword+=-,$
 syntax case match
 
