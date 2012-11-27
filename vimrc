@@ -270,6 +270,7 @@ hi CursorLine cterm=underline
 "set colorcolumn=81
 "set keywordprg=man\ -a
 
+colorscheme shadowstar
 "set omnifunc=syntaxcomplete#Complete
 set path=include/,,/usr/include/
 set completeopt=longest,menu
