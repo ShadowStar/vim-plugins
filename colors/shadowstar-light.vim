@@ -136,3 +136,5 @@ else
   hi ExtraWhitespace term=standout ctermbg=9 guibg=Red
 endif
 
+runtime! syntax/style.vim
+

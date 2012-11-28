@@ -74,3 +74,5 @@ hi Error term=reverse cterm=bold ctermfg=7 ctermbg=1 guifg=White guibg=Red
 hi Todo term=standout cterm=bold ctermfg=0 ctermbg=3 guifg=Blue guibg=Yellow
 hi ExtraWhitespace term=standout ctermbg=1 guibg=Red
 
+runtime! syntax/style.vim
+
