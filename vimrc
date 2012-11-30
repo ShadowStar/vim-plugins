@@ -235,7 +235,7 @@ function! FindEdit(...)
 endfunction
 
 command! -nargs=* -complete=file FindEdit call FindEdit(<f-args>)
-runtime! syntax/style.vim
+"runtime! syntax/style.vim
 
 filetype plugin on
 filetype indent on
