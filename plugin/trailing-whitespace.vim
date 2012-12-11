@@ -2,10 +2,10 @@
 highlight ExtraWhitespace ctermbg=darkred guibg=#382424
 autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
 autocmd BufWinEnter,FileType !diff match ExtraWhitespace /\(\s\+$\|\ \t\)/
-autocmd BufWinEnter,FileType diff match ExtraWhitespace /^$/
+autocmd BufWinEnter,FileType diff match ExtraWhitespace /^[^ \ndi+\-@]/
 " the above flashes annoyingly while typing, be calmer in insert mode
 autocmd InsertLeave,FileType !diff match ExtraWhitespace /\(\s\+$\|\ \t\)/
-autocmd InsertLeave,FileType diff match ExtraWhitespace /^$/
+autocmd InsertLeave,FileType diff match ExtraWhitespace /^[^ \ndi+\-@]/
 autocmd InsertEnter,FileType !diff match ExtraWhitespace /\s\+\%#\@<!$/
 
 function! s:FixWhitespace(line1,line2)
