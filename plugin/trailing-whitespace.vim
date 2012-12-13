@@ -1,18 +1,19 @@
 " Highlight EOL whitespace, http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 highlight ExtraWhitespace ctermbg=darkred guibg=#382424
 autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
-autocmd BufWinEnter,FileType !diff match ExtraWhitespace /\(\s\+$\|\ \t\)/
+autocmd BufWinEnter,FileType [^(diff)] match ExtraWhitespace /\(\s\+$\|\ \t\|^\_s\{2,}$\)/
 autocmd BufWinEnter,FileType diff match ExtraWhitespace /^[^ \ndi+\-@]/
 " the above flashes annoyingly while typing, be calmer in insert mode
-autocmd InsertLeave,FileType !diff match ExtraWhitespace /\(\s\+$\|\ \t\)/
+autocmd InsertLeave,FileType [^(diff)] match ExtraWhitespace /\(\s\+$\|\ \t\|^\_s\{2,}$\)/
 autocmd InsertLeave,FileType diff match ExtraWhitespace /^[^ \ndi+\-@]/
-autocmd InsertEnter,FileType !diff match ExtraWhitespace /\s\+\%#\@<!$/
+"autocmd InsertEnter,FileType [^(diff)] match ExtraWhitespace /\s\+\%#\@<!$/
 
 function! s:FixWhitespace(line1,line2)
     if &filetype != "diff"
         let l:save_cursor = getpos(".")
         silent! execute ':' . a:line1 . ',' . a:line2 . 's/\s\+$//'
         silent! execute ':' . a:line1 . ',' . a:line2 . 's/\ \t/\t/'
+        silent! execute ':' . a:line1 . ',' . a:line2 . 's/^\_s\+$//'
         call setpos('.', l:save_cursor)
     endif
 endfunction
