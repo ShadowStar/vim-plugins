@@ -336,7 +336,7 @@ let g:SrcExpl_isUpdateTags = 0
 let g:SrcExpl_updateTagsCmd = "exuberant-ctags --sort=foldcase -R ."
 let g:SrcExpl_updateTagsKey = "<F6>"
 
-let c_space_errors = 1
+"let c_space_errors = 1
 let c_gnu = 1
 let Tlist_Auto_Highlight_Tag = 1
 let Tlist_Exit_OnlyWindow = 1
