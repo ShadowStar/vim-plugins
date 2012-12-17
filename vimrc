@@ -52,17 +52,22 @@ set nomodeline
 " Try to come up with some nice sane GUI fonts. Also try to set a sensible
 " value for fileencodings based upon locale. These can all be overridden in
 " the user vimrc file.
+if v:lang =~? "UTF-8$"
+  set fileencodings=utf-8
+endif
 if v:lang =~? "^ko"
-  set fileencodings=euc-kr
+  set fileencodings+=euc-kr
   set guifontset=-*-*-medium-r-normal--16-*-*-*-*-*-*-*
 elseif v:lang =~? "^ja_JP"
-  set fileencodings=euc-jp
+  set fileencodings+=euc-jp
   set guifontset=-misc-fixed-medium-r-normal--14-*-*-*-*-*-*-*
 elseif v:lang =~? "^zh_TW"
-  set fileencodings=big5
+  set fileencodings+=big5
   set guifontset=-sony-fixed-medium-r-normal--16-150-75-75-c-80-iso8859-1,-taipei-fixed-medium-r-normal--16-150-75-75-c-160-big5-0
 elseif v:lang =~? "^zh_CN"
-  set fileencodings=gb2312
+  set fileencodings+=gb2312
+  set fileencodings+=gbk
+  set fileencodings+=gb18030
   set guifontset=*-r-*
 endif
 
@@ -346,6 +351,8 @@ let Tlist_GainFocus_On_ToggleOpen = 1
 "let Tlist_Close_On_Select = 1
 let tlist_make_settings = 'make;m:makros;t:targets'
 let tlist_qmake_settings = 'qmake;t:SystemVariables'
+set laststatus=2
+set statusline=%f%y%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v@%l/%L\ --%p%%--
 
 highlight StatusLine term=bold,reverse cterm=bold,reverse ctermfg=green gui=bold,reverse guifg=green
 highlight StatusLineNC term=reverse cterm=reverse ctermfg=darkred gui=reverse guifg=darkred
