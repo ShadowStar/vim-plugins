@@ -352,7 +352,7 @@ let Tlist_GainFocus_On_ToggleOpen = 1
 let tlist_make_settings = 'make;m:makros;t:targets'
 let tlist_qmake_settings = 'qmake;t:SystemVariables'
 set laststatus=2
-set statusline=%f%y%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v@%l/%L\ --%p%%--
+set statusline=%y%f%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v@%l/%L\ --%p%%--
 
 highlight StatusLine term=bold,reverse cterm=bold,reverse ctermfg=green gui=bold,reverse guifg=green
 highlight StatusLineNC term=reverse cterm=reverse ctermfg=darkred gui=reverse guifg=darkred
