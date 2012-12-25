@@ -273,7 +273,7 @@ set cinoptions=:0,l1,t0,g0,b1,(0
 set formatoptions=tcqlron
 set cul
 hi CursorLine cterm=underline
-"set colorcolumn=81
+set colorcolumn=+1
 "set keywordprg=man\ -a
 
 colorscheme shadowstar
