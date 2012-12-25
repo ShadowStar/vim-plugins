@@ -1,4 +1,11 @@
 " Highlight EOL whitespace, http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+
+if exists("g:loaded_trailing_whitepace")
+  finish
+endif
+
+let g:loaded_trailing_whitepace = 1
+
 highlight ExtraWhitespace ctermbg=darkred guibg=#382424
 autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
 autocmd BufWinEnter,FileType [^(diff|git)] match ExtraWhitespace /^\(\s*\n\)\{2,}\| \+\ze\t\|\s\+$/
