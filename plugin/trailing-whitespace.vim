@@ -8,12 +8,12 @@ let g:loaded_trailing_whitepace = 1
 
 highlight ExtraWhitespace ctermbg=darkred guibg=#382424
 autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
-autocmd BufWinEnter,FileType [^(diff|git)] match ExtraWhitespace /^\(\s*\n\)\{2,}\| \+\ze\t\|\s\+$/
-autocmd BufWinEnter,FileType diff,git match ExtraWhitespace /^\([+ ]\s*\n\)\{2,}\|\%>1v \+\ze\t\|\%>1v\s\+$/
+autocmd BufWinEnter,FileType [^(diff|git|gitcommit)] match ExtraWhitespace /^\(\s*\n\)\{2,}\| \+\ze\t\|\s\+$/
+autocmd BufWinEnter,FileType diff,git,gitcommit match ExtraWhitespace /^\([+ ]\s*\n\)\{2,}\|\%>1v \+\ze\t\|\%>1v\s\+$/
 "autocmd BufWinEnter,FileType diff match ExtraWhitespace /^[^ \ndi+\-@]/
 " the above flashes annoyingly while typing, be calmer in insert mode
-autocmd InsertLeave,FileType [^(diff|git)] match ExtraWhitespace /^\(\s*\n\)\{2,}\| \+\ze\t\|\s\+$/
-autocmd InsertLeave,FileType diff,git match ExtraWhitespace /^\([+ ]\s*\n\)\{2,}\|\%>1v \+\ze\t\|\%>1v\s\+$/
+autocmd InsertLeave,FileType [^(diff|git|gitcommit)] match ExtraWhitespace /^\(\s*\n\)\{2,}\| \+\ze\t\|\s\+$/
+autocmd InsertLeave,FileType diff,git,gitcommit match ExtraWhitespace /^\([+ ]\s*\n\)\{2,}\|\%>1v \+\ze\t\|\%>1v\s\+$/
 "autocmd InsertLeave,FileType diff match ExtraWhitespace /^[^ \ndi+\-@]/
 "autocmd InsertEnter,FileType [^(diff)] match ExtraWhitespace /\s\+\%#\@<!$/
 "autocmd Syntax [^(diff|git)] syn match ExtraWhitespace / \+\ze\t\|\s\+$/
