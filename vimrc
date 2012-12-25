@@ -269,7 +269,8 @@ set wildmenu                    " command-line completion in an enhanced mode
 set title
 set hidden
 set cindent
-set cinoptions=:0
+set cinoptions=:0,l1,t0,g0,b1,(0
+set formatoptions=tcqlron
 set cul
 hi CursorLine cterm=underline
 "set colorcolumn=81
