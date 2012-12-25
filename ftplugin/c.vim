@@ -15,8 +15,18 @@ if exists("b:did_C_ftplugin")
 endif
 let b:did_C_ftplugin = 1
 
-set colorcolumn=81
-set keywordprg=man\ -S\ 2:3
+"set colorcolumn=81
+setlocal keywordprg=man\ -S\ 2:3
+setlocal wildignore+=*.ko,*.mod.c,*.order,modules.builtin
+setlocal tabstop=8
+setlocal shiftwidth=8
+setlocal textwidth=80
+setlocal noexpandtab
+setlocal cindent
+setlocal smartindent
+setlocal formatoptions=tcqlron
+setlocal cinoptions=:0,l1,t0,g0,b1,(0
+
 "set tags=tags;/
 
 "
