@@ -240,6 +240,7 @@ hi def link cAnsiFunction cFunction
 hi def link cAnsiName cIdentifier
 
 " Operators
+syn keyword cOperator	likely unlikely
 syn match cOperator	"\(<<\|>>\|[-+*/%&^|<>!=]\)="
 syn match cOperator	"<<\|>>\|&&\|||\|++\|--\|->"
 syn match cOperator	"[.!~*&%<>^|=,+-]"
@@ -252,6 +253,7 @@ syn match cOperator	"[][]"
 syn keyword cDefined defined contained containedin=cDefine
 hi def link cDefined cDefine
 
+syn match cType		"_\{,2}[us]\(8\|16\|32\|64\)"
 " Functions
 syn match cUserFunction "\<\h\w*\>\ze\_s*(" contains=cType,cDelimiter,cDefine
 syn match cUserFunctionPointer "(\s*\*\s*\h\w*\s*)\ze\_s*(" contains=cDelimiter,cOperator
@@ -268,8 +270,12 @@ syn match cBraces display "[{}]"
 " Booleans
 syn keyword cBoolean true false TRUE FALSE
 
+syn match cLineError	" \+\t"		" spaces before tab
+syn match cLineError	"\s\+$"		" trailing whitespaces
+syn match cLineError	"\%81v.\+"	" virtual column 81 and more
 
 " Links
+hi def link cLineError cError
 hi def link cFunction Function
 hi def link cIdentifier Identifier
 hi def link cDelimiter Delimiter
