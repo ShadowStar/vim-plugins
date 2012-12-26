@@ -1,23 +1,21 @@
 " Highlight EOL whitespace, http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 
-if exists("g:loaded_trailing_whitepace")
+if exists("g:loaded_trailing_whitespace")
   finish
 endif
 
-let g:loaded_trailing_whitepace = 1
+let g:loaded_trailing_whitespace = 1
 
-highlight ExtraWhitespace ctermbg=darkred guibg=#382424
-autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
-autocmd BufWinEnter,FileType [^(diff|git|gitcommit)] match ExtraWhitespace /^\(\s*\n\)\{2,}\| \+\ze\t\|\s\+$/
-autocmd BufWinEnter,FileType diff,git,gitcommit match ExtraWhitespace /^\([+ ]\s*\n\)\{2,}\|\%>1v \+\ze\t\|\%>1v\s\+$/
-"autocmd BufWinEnter,FileType diff match ExtraWhitespace /^[^ \ndi+\-@]/
-" the above flashes annoyingly while typing, be calmer in insert mode
-autocmd InsertLeave,FileType [^(diff|git|gitcommit)] match ExtraWhitespace /^\(\s*\n\)\{2,}\| \+\ze\t\|\s\+$/
-autocmd InsertLeave,FileType diff,git,gitcommit match ExtraWhitespace /^\([+ ]\s*\n\)\{2,}\|\%>1v \+\ze\t\|\%>1v\s\+$/
-"autocmd InsertLeave,FileType diff match ExtraWhitespace /^[^ \ndi+\-@]/
-"autocmd InsertEnter,FileType [^(diff)] match ExtraWhitespace /\s\+\%#\@<!$/
-"autocmd Syntax [^(diff|git)] syn match ExtraWhitespace / \+\ze\t\|\s\+$/
-"autocmd Syntax diff,git syn match ExtraWhitespace /\%>1v\ \+\ze\t\|\%>1v\s\+$/
+function! s:TrailingWhitespace()
+  hi TWError term=reverse cterm=bold ctermfg=7 ctermbg=1 guifg=White guibg=Red
+  if &filetype == "diff" || &filetype == "git" || &filetype == "gitcommit"
+    match TWError	/^\([+ ]\s*\n\)\{2,}\|\%>1v \+\ze\t\|\%>1v\s\+$/
+  else
+    match TWError	/^\(\s*\n\)\{2,}\| \+\ze\t\|\s\+$/
+  endif
+endfunction
+
+autocmd BufWinEnter,InsertLeave * call s:TrailingWhitespace()
 
 if version >= 702
   autocmd BufWinLeave * call clearmatches()
