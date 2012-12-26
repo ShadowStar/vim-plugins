@@ -270,9 +270,9 @@ syn match cBraces display "[{}]"
 " Booleans
 syn keyword cBoolean true false TRUE FALSE
 
-syn match cLineError	" \+\t"		" spaces before tab
-syn match cLineError	"\s\+$"		" trailing whitespaces
-syn match cLineError	"\%81v.\+"	" virtual column 81 and more
+syn match cLineError display	" \+\t"		" spaces before tab
+syn match cLineError display	"\s\+$"		" trailing whitespaces
+"syn match cLineError display	"\%81v.\+"	" virtual column 81 and more
 
 " Links
 hi def link cLineError cError
