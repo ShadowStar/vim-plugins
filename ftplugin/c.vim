@@ -25,7 +25,7 @@ setlocal noexpandtab
 setlocal cindent
 setlocal smartindent
 setlocal formatoptions=tcqlron
-setlocal cinoptions=:0,l1,t0,g0,b1,(0
+setlocal cinoptions=:0,l1,t0,g0,(0
 
 "set tags=tags;/
 
