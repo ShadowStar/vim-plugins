@@ -240,7 +240,7 @@ hi def link cAnsiFunction cFunction
 hi def link cAnsiName cIdentifier
 
 " Operators
-syn keyword cOperator	likely unlikely
+"syn keyword cOperator	likely unlikely
 syn match cOperator	"\(<<\|>>\|[-+*/%&^|<>!=]\)="
 syn match cOperator	"<<\|>>\|&&\|||\|++\|--\|->"
 syn match cOperator	"[.!~*&%<>^|=,+-]"
