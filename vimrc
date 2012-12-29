@@ -242,6 +242,34 @@ endfunction
 command! -nargs=* -complete=file FindEdit call FindEdit(<f-args>)
 "runtime! syntax/style.vim
 
+function! KeyFollow()
+  if !exists("g:KeyFollowMatch")
+    let g:KeyFollowMatch = 0
+  endif
+  hi KeyFollow term=reverse cterm=bold ctermfg=5 ctermbg=7
+  call matchdelete(g:KeyFollowMatch)
+  let g:KeyFollowMatch = matchadd("KeyFollow", '\<' . expand("<cword>") . '\>')
+endfunction
+
+function! KeyFollowToggle()
+  if !exists("g:KeyFollow")
+    let g:KeyFollow = 0
+  endif
+  if (g:KeyFollow == 0)
+    augroup KeyFollow
+    au!
+    autocmd CursorMoved * silent! call KeyFollow()
+    augroup END
+    let g:KeyFollow = 1
+  else
+    let g:KeyFollow = 0
+    autocmd! KeyFollow
+    call matchdelete(g:KeyFollowMatch)
+  endif
+endfunction
+
+command! -nargs=0 KeyFollow call KeyFollowToggle()
+
 filetype plugin on
 filetype indent on
 syntax on
@@ -320,6 +348,7 @@ noremap <F8> :NERDTreeToggle<CR>
 inoremap <F8> <ESC>:NERDTreeToggle<CR>
 noremap <leader>v <C-W>v
 noremap <leader>s <C-W>s
+noremap <leader>f :KeyFollow<CR>
 noremap <C-h> <C-W>h
 noremap <C-j> <C-W>j
 noremap <C-k> <C-W>k
