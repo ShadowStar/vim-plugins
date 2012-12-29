@@ -9,11 +9,10 @@
 "   0.4 - updates and fixes to cDelimiter to fix break with foldmethod=syntax,
 "         entirely suggested and solved by Ivan Freitas
 "         <ivansichfreitas@gmail.com>
-"   0.3 - updates and fixes to cUserFunctionPointer, thanks to 
+"   0.3 - updates and fixes to cUserFunctionPointer, thanks to
 "         Alexei <lxmzhv@gmail.com>
 "   0.2 - change [] to operator
 "   0.1 - initial upload, modification from vimscript#1201, Extended c.vim
-
 
 " Common ANSI-standard functions
 syn keyword cAnsiFunction	MULU_ DIVU_ MODU_ MUL_ DIV_ MOD_
@@ -253,7 +252,7 @@ syn match cOperator	"[][]"
 syn keyword cDefined defined contained containedin=cDefine
 hi def link cDefined cDefine
 
-syn match cType		"_\{,2}[us]\(8\|16\|32\|64\)"
+syn match cType		"\<_\{1,2}[us]\(8\|16\|32\|64\)\>"
 " Functions
 syn match cUserFunction "\<\h\w*\>\ze\_s*(" contains=cType,cDelimiter,cDefine
 syn match cUserFunctionPointer "(\s*\*\s*\h\w*\s*)\ze\_s*(" contains=cDelimiter,cOperator
@@ -265,7 +264,6 @@ hi def link cUserFunctionPointer cFunction
 syn match cDelimiter    "[();\\]"
 " foldmethod=syntax fix, courtesy of Ivan Freitas
 syn match cBraces display "[{}]"
-
 
 " Booleans
 syn keyword cBoolean true false TRUE FALSE
