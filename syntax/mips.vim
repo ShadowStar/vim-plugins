@@ -169,8 +169,8 @@ syntax keyword	mipsInstruction	seb seh slt slti sltiu sltu sub subu
 " Branch and Jump Instructions
 syntax keyword	mipsInstruction	b bal beq bgez bgezal bgtz blez bltz bltzal bne
 syntax keyword	mipsInstruction	j jal jalr jalx jr
-syntax match	mipsInstruction	"\<jalr\.hb"
-syntax match	mipsInstruction	"\<jr\.hb"
+syntax match	mipsInstruction	"\<jalr\.hb\>"
+syntax match	mipsInstruction	"\<jr\.hb\>"
 
 " Instruction Control Instructions
 syntax keyword	mipsInstruction	ehb nop pause ssnop
@@ -341,8 +341,8 @@ hi def link	mipsInclude	Magenta
 hi def link	mipsRegister	Green
 hi def link	mipsDirective	Green
 hi def link	mipsInstruction	Cyan
-hi def link	cvmInstruction	Cyan
-hi def link	cvm2Instruction	Cyan
+hi def link	cvmInstruction	LightCyanB
+hi def link	cvm2Instruction	LightCyanB
 hi def link	PseuInstruction	CyanU
 
 let b:current_syntax = "mips"
