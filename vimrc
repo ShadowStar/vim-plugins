@@ -293,6 +293,10 @@ set showcmd                     " display incomplete commands
 set smartindent                 " smart autoindenting when starting a new line
 set visualbell                  " visual bell instead of beeping
 set wildignore=*.bak,*.o,*.e,*~ " wildmenu: ignore these extensions
+set wildignore+=*.tar,*.tgz,*.gz,*.bz2,*.lzma,*.zip,*.rar
+set wildignore+=*.pdf,*.ppt,*.pptx,*.doc,*.docx,*.xls,*.xlsx
+set wildignore+=*.rmvb,*.avi,*.mpg,*.mpeg,*.mp4,*.mkv,*.swf
+set wildignore+=*.mp3,*.aac,*.wav,*.flac
 set wildmenu                    " command-line completion in an enhanced mode
 set title
 set hidden
