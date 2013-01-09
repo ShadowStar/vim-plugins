@@ -668,6 +668,14 @@ g:sudoAuth	SudoEdit.txt	/*g:sudoAuth*
 g:sudoAuthArg	SudoEdit.txt	/*g:sudoAuthArg*
 g:sudo_askpass	SudoEdit.txt	/*g:sudo_askpass*
 g:sudo_no_gui	SudoEdit.txt	/*g:sudo_no_gui*
+gitlog	gitlog.txt	/*gitlog*
+gitlog-contents	gitlog.txt	/*gitlog-contents*
+gitlog-description	gitlog.txt	/*gitlog-description*
+gitlog-history	gitlog.txt	/*gitlog-history*
+gitlog-mapping	gitlog.txt	/*gitlog-mapping*
+gitlog-searching	gitlog.txt	/*gitlog-searching*
+gitlog-usage	gitlog.txt	/*gitlog-usage*
+gitlog.txt	gitlog.txt	/*gitlog.txt*
 mmtemplates#core#ChooseStyle()	templatesupport.txt	/*mmtemplates#core#ChooseStyle()*
 mmtemplates#core#CreateMaps()	templatesupport.txt	/*mmtemplates#core#CreateMaps()*
 mmtemplates#core#CreateMenus()	templatesupport.txt	/*mmtemplates#core#CreateMenus()*
