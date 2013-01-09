@@ -346,6 +346,8 @@ noremap <F4> :tabnew
 inoremap <F4> <ESC>:tabnew 
 noremap <F5> :SrcExplToggle<CR>
 inoremap <F5> <ESC>:SrcExplToggle<CR>
+noremap <F6> :call GITLOG_ToggleWindows()<CR>
+inoremap <F6> <ESC>:call GITLOG_ToggleWindows()<CR>
 noremap <F7> :BufExplorer<CR>
 inoremap <F7> <ESC>:BufExplorer<CR>
 noremap <F8> :NERDTreeToggle<CR>
