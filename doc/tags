@@ -641,8 +641,10 @@ g:bufExplorerShowTabBuffer	bufexplorer.txt	/*g:bufExplorerShowTabBuffer*
 g:bufExplorerShowUnlisted	bufexplorer.txt	/*g:bufExplorerShowUnlisted*
 g:bufExplorerSortBy	bufexplorer.txt	/*g:bufExplorerSortBy*
 g:bufExplorerSplitBelow	bufexplorer.txt	/*g:bufExplorerSplitBelow*
+g:bufExplorerSplitHorzSize	bufexplorer.txt	/*g:bufExplorerSplitHorzSize*
 g:bufExplorerSplitOutPathName	bufexplorer.txt	/*g:bufExplorerSplitOutPathName*
 g:bufExplorerSplitRight	bufexplorer.txt	/*g:bufExplorerSplitRight*
+g:bufExplorerSplitVertSize	bufexplorer.txt	/*g:bufExplorerSplitVertSize*
 g:colorv_cache_fav	colorv.txt	/*g:colorv_cache_fav*
 g:colorv_cache_file	colorv.txt	/*g:colorv_cache_file*
 g:colorv_debug	colorv.txt	/*g:colorv_debug*
