@@ -636,6 +636,7 @@ g:bufExplorerFindActive	bufexplorer.txt	/*g:bufExplorerFindActive*
 g:bufExplorerFuncRef	bufexplorer.txt	/*g:bufExplorerFuncRef*
 g:bufExplorerReverseSort	bufexplorer.txt	/*g:bufExplorerReverseSort*
 g:bufExplorerShowDirectories	bufexplorer.txt	/*g:bufExplorerShowDirectories*
+g:bufExplorerShowNoName	bufexplorer.txt	/*g:bufExplorerShowNoName*
 g:bufExplorerShowRelativePath	bufexplorer.txt	/*g:bufExplorerShowRelativePath*
 g:bufExplorerShowTabBuffer	bufexplorer.txt	/*g:bufExplorerShowTabBuffer*
 g:bufExplorerShowUnlisted	bufexplorer.txt	/*g:bufExplorerShowUnlisted*
@@ -665,6 +666,7 @@ g:colorv_url_kuler_search	colorv.txt	/*g:colorv_url_kuler_search*
 g:colorv_win_pos	colorv.txt	/*g:colorv_win_pos*
 g:patchreview_patch	patchreview.txt	/*g:patchreview_patch*
 g:patchreview_patch_needs_crlf	patchreview.txt	/*g:patchreview_patch_needs_crlf*
+g:patchreview_unified_rejects	patchreview.txt	/*g:patchreview_unified_rejects*
 g:patchreview_wiggle	patchreview.txt	/*g:patchreview_wiggle*
 g:sudoAuth	SudoEdit.txt	/*g:sudoAuth*
 g:sudoAuthArg	SudoEdit.txt	/*g:sudoAuthArg*
@@ -711,6 +713,7 @@ patchreview-usage	patchreview.txt	/*patchreview-usage*
 patchreview.txt	patchreview.txt	/*patchreview.txt*
 patchreview_patch	patchreview.txt	/*patchreview_patch*
 patchreview_patch_needs_crlf	patchreview.txt	/*patchreview_patch_needs_crlf*
+patchreview_unified_rejects	patchreview.txt	/*patchreview_unified_rejects*
 patchreview_wiggle	patchreview.txt	/*patchreview_wiggle*
 srcexpl-changelog	srcexpl.txt	/*srcexpl-changelog*
 srcexpl-commands	srcexpl.txt	/*srcexpl-commands*
