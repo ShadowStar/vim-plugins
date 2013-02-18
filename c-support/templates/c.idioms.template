@@ -25,6 +25,8 @@ static void<CURSOR>
 }
 /* ----  end of static function |FUNCTION_NAME|  ---- */
 == Idioms.main == map:im, shortcut:m  ==
+#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 /*
