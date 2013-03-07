@@ -35,6 +35,9 @@ function! s:LoadCscope(...)
   if (index(g:dir_list, l:dir) >= 0)
     return
   endif
+  if (!filereadable(l:dir . "/./cscope.out") && !filereadable(l:dir . "/./tags"))
+    return
+  endif
   call add(g:dir_list, l:dir)
   let db = s:Find('cscope.out',l:dir)
 "  let db = findfile("cscope.out", "**", -1)
