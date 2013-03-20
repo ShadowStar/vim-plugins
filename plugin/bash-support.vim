@@ -2805,6 +2805,7 @@ function! BASH_ExpandUserMacros ( key )
   let s:BASH_Macro['|SUFFIX|']		= expand("%:e")
   let s:BASH_Macro['|TIME|']  		= BASH_DateAndTime('t')
   let s:BASH_Macro['|YEAR|']  		= BASH_DateAndTime('y')
+  let s:BASH_Macro['|SHELL|']     	= $SHELL
 
   "------------------------------------------------------------------------------
   "  delete jump targets if mapping for C-j is off
