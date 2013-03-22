@@ -8,8 +8,8 @@
 "              Jonathan Lai <laiks.jonathan@gmail.com>                         "
 " Homepage:    http://www.vim.org/scripts/script.php?script_id=2179            "
 " GitHub:      https://github.com/wesleyche/SrcExpl                            "
-" Version:     5.1                                                             "
-" Last Change: September 16th, 2012                                            "
+" Version:     5.2                                                             "
+" Last Change: March 21th, 2013                                                "
 " Licence:     This program is free software; you can redistribute it and / or "
 "              modify it under the terms of the GNU General Public License as  "
 "              published by the Free Software Foundation; either version 2, or "
@@ -38,7 +38,7 @@
 " |~ \___________\||~           .-------------. |            |~ \____________\||
 " |~               |~           \______________\|            |~                |
 " +-__Tag_List__---+-demo.c----------------------------------+-_NERD_tree_-----+
-" |Source Explorer v5.1           .-----------------.                          |
+" |Source Explorer v5.2           .-----------------.                          |
 " |~                              | Source Explorer |\                         |
 " |~                              .-----------------. |                        |
 " |~                              \__________________\|                        |
@@ -88,6 +88,12 @@
 "                                                                              "
 " // Set "<F12>" key for updating the tags file artificially                   "
 " let g:SrcExpl_updateTagsKey = "<F12>"
+"                                                                              "
+" // Set "<F3>" key for displaying the previous definition in the jump list    "
+" let g:SrcExpl_prevDefKey = "<F3>"
+"                                                                              "
+" // Set "<F4>" key for displaying the next definition in the jump list        "
+" let g:SrcExpl_nextDefKey = "<F4>"
 "                                                                              "
 " Just_change_above_of_them_by_yourself:-)                                     "
 "                                                                              "
@@ -189,6 +195,16 @@ if !exists('g:SrcExpl_updateTagsKey')
     let g:SrcExpl_updateTagsKey = ''
 endif
 
+" User interface to display the previous definition in the jump list
+if !exists('g:SrcExpl_prevDefKey')
+    let g:SrcExpl_prevDefKey = ''
+endif
+
+" User interface to display the next definition in the jump list
+if !exists('g:SrcExpl_nextDefKey')
+    let g:SrcExpl_nextDefKey = ''
+endif
+
 " }}}
 
 " Global variables {{{
@@ -200,7 +216,7 @@ let g:SrcExpl_markList = []
 let s:SrcExpl_pluginName = 'Source Explorer'
 
 " Plugin version
-let s:SrcExpl_pluginVer = 5.1
+let s:SrcExpl_pluginVer = 5.2
 
 " Buffer name
 let s:SrcExpl_bufName = 'Source_Explorer'
@@ -220,7 +236,30 @@ let s:SrcExpl_isDebug = 0
 " Runing switch flag
 let s:SrcExpl_isRunning = 0
 
+" Set the highlight color
+hi SrcExpl_HighLight term=bold guifg=Black guibg=Magenta ctermfg=Black ctermbg=Magenta
+
 " }}}
+
+" SrcExpl_PrevDef() {{{
+
+" Display the previous definition in the jump list
+
+function! g:SrcExpl_PrevDef()
+
+    call <SID>SrcExpl_JumpDef(1)
+
+endfunction " }}}
+
+" SrcExpl_NextDef() {{{
+
+" Display the next definition in the jump list
+
+function! g:SrcExpl_NextDef()
+
+    call <SID>SrcExpl_JumpDef(2)
+
+endfunction " }}}
 
 " SrcExpl_GetVer() {{{
 
@@ -356,8 +395,7 @@ endfunction " }}}
 
 function! g:SrcExpl_Jump()
 
-    " Only do the operation on the Source Explorer
-    " window is valid
+    " Only do the operation on the Source Explorer window is valid
     if !<SID>SrcExpl_WinActive()
         return -1
     endif
@@ -376,8 +414,8 @@ function! g:SrcExpl_Jump()
         endif
     endif
 
+    " Do not refresh when jumping to the edit window
     if g:SrcExpl_searchLocalDef != 0
-        " We have already jumped to the edit window
         let s:SrcExpl_isJumped = 1
     endif
     " Indeed go back to the edit window
@@ -388,7 +426,7 @@ function! g:SrcExpl_Jump()
     " We got multiple definitions
     if s:SrcExpl_status == 2
         " Select the exact one and jump to its context
-        call <SID>SrcExpl_SelToJump()
+        call <SID>SrcExpl_SelToJump(0)
         " Set the mark for recording the current position
         call <SID>SrcExpl_SetMarkList()
         return 0
@@ -456,10 +494,40 @@ function! g:SrcExpl_Refresh()
         endif
     endif
 
-    " Try to tag something
-    call <SID>SrcExpl_TagSth(l:expr)
+    " Try to tag something when necessary
+    if s:SrcExpl_symbol !=# s:SrcExpl_lastSymbol || s:SrcExpl_lastSymbol ==# ""
+        call <SID>SrcExpl_TagSth(l:expr)
+        let s:SrcExpl_lastSymbol = s:SrcExpl_symbol
+    endif
 
     return 0
+
+endfunction " }}}
+
+" SrcExpl_JumpDef() {{{
+
+" Display the previous or next definition in the jump list
+
+function! <SID>SrcExpl_JumpDef(dir)
+
+    " Multiple definitions
+    if s:SrcExpl_status == 2
+        " Do not refresh when jumping to the edit window
+        if g:SrcExpl_searchLocalDef != 0
+            let s:SrcExpl_isJumped = 1
+        endif
+        " Indeed go back to the edit window
+        silent! exe s:SrcExpl_editWin . "wincmd w"
+        " Set the mark for recording the current position
+        call <SID>SrcExpl_SetMarkList()
+        " Select the exact one and jump to its context
+        call <SID>SrcExpl_SelToJump(a:dir)
+        " Set the mark for recording the current position
+        call <SID>SrcExpl_SetMarkList()
+    " One definition or local definition
+    elseif s:SrcExpl_status == 1 || s:SrcExpl_status == 3
+        call <SID>SrcExpl_ReportErr("No more definitions")
+    endif
 
 endfunction " }}}
 
@@ -799,8 +867,9 @@ endfunction " }}}
 
 " Select one of multi-definitions, and jump to there
 
-function! <SID>SrcExpl_SelToJump()
+function! <SID>SrcExpl_SelToJump(dir)
 
+    let l:error = 0
     let l:index = 0
     let l:fpath = ""
     let l:excmd = ""
@@ -811,8 +880,41 @@ function! <SID>SrcExpl_SelToJump()
         call <SID>SrcExpl_WinGo()
     endif
 
-    " Get the item data that the user selected just now
-    let l:list = getline(".")
+    if a:dir == 1 " Pref def
+        if line(".") <= 2 " Prompt
+            let l:error = 1
+            call cursor(1, 1)
+            call <SID>SrcExpl_MatchExpr()
+            call <SID>SrcExpl_ColorExpr()
+        else " Jump list
+            call cursor(line(".") - 1, 1)
+            let l:list = getline(".")
+        endif
+    elseif a:dir == 2 " Next def
+        let l:temp = line(".") + 1
+        if line(".") == 1 " Prompt
+            call cursor(l:temp, 1)
+            let l:list = getline(".")
+        else " Jump list
+            call cursor(l:temp, 1)
+            if l:temp == line(".")
+                let l:list = getline(".")
+            else " Exceed the defs' max
+                let l:error = 2
+            endif
+        endif
+    else " Normal click
+        let l:list = getline(".")
+    endif
+
+    if l:error != 0 " Invalid
+        silent! exe s:SrcExpl_editWin . "wincmd w"
+        call <SID>SrcExpl_ReportErr("No more definitions")
+        return
+    else " Go ahead
+        call <SID>SrcExpl_ColorLine()
+    endif
+
     " Traverse the prompt string until get the file path
     while !((l:list[l:index] == ']') &&
         \ (l:list[l:index + 1] == ':'))
@@ -838,7 +940,7 @@ function! <SID>SrcExpl_SelToJump()
     " Offset
     let l:index += 3
 
-    " Get the EX command string
+    " Get the Ex command string
     while l:list[l:index] != ''
         let l:excmd = l:excmd . l:list[l:index]
         let l:index += 1
@@ -849,12 +951,12 @@ function! <SID>SrcExpl_SelToJump()
     " Open the file containing the definition context
     exe "edit " . l:fpath
 
-    " Modify the EX Command to locate the tag exactly
+    " Modify the Ex Command to locate the tag exactly
     let l:expr = substitute(l:excmd, '/^', '/^\\C', 'g')
     let l:expr = substitute(l:expr,  '\*',  '\\\*', 'g')
     let l:expr = substitute(l:expr,  '\[',  '\\\[', 'g')
     let l:expr = substitute(l:expr,  '\]',  '\\\]', 'g')
-    " Use EX Command to Jump to the exact position of the definition
+    " Use Ex Command to jump to the exact position of the definition
     silent! exe l:expr
 
     " Match the symbol
@@ -873,14 +975,24 @@ function! <SID>SrcExpl_SetCurrMark()
 
 endfunction " }}}
 
+" SrcExpl_ColorLine() {{{
+
+" Highlight current line
+
+function! <SID>SrcExpl_ColorLine()
+
+    " Highlight this
+    exe 'match SrcExpl_HighLight /.\%' . line(".") . 'l/'
+    redraw
+
+endfunction " }}}
+
 " SrcExpl_ColorExpr() {{{
 
 " Highlight the symbol of definition
 
 function! <SID>SrcExpl_ColorExpr()
 
-    " Set the highlight color
-    hi SrcExpl_HighLight term=bold guifg=Black guibg=Magenta ctermfg=Black ctermbg=Magenta
     " Highlight this
     exe 'match SrcExpl_HighLight "\%' . line(".") . 'l\%' .
         \ col(".") . 'c\k*"'
@@ -945,7 +1057,7 @@ function! <SID>SrcExpl_ListMultiDefs(list, len)
         " Delete all lines in buffer
         1,$d _
         " Get the tags dictionary array
-        " Begin build the Jump List for exploring the tags
+        " Begin build the jump list for exploring the tags
         put! = '[Jump List]: '. s:SrcExpl_symbol . ' (' . a:len . ') '
         " Match the symbol
         call <SID>SrcExpl_MatchExpr()
@@ -964,16 +1076,16 @@ function! <SID>SrcExpl_ListMultiDefs(list, len)
                 " We should avoid the './' or '.\' in the whole file path
                 if l:dict['filename'][0] == '.'
                     put! ='[File Path]: ' . l:path . l:dict['filename'][2:]
-                        \ . ' ' . '[EX Command]: ' . l:dict['cmd']
+                        \ . ' ' . '[Ex Command]: ' . l:dict['cmd']
                 else
                     " Generated by 'ctags --sort=foldcase -R .'
                     if len(l:path) == 0
                         put! ='[File Path]: ' . l:path . l:dict['filename']
-                            \ . ' ' . '[EX Command]: ' . l:dict['cmd']
+                            \ . ' ' . '[Ex Command]: ' . l:dict['cmd']
                     " Generated by 'ctags -L cscope.files'
                     else
                         put! ='[File Path]: ' . l:dict['filename']
-                            \ . ' ' . '[EX Command]: ' . l:dict['cmd']
+                            \ . ' ' . '[Ex Command]: ' . l:dict['cmd']
                     endif
                 endif
             " Traversal finished
@@ -1014,12 +1126,12 @@ function! <SID>SrcExpl_ViewOneDef(fpath, excmd)
 
     " Indeed back to the Source Explorer active window
     if <SID>SrcExpl_WinActive()
-        " Modify the EX Command to locate the tag exactly
+        " Modify the Ex Command to locate the tag exactly
         let l:expr = substitute(a:excmd, '/^', '/^\\C', 'g')
         let l:expr = substitute(l:expr,  '\*',  '\\\*', 'g')
         let l:expr = substitute(l:expr,  '\[',  '\\\[', 'g')
         let l:expr = substitute(l:expr,  '\]',  '\\\]', 'g')
-        " Execute EX command according to the parameter
+        " Execute Ex command according to the parameter
         silent! exe l:expr
 
         " Match the symbol
@@ -1030,7 +1142,7 @@ function! <SID>SrcExpl_ViewOneDef(fpath, excmd)
         call <SID>SrcExpl_SetCurrMark()
 
         " Not highlight the word that had been searched.
-        " Because execute EX command will active a search event
+        " Because execute Ex command will active a search event
         let l:hlsearch = &hlsearch
         set nohlsearch
         " Refresh all the screen
@@ -1060,6 +1172,8 @@ function! <SID>SrcExpl_TagSth(expr)
         let l:len = len(l:list)
     else
         call <SID>SrcExpl_WinPrompt(s:SrcExpl_pluginName . ' v' . string(s:SrcExpl_pluginVer))
+        " Should be regarded as 'no definition'
+        let s:SrcExpl_status = 0
         return
     endif
 
@@ -1268,6 +1382,18 @@ function! <SID>SrcExpl_CleanUp()
         exe "nunmap " . g:SrcExpl_updateTagsKey
     endif
 
+    " Unmap the previous key
+    if maparg(g:SrcExpl_prevDefKey, 'n') ==
+        \ ":call g:SrcExpl_PrevDef()<CR>"
+        exe "nunmap " . g:SrcExpl_prevDefKey
+    endif
+
+    " Unmap the next key
+    if maparg(g:SrcExpl_nextDefKey, 'n') ==
+        \ ":call g:SrcExpl_NextDef()<CR>"
+        exe "nunmap " . g:SrcExpl_nextDefKey
+    endif
+
     " Unload the autocmd group
     silent! autocmd! SrcExpl_AutoCmd
 
@@ -1305,6 +1431,8 @@ function! <SID>SrcExpl_Init()
     let s:SrcExpl_currMark = []
     " The key word symbol for exploring
     let s:SrcExpl_symbol = ''
+    " The last symbol for exploring
+    let s:SrcExpl_lastSymbol = ''
 
     " Auto change current work directory
     exe "set autochdir"
@@ -1343,6 +1471,16 @@ function! <SID>SrcExpl_Init()
     if g:SrcExpl_updateTagsKey != ""
         exe "nnoremap " . g:SrcExpl_updateTagsKey .
             \ " :call g:SrcExpl_UpdateTags()<CR>"
+    endif
+
+    if g:SrcExpl_prevDefKey != ""
+        exe "nnoremap " . g:SrcExpl_prevDefKey .
+            \ " :call g:SrcExpl_PrevDef()<CR>"
+    endif
+
+    if g:SrcExpl_nextDefKey != ""
+        exe "nnoremap " . g:SrcExpl_nextDefKey .
+            \ " :call g:SrcExpl_NextDef()<CR>"
     endif
 
     " Then we set the routine function when the event happens

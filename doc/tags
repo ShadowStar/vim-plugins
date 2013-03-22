@@ -586,7 +586,9 @@ g:ConflictDetection_WarnEvents	ConflictDetection.txt	/*g:ConflictDetection_WarnE
 g:SrcExpl_gobackKey	srcexpl.txt	/*g:SrcExpl_gobackKey*
 g:SrcExpl_isUpdateTags	srcexpl.txt	/*g:SrcExpl_isUpdateTags*
 g:SrcExpl_jumpKey	srcexpl.txt	/*g:SrcExpl_jumpKey*
+g:SrcExpl_nextDefKey	srcexpl.txt	/*g:SrcExpl_nextDefKey*
 g:SrcExpl_pluginList	srcexpl.txt	/*g:SrcExpl_pluginList*
+g:SrcExpl_prevDefKey	srcexpl.txt	/*g:SrcExpl_prevDefKey*
 g:SrcExpl_refreshTime	srcexpl.txt	/*g:SrcExpl_refreshTime*
 g:SrcExpl_searchLocalDef	srcexpl.txt	/*g:SrcExpl_searchLocalDef*
 g:SrcExpl_updateTagsCmd	srcexpl.txt	/*g:SrcExpl_updateTagsCmd*
