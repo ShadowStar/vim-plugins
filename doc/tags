@@ -718,6 +718,17 @@ patchreview_patch	patchreview.txt	/*patchreview_patch*
 patchreview_patch_needs_crlf	patchreview.txt	/*patchreview_patch_needs_crlf*
 patchreview_unified_rejects	patchreview.txt	/*patchreview_unified_rejects*
 patchreview_wiggle	patchreview.txt	/*patchreview_wiggle*
+signify	signify.txt	/*signify*
+signify-author	signify.txt	/*signify-author*
+signify-commands	signify.txt	/*signify-commands*
+signify-contents	signify.txt	/*signify-contents*
+signify-credits	signify.txt	/*signify-credits*
+signify-intro	signify.txt	/*signify-intro*
+signify-license	signify.txt	/*signify-license*
+signify-mappings	signify.txt	/*signify-mappings*
+signify-options	signify.txt	/*signify-options*
+signify-usage	signify.txt	/*signify-usage*
+signify.txt	signify.txt	/*signify.txt*
 srcexpl-changelog	srcexpl.txt	/*srcexpl-changelog*
 srcexpl-commands	srcexpl.txt	/*srcexpl-commands*
 srcexpl-console-mappings	srcexpl.txt	/*srcexpl-console-mappings*
