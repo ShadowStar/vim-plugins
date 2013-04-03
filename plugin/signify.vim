@@ -3,7 +3,7 @@
 " Maintainer:  Marco Hinz <http://github.com/mhinz>
 " Version:     1.4
 
-if exists('g:loaded_signify') || !has('signs') || &cp
+if exists('g:signify_disable') || exists('g:loaded_signify') || !has('signs') || &cp
   finish
 endif
 let g:loaded_signify = 1

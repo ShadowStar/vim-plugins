@@ -393,6 +393,7 @@ set statusline=%y%f%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v/%{&textwidth}C,%l/%LL\ --%p%%
 highlight StatusLine term=bold,reverse cterm=bold,reverse ctermfg=green gui=bold,reverse guifg=green
 highlight StatusLineNC term=reverse cterm=reverse ctermfg=darkred gui=reverse guifg=darkred
 
+let g:signify_disable = 1
 let g:signify_vcs_list = [ 'git' ]
 let g:signify_mapping_next_hunk = '<leader>gj'
 let g:signify_mapping_prev_hunk = '<leader>gk'
