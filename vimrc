@@ -400,6 +400,7 @@ let g:signify_mapping_prev_hunk = '<leader>gk'
 let g:signify_mapping_toggle_highlight = '<leader>gh'
 let g:signify_mapping_toggle = '<leader>gt'
 let g:signify_sign_color_inherit_from_linenr = 1
+let g:loaded_syntastic_plugin = 1
 
 "if filereadable(".vimrc")
 "	source .vimrc
