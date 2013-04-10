@@ -425,6 +425,7 @@ function! BufExplorer()
             execute "drop" name
         endif
 
+        exec "wincmd c"
         return
     endif
 
