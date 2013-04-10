@@ -329,6 +329,7 @@ let g:SuperTabDefaultCompletionType="context"
 let g:SuperTabCrMapping = 1
 let g:bufExplorerDetailedHelp=1
 let g:bufExplorerShowRelativePath=1
+let g:bufExplorerSplitVertSize=30
 
 inoremap [] []<left>
 inoremap {} {}<left>
@@ -348,18 +349,23 @@ noremap <F5> :SrcExplToggle<CR>
 inoremap <F5> <ESC>:SrcExplToggle<CR>
 noremap <F6> :call GITLOG_ToggleWindows()<CR>
 inoremap <F6> <ESC>:call GITLOG_ToggleWindows()<CR>
-noremap <F7> :BufExplorer<CR>
-inoremap <F7> <ESC>:BufExplorer<CR>
+noremap <F7> :BufExplorerVerticalSplit<CR>
+inoremap <F7> <ESC>:BufExplorerVerticalSplit<CR>
 noremap <F8> :NERDTreeToggle<CR>
 inoremap <F8> <ESC>:NERDTreeToggle<CR>
 noremap <leader>v <C-W>v
 noremap <leader>s <C-W>s
 noremap <leader>f :KeyFollow<CR>
+noremap <leader>d :VCSDiff<CR>
+noremap <leader>l :VCSLog<CR>
 noremap <C-h> <C-W>h
 noremap <C-j> <C-W>j
 noremap <C-k> <C-W>k
 noremap <C-l> <C-W>l
 
+let g:EchoFuncKeyPrev = '<C-k>'
+let g:EchoFuncKeyNext = '<C-j>'
+let VCSCommandSplit = 'vertical'
 "let g:C_FormatTime = '%H:%M'
 let g:BASH_FormatDate            = '%D'
 let g:BASH_FormatTime            = '%H:%M'
