@@ -365,7 +365,7 @@ noremap <C-l> <C-W>l
 
 let g:EchoFuncKeyPrev = '<C-k>'
 let g:EchoFuncKeyNext = '<C-j>'
-let VCSCommandSplit = 'vertical'
+"let VCSCommandSplit = 'vertical'
 "let g:C_FormatTime = '%H:%M'
 let g:BASH_FormatDate            = '%D'
 let g:BASH_FormatTime            = '%H:%M'
