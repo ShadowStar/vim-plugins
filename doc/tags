@@ -610,6 +610,7 @@ g:SrcExpl_searchLocalDef	srcexpl.txt	/*g:SrcExpl_searchLocalDef*
 g:SrcExpl_updateTagsCmd	srcexpl.txt	/*g:SrcExpl_updateTagsCmd*
 g:SrcExpl_updateTagsKey	srcexpl.txt	/*g:SrcExpl_updateTagsKey*
 g:SrcExpl_winHeight	srcexpl.txt	/*g:SrcExpl_winHeight*
+g:SuperTabClosePreviewOnPopupClose	supertab.txt	/*g:SuperTabClosePreviewOnPopupClose*
 g:SuperTabCompletionContexts	supertab.txt	/*g:SuperTabCompletionContexts*
 g:SuperTabContextDefaultCompletionType	supertab.txt	/*g:SuperTabContextDefaultCompletionType*
 g:SuperTabCrMapping	supertab.txt	/*g:SuperTabCrMapping*
@@ -764,6 +765,8 @@ srcexpl-uninstall	srcexpl.txt	/*srcexpl-uninstall*
 srcexpl-variables	srcexpl.txt	/*srcexpl-variables*
 srcexpl.txt	srcexpl.txt	/*srcexpl.txt*
 supertab	supertab.txt	/*supertab*
+supertab-closepreviewonpopupclose	supertab.txt	/*supertab-closepreviewonpopupclose*
+supertab-completionchaining	supertab.txt	/*supertab-completionchaining*
 supertab-completioncontexts	supertab.txt	/*supertab-completioncontexts*
 supertab-contextdefault	supertab.txt	/*supertab-contextdefault*
 supertab-contextdiscover	supertab.txt	/*supertab-contextdiscover*
