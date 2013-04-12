@@ -287,6 +287,7 @@ SudoEdit.txt	SudoEdit.txt	/*SudoEdit.txt*
 SudoRead	SudoEdit.txt	/*SudoRead*
 SudoWrite	SudoEdit.txt	/*SudoWrite*
 SyntasticMake()	syntastic.txt	/*SyntasticMake()*
+Tlist_Get_Filenames()	taglist.txt	/*Tlist_Get_Filenames()*
 Tlist_Get_Tag_Prototype_By_Line()	taglist.txt	/*Tlist_Get_Tag_Prototype_By_Line()*
 Tlist_Get_Tagname_By_Line()	taglist.txt	/*Tlist_Get_Tagname_By_Line()*
 Tlist_Set_App()	taglist.txt	/*Tlist_Set_App()*
