@@ -327,9 +327,10 @@ let g:OmniCpp_SelectFirstItem = 2
 let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
 let g:SuperTabDefaultCompletionType="context"
 let g:SuperTabCrMapping = 1
-let g:bufExplorerDetailedHelp=1
+"let g:bufExplorerDetailedHelp=1
 let g:bufExplorerShowRelativePath=1
 let g:bufExplorerSplitVertSize=30
+let g:bufExplorerSplitHorzSize=10
 
 inoremap [] []<left>
 inoremap {} {}<left>
@@ -349,8 +350,8 @@ noremap <F5> :SrcExplToggle<CR>
 inoremap <F5> <ESC>:SrcExplToggle<CR>
 noremap <F6> :call GITLOG_ToggleWindows()<CR>
 inoremap <F6> <ESC>:call GITLOG_ToggleWindows()<CR>
-noremap <F7> :BufExplorerVerticalSplit<CR>
-inoremap <F7> <ESC>:BufExplorerVerticalSplit<CR>
+noremap <F7> :BufExplorerHorizontalSplit<CR>
+inoremap <F7> <ESC>:BufExplorerHorizontalSplit<CR>
 noremap <F8> :NERDTreeToggle<CR>
 inoremap <F8> <ESC>:NERDTreeToggle<CR>
 noremap <leader>v <C-W>v
