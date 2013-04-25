@@ -769,6 +769,15 @@ srcexpl-trinity	srcexpl.txt	/*srcexpl-trinity*
 srcexpl-uninstall	srcexpl.txt	/*srcexpl-uninstall*
 srcexpl-variables	srcexpl.txt	/*srcexpl-variables*
 srcexpl.txt	srcexpl.txt	/*srcexpl.txt*
+startify	startify.txt	/*startify*
+startify-author	startify.txt	/*startify-author*
+startify-commands	startify.txt	/*startify-commands*
+startify-contents	startify.txt	/*startify-contents*
+startify-intro	startify.txt	/*startify-intro*
+startify-license	startify.txt	/*startify-license*
+startify-options	startify.txt	/*startify-options*
+startify-usage	startify.txt	/*startify-usage*
+startify.txt	startify.txt	/*startify.txt*
 supertab	supertab.txt	/*supertab*
 supertab-closepreviewonpopupclose	supertab.txt	/*supertab-closepreviewonpopupclose*
 supertab-completionchaining	supertab.txt	/*supertab-completionchaining*
