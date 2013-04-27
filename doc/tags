@@ -703,6 +703,7 @@ gitlog-description	gitlog.txt	/*gitlog-description*
 gitlog-history	gitlog.txt	/*gitlog-history*
 gitlog-mapping	gitlog.txt	/*gitlog-mapping*
 gitlog-searching	gitlog.txt	/*gitlog-searching*
+gitlog-tree	gitlog.txt	/*gitlog-tree*
 gitlog-usage	gitlog.txt	/*gitlog-usage*
 gitlog.txt	gitlog.txt	/*gitlog.txt*
 mmtemplates#core#ChooseStyle()	templatesupport.txt	/*mmtemplates#core#ChooseStyle()*
