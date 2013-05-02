@@ -1,7 +1,7 @@
 " Plugin:      https://github.com/mhinz/vim-startify
 " Description: Start screen displaying recently used stuff.
 " Maintainer:  Marco Hinz <http://github.com/mhinz>
-" Version:     1.3
+" Version:     1.4
 
 if exists('g:loaded_startify') || &cp
   finish
@@ -14,7 +14,10 @@ let g:startify_session_dir = resolve(expand(get(g:, 'startify_session_dir',
 
 augroup startify
   autocmd!
-  autocmd VimEnter * if !argc() && (line2byte('$') == -1) | call s:insane_in_the_membrane() | endif
+  autocmd VimEnter *
+        \ if !argc() && (line2byte('$') == -1) && (v:progname =~? '^[gm]\=vim\%[\.exe]$') |
+        \   call s:insane_in_the_membrane() |
+        \ endif
 augroup END
 
 command! -nargs=? -bar -complete=customlist,startify#get_session_names SSave call startify#save_session(<f-args>)
@@ -25,13 +28,13 @@ command! -nargs=0 -bar Startify enew | call s:insane_in_the_membrane()
 function! s:insane_in_the_membrane() abort
   if !empty(v:servername) && exists('g:startify_skiplist_server')
     for servname in g:startify_skiplist_server
-      if servname == v:servername
+      if (servname == v:servername)
         return
       endif
     endfor
   endif
   setlocal nonumber noswapfile bufhidden=wipe
-  if v:version >= 703
+  if (v:version >= 703)
     setlocal norelativenumber
   endif
   if get(g:, 'startify_unlisted_buffer', 1)
@@ -39,22 +42,28 @@ function! s:insane_in_the_membrane() abort
   endif
   setfiletype startify
 
-  call append('$', '   [e]  <empty buffer>')
-  let cnt = 0
+  let special = get(g:, 'startify_enable_special', 1)
   let sep = startify#get_sep()
+  let cnt = 0
+
+  if special
+    call append('$', '   [i]  <empty buffer>')
+  endif
 
   if get(g:, 'startify_show_files', 1) && !empty(v:oldfiles)
     let numfiles = get(g:, 'startify_show_files_number', 10)
-    call append('$', '')
+    if special
+      call append('$', '')
+    endif
     for fname in v:oldfiles
       let expfname = expand(fname)
-      if !filereadable(expfname) || (exists('g:startify_skiplist') && startify#process_skiplist(expfname))
+      if !filereadable(expfname) || (exists('g:startify_skiplist') && startify#is_in_skiplist(expfname))
         continue
       endif
       call append('$', '   ['. cnt .']'. repeat(' ', 3 - strlen(string(cnt))) . fname)
       execute 'nnoremap <buffer> '. cnt .' :edit '. startify#escape(fname) .' <bar> lcd %:h<cr>'
       let cnt += 1
-      if cnt == numfiles
+      if (cnt == numfiles)
         break
       endif
     endfor
@@ -84,15 +93,17 @@ function! s:insane_in_the_membrane() abort
     endfor
   endif
 
-  call append('$', ['', '   [q]  quit'])
+  if special
+    call append('$', ['', '   [q]  <quit>'])
+  endif
 
   setlocal nomodifiable nomodified
 
-  nnoremap <buffer><silent> e :enew<cr>
+  nnoremap <buffer><silent> i :enew<cr>
   nnoremap <buffer> <cr> :normal <c-r><c-w><cr>
   nnoremap <buffer> <2-LeftMouse> :execute 'normal '. matchstr(getline('.'), '\w\+')<cr>
   nnoremap <buffer> q
-        \ :if len(filter(range(0, bufnr('$')), 'buflisted(v:val)')) > 1 <bar>
+        \ :if (len(filter(range(0, bufnr('$')), 'buflisted(v:val)')) > 1) <bar>
         \   bd <bar>
         \ else <bar>
         \   quit <bar>
@@ -106,7 +117,7 @@ function! s:insane_in_the_membrane() abort
   autocmd startify CursorMoved <buffer> call s:set_cursor()
   autocmd startify BufWipeout <buffer> autocmd! startify *
 
-  call cursor(4, 5)
+  call cursor(special ? 4 : 2, 5)
 endfunction
 
 " Function: s:set_cursor {{{1
@@ -114,7 +125,7 @@ function! s:set_cursor() abort
   let s:line_old = exists('s:line_new') ? s:line_new : 5
   let s:line_new = line('.')
   if empty(getline(s:line_new))
-    if s:line_new > s:line_old
+    if (s:line_new > s:line_old)
       let s:line_new += 1
       call cursor(s:line_new, 5) " going down
     else
