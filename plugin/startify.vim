@@ -11,7 +11,7 @@ let g:loaded_startify = 1
 augroup startify
   autocmd!
   autocmd VimEnter *
-        \ if !argc() && (line2byte('$') == -1) && (v:progname =~? '^[gm]\=vim\%[\.exe]$') |
+        \ if !argc() && (line2byte('$') == -1) && (v:progname =~? '^[gm]\=vi\%[m]\%[\.exe]$') |
         \   call startify#insane_in_the_membrane() |
         \ endif
 augroup END
