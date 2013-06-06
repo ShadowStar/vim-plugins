@@ -4,6 +4,6 @@
 " URL:          https://github.com/rdolgushin/gitignore.vim
 
 " Support of tComment
-if exists('loaded_tcomment')
-  call tcomment#DefineType('gitignore', '# %s')
-end
+" if exists('loaded_tcomment')
+"   call tcomment#DefineType('gitignore', '# %s')
+" endif
