@@ -3,6 +3,8 @@ snippet SHELL
 		else if [ -x /bin/bash ]; then echo /bin/bash; \
 		else echo "/bin/sh -c"; fi; fi)
 
+	export SHELL
+
 snippet TOPDIR
 	TOPDIR := $(CURDIR)
 
