@@ -1,0 +1,64 @@
+snippet SHELL
+	SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+		else if [ -x /bin/bash ]; then echo /bin/bash; \
+		else echo "/bin/sh -c"; fi; fi)
+
+snippet TOPDIR
+	TOPDIR := $(CURDIR)
+
+snippet _all
+	_all: all
+
+snippet ifdef
+	ifdef ${1}
+
+	endif
+
+snippet ifdefe
+	ifdef ${1}
+
+	else
+
+	endif
+
+snippet ifndef
+	ifndef ${1}
+
+	endif
+
+snippet ifndefe
+	ifndef ${1}
+
+	else
+
+	endif
+
+snippet ifeq
+	ifeq ($(${1}),${2})
+
+	endif
+
+snippet ifneq
+	ifneq ($(${1}),${2})
+
+	endif
+
+snippet ifeqe
+	ifeq ($(${1}),${2})
+
+	else
+
+	endif
+
+snippet ifneqe
+	ifneq ($(${1}),${2})
+
+	else
+
+	endif
+
+snippet define
+	define ${1}
+
+	endef
+
