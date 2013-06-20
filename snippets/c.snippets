@@ -115,12 +115,12 @@ snippet struct
 	}${3: /* optional variable list */};${4}
 # Typedef union
 snippet tdu
-	typedef union ${2:_$1 }{
+	typedef union ${2:__$1 }{
 		${3:/* data */}
 	} ${1:`Filename('$1_t', 'name')`};
 # Typedef struct
 snippet tds
-	typedef struct ${2:_$1 }{
+	typedef struct ${2:__$1 }{
 		${3:/* data */}
 	} ${1:`Filename('$1_t', 'name')`};
 # Typdef enum
