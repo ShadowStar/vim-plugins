@@ -10,12 +10,12 @@ endif
 
 let g:loaded_cscope_tags = 1
 
-if (!exists("db_list"))
-  let g:db_list = []
+if (!exists("cscope_tags_db_list"))
+  let g:cscope_tags_db_list = []
 endif
 
-if (!exists("dir_list"))
-  let g:dir_list = []
+if (!exists("cscope_tags_dir_list"))
+  let g:cscope_tags_dir_list = []
 endif
 
 function! s:Find(name, dir)
@@ -30,22 +30,22 @@ function! s:LoadCscope(...)
       let l:dir = getcwd()
     endif
   else
-    let l:dir = a:1
+    let l:dir = expand(a:1)
   endif
-  if (index(g:dir_list, l:dir) >= 0)
+  if (index(g:cscope_tags_dir_list, l:dir) >= 0)
     return
   endif
-  if (!filereadable(l:dir . "/./cscope.out") && !filereadable(l:dir . "/./tags"))
+  if (!filereadable(l:dir . '/cscope.out') && !filereadable(l:dir . '/tags'))
     return
   endif
-  call add(g:dir_list, l:dir)
+  call add(g:cscope_tags_dir_list, l:dir)
   let db = s:Find('cscope.out',l:dir)
 "  let db = findfile("cscope.out", "**", -1)
   if (!empty(db))
     set nocscopeverbose " suppress 'duplicate connection' error
     for item in db
-      if (index(g:db_list, item) < 0)
-        call add(g:db_list, item)
+      if (index(g:cscope_tags_db_list, item) < 0)
+        call add(g:cscope_tags_db_list, item)
         let path = strpart(item, 0, match(item, "/cscope.out$"))
         exe "cs add " . item . " " . path
       endif
@@ -56,11 +56,11 @@ function! s:LoadCscope(...)
   let tagfile = s:Find('tags', l:dir)
   if (!empty(tagfile))
     for item in tagfile
-      if (index(g:db_list, item) >= 0)
+      if (index(g:cscope_tags_db_list, item) >= 0)
         call remove(tagfile, index(tagfile, item))
       endif
     endfor
-    let g:db_list += tagfile
+    let g:cscope_tags_db_list += tagfile
     let taglist = join(tagfile, ",")
     exec "set tags+=" . taglist
   endif
