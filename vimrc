@@ -222,7 +222,7 @@ function! FindEdit(...)
     silent echon l:list
     redir END
     let old_efm = &efm
-    set efm = %f
+    set efm=%f
 
     if exists(":cgetfile")
       execute "silent! cgetfile " . tmpfile
