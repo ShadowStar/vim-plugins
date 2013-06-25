@@ -15,6 +15,13 @@ if exists("b:did_make_ftplugin")
 endif
 let b:did_make_ftplugin = 1
 
+if exists("loaded_matchit")
+  let s:sol = '\%(;\s*\|^\s*\)\@<='  " start of line
+  let b:match_words =
+    \ s:sol.'\<if\(n\)\=\(eq\|def\)\>:' . s:sol.'\<else\>:' . s:sol.'\<endif\>,' .
+    \ s:sol.'\<define\>:' . s:sol.'\<endef\>'
+endif
+
  map    <buffer>  <silent>  <C-F9>                  :call C_Make()<CR>
 imap    <buffer>  <silent>  <C-F9>             <C-C>:call C_Make()<CR>
  map    <buffer>  <silent>  <LocalLeader>rm         :call C_Make()<CR>
