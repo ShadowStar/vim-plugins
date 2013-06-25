@@ -310,6 +310,8 @@ if v:version >= 703
 endif
 "set keywordprg=man\ -a
 
+runtime macros/matchit.vim
+
 colorscheme shadowstar
 "set omnifunc=syntaxcomplete#Complete
 set path=include/,,/usr/include/
