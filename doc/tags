@@ -853,6 +853,7 @@ patchreview_unified_rejects	patchreview.txt	/*patchreview_unified_rejects*
 patchreview_wiggle	patchreview.txt	/*patchreview_wiggle*
 signify	signify.txt	/*signify*
 signify-author	signify.txt	/*signify-author*
+signify-colors	signify.txt	/*signify-colors*
 signify-commands	signify.txt	/*signify-commands*
 signify-contents	signify.txt	/*signify-contents*
 signify-credits	signify.txt	/*signify-credits*
