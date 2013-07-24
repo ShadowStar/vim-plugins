@@ -82,7 +82,7 @@ call CountJump#Motion#MakeBracketMotion('<buffer>', '', '',
 "ah			"a hunk" text object, select [count] hunks, including
 "			the header.
 " Note: For context diffs, these selections are off by one or a few lines.
-function! diff_movement#JumpToHunkBegin( count, isInner )
+function! s:diff_movement_JumpToHunkBegin( count, isInner )
     " Enable selection of inner hunk even if the cursor is positioned on the
     " hunk header.
     if a:isInner
@@ -97,7 +97,7 @@ function! diff_movement#JumpToHunkBegin( count, isInner )
     endif
     return l:pos
 endfunction
-function! diff_movement#JumpToHunkEnd( count, isInner )
+function! s:diff_movement_JumpToHunkEnd( count, isInner )
     " Due to the multi-line pattern, we somehow must navigate to the actual
     " start of the diff hunk. This only differs from the cursor position (after
     " the diff hunk header, position 1) by less than one full line, if at all,
@@ -116,10 +116,91 @@ function! diff_movement#JumpToHunkEnd( count, isInner )
     endif
     return l:pos
 endfunction
+
 call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'aI', 'V',
-\   function('diff_movement#JumpToHunkBegin'),
-\   function('diff_movement#JumpToHunkEnd'),
+\   function('s:diff_movement_JumpToHunkBegin'),
+\   function('s:diff_movement_JumpToHunkEnd'),
 \)
+
+unlet s:diffHunkHeaderPattern
+unlet s:diffHunkEndPattern
+
+let s:gitHunkHeaderPattern = '^\%(From\|commit\)\s\+\x\{40\}'
+
+let s:gitHunkEndPattern = join(
+\   [
+\	'^.*\n' . s:gitHunkHeaderPattern,
+\	'^.*\%$'
+\   ], '\|'
+\)
+
+call CountJump#Motion#MakeBracketMotion('<buffer>', 'g', 'G',
+\   s:gitHunkHeaderPattern,
+\   s:gitHunkEndPattern,
+\   0
+\)
+
+function! s:git_movement_JumpToHunkBegin( count, isInner )
+    " Enable selection of inner hunk even if the cursor is positioned on the
+    " hunk header.
+    if a:isInner
+	normal! j0
+    endif
+
+    let l:pos = CountJump#CountSearch(a:count, [s:gitHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
+    if l:pos == [0, 0] | return l:pos | endif
+
+    if a:isInner
+	normal! j0
+    endif
+    return l:pos
+endfunction
+function! s:git_movement_JumpToHunkEnd( count, isInner )
+    " Due to the multi-line pattern, we somehow must navigate to the actual
+    " start of the diff hunk. This only differs from the cursor position (after
+    " the diff hunk header, position 1) by less than one full line, if at all,
+    " but is significant for certain hunks.
+    call CountJump#CountSearch(1, [s:gitHunkHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
+
+    let l:pos = CountJump#CountSearch(a:count, [s:gitHunkEndPattern, 'W' . (a:isInner ? '' : 'e')])
+
+    if ! a:isInner && line('.') < line('$')
+	normal! k0
+	if getline('.') =~# '\*\{4,}$'
+	    " Further adaptation to exclude the context diff separator line in
+	    " an outer text object.
+	    normal! k0
+	endif
+    endif
+    return l:pos
+endfunction
+
+call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'aI', 'V',
+\   function('s:git_movement_JumpToHunkBegin'),
+\   function('s:git_movement_JumpToHunkEnd'),
+\)
+
+unlet s:gitHunkHeaderPattern
+unlet s:gitHunkEndPattern
+
+let s:vimHunkHeaderPattern = '^\s*fu\%[nction]\>'
+let s:vimHunkEndPattern = '^\s*endf*\%[unction]\>'
+
+"			Move around Vim functions:
+"]m			Go to [count] next start of a function.
+"]M			Go to [count] next end of a function.
+"[m			Go to [count] previous start of a function.
+"[M			Go to [count] previous end of a function.
+
+call CountJump#Motion#MakeBracketMotion('<buffer>', 'm', 'M', s:vimHunkHeaderPattern, s:vimHunkEndPattern, 0)
+
+"im			"inner method" text object, select [count] function contents.
+"am			"a method" text object, select [count] functions, including
+"			the function definition and 'endfunction'.
+call CountJump#TextObject#MakeWithCountSearch('<buffer>', 'm', 'ai', 'V', s:vimHunkHeaderPattern, s:vimHunkEndPattern)
+
+unlet s:vimHunkHeaderPattern
+unlet s:vimHunkEndPattern
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
