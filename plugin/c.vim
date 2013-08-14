@@ -2670,7 +2670,7 @@ function! s:CreateAdditionalMaps ()
 	imap <buffer>  <silent>  <LocalLeader>hm    <C-C>:call C_Help("m")<CR>
 	"
 	if !exists("g:C_Ctrl_j") || ( exists("g:C_Ctrl_j") && g:C_Ctrl_j != 'off' )
-		nmap  <buffer>  <silent>  <C-j>   i<C-R>=C_JumpCtrlJ()<CR>
+"		nmap  <buffer>  <silent>  <C-j>   i<C-R>=C_JumpCtrlJ()<CR>
 		imap  <buffer>  <silent>  <C-j>    <C-R>=C_JumpCtrlJ()<CR>
 	endif
 endfunction    " ----------  end of function s:CreateAdditionalMaps  ----------

@@ -1008,7 +1008,7 @@ function! s:CreateAdditionalMaps ()
 	 noremap  <buffer>  <silent>  <LocalLeader>hbs        :call BASH_HelpBashSupport()<CR>
 	inoremap  <buffer>  <silent>  <LocalLeader>hbs   <C-C>:call BASH_HelpBashSupport()<CR>
 	"
-	nmap    <buffer>  <silent>  <C-j>    i<C-R>=BASH_JumpForward()<CR>
+"	nmap    <buffer>  <silent>  <C-j>    i<C-R>=BASH_JumpForward()<CR>
 	imap    <buffer>  <silent>  <C-j>     <C-R>=BASH_JumpForward()<CR>
 	"
 	"-------------------------------------------------------------------------------
