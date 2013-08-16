@@ -16,6 +16,7 @@ syntax case match
 syntax keyword	mipsTodo	COMBAK XXX FIXME TODO contained containedin=mipsComment
 syntax match	mipsComment	"\/\/.*"
 syntax region	mipsComment	start="\/\*" end="\*\/"
+syntax region	mipsComment	start=/#/ end=/$/
 syntax match	mipsNumber	"\<\(0\|-\?[1-9]\d*\)\(U\|UL\|ULL\)\=\>" " Dec numbers
 syntax match	mipsNumber	"\<0[0-7]\+\>" " Oct numbers
 syntax match	mipsNumber	"\<0x[0-9a-fA-F]\+\(U\|UL\|ULL\)\=\>" " Hex numbers
@@ -345,4 +346,13 @@ hi def link	cvmInstruction	LightCyanB
 hi def link	cvm2Instruction	LightCyanB
 hi def link	PseuInstruction	CyanU
 
-let b:current_syntax = "mips"
+syn include @cPP syntax/c.vim
+syn match   cPPLineCont "\\$" contained
+
+syn region  cPPPreProc start=/^\s*#\s*\(if\|else\|endif\|define\|include\)/ end=/$/ contains=@cPP,cPPLineCont
+
+syn sync ccomment
+syn sync linebreaks=1
+
+let b:current_syntax = "asm_mips"
+
