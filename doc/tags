@@ -322,6 +322,7 @@ CountJump-usage	CountJump.txt	/*CountJump-usage*
 CountJump.txt	CountJump.txt	/*CountJump.txt*
 CountJump.vim	CountJump.txt	/*CountJump.vim*
 CtrlP	ctrlp.txt	/*CtrlP*
+DiffGoFile()	diffgofile.txt	/*DiffGoFile()*
 ExtractSnips()	snipMate.txt	/*ExtractSnips()*
 ExtractSnipsFile()	snipMate.txt	/*ExtractSnipsFile()*
 Filename()	snipMate.txt	/*Filename()*
@@ -795,6 +796,14 @@ ctrlp-miscellaneous-configs	ctrlp.txt	/*ctrlp-miscellaneous-configs*
 ctrlp-options	ctrlp.txt	/*ctrlp-options*
 ctrlp.txt	ctrlp.txt	/*ctrlp.txt*
 cvscommand-changes	vcscommand.txt	/*cvscommand-changes*
+diffgofile	diffgofile.txt	/*diffgofile*
+diffgofile-configuration	diffgofile.txt	/*diffgofile-configuration*
+diffgofile-contents	diffgofile.txt	/*diffgofile-contents*
+diffgofile-history	diffgofile.txt	/*diffgofile-history*
+diffgofile-intro	diffgofile.txt	/*diffgofile-intro*
+diffgofile-keys	diffgofile.txt	/*diffgofile-keys*
+diffgofile-operation	diffgofile.txt	/*diffgofile-operation*
+diffgofile.txt	diffgofile.txt	/*diffgofile.txt*
 diffreview	patchreview.txt	/*diffreview*
 diffreview-usage	patchreview.txt	/*diffreview-usage*
 g:ConflictDetection_AutoDetectEvents	ConflictDetection.txt	/*g:ConflictDetection_AutoDetectEvents*
@@ -894,6 +903,9 @@ g:ctrlp_mru_files	ctrlp.txt	/*g:ctrlp_mru_files*
 g:ctrlp_open_multi	ctrlp.txt	/*g:ctrlp_open_multi*
 g:ctrlp_persistent_input	ctrlp.txt	/*g:ctrlp_persistent_input*
 g:ctrlp_regexp_search	ctrlp.txt	/*g:ctrlp_regexp_search*
+g:diffgofile_directories_up	diffgofile.txt	/*g:diffgofile_directories_up*
+g:diffgofile_environment	diffgofile.txt	/*g:diffgofile_environment*
+g:loaded_diffgofile	diffgofile.txt	/*g:loaded_diffgofile*
 g:mwAutoLoadMarks	mark.txt	/*g:mwAutoLoadMarks*
 g:mwAutoSaveMarks	mark.txt	/*g:mwAutoSaveMarks*
 g:mwDefaultHighlightingPalette	mark.txt	/*g:mwDefaultHighlightingPalette*
