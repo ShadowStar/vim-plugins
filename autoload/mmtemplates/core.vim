@@ -41,7 +41,7 @@ endif
 if &cp || ( exists('g:Templates_Version') && ! exists('g:Templates_DevelopmentOverwrite') )
 	finish
 endif
-let g:Templates_Version= '0.9.1.1'     " version number of this script; do not change
+let g:Templates_Version= '0.9.1-2'     " version number of this script; do not change
 "
 if ! exists ( 'g:Templates_MapInUseWarn' )
 	let g:Templates_MapInUseWarn = 1
@@ -213,7 +213,6 @@ function! s:UpdateTemplateRegex ( regex, settings )
 	let a:regex.MacroName    = a:settings.MacroName
 	let a:regex.MacroNameC   = '\('.a:settings.MacroName.'\)'
 	let a:regex.MacroMatch   = '^'.a:settings.MacroStart.a:settings.MacroName.a:settings.MacroEnd.'$'
-	let a:regex.MacroSimple  = a:settings.MacroStart.a:settings.MacroName.a:settings.MacroEnd
 	"
 	" Syntax Categories
 	let a:regex.FunctionLine    = '^'.a:settings.MacroStart.'\('.a:regex.MacroNameC.'(\(.*\))\)'.a:settings.MacroEnd.'\s*\n'
@@ -223,6 +222,7 @@ function! s:UpdateTemplateRegex ( regex, settings )
 	let a:regex.FunctionInsert  = a:settings.MacroStart.'\(Insert\|InsertLine\)'.'(\(.\{-}\))'.a:settings.MacroEnd
 	let a:regex.MacroRequest    = a:settings.MacroStart.'?'.a:regex.MacroNameC.'\%(:\(\a\)\)\?'.a:settings.MacroEnd
 	let a:regex.MacroInsert     = a:settings.MacroStart.''.a:regex.MacroNameC.'\%(:\(\a\)\)\?'.a:settings.MacroEnd
+	let a:regex.MacroNoCapture  = a:settings.MacroStart.a:settings.MacroName.'\%(:\a\)\?'.a:settings.MacroEnd
 	let a:regex.ListItem        = a:settings.MacroStart.''.a:regex.MacroNameC.':ENTRY_*'.a:settings.MacroEnd
 	"
 	let a:regex.TextBlockFunctions = '^\%(C\|Comment\|Insert\|InsertLine\)$'
@@ -1484,7 +1484,7 @@ function! s:ReplaceMacros ( text, m_local )
 			let m_text = get ( s:library.macros, mlist[2], '' )
 		end
 		"
-		if m_text =~ s:library.regex_template.MacroSimple
+		if m_text =~ s:library.regex_template.MacroNoCapture
 			"
 			call add ( s:t_runtime.macro_stack, mlist[2] )
 			"
@@ -2521,26 +2521,39 @@ endfunction    " ----------  end of function s:InsertIntoBuffer  ----------
 "
 function! s:PositionCursor ( placement, flag_mode, pos1, pos2 )
 	"
-	" TODO: syntax
+	" :TODO:12.08.2013 11:03:WM: changeable syntax?
+	" :TODO:12.08.2013 12:00:WM: change behavior?
 	"
 	exe ":".a:pos1
 	let mtch = search( '<CURSOR>\|{CURSOR}', 'c', a:pos2 )
-	if mtch != 0  " CURSOR found:
+	if mtch != 0
+		" tag found (and cursor moved, we are now at the position of the match)
 		let line = getline(mtch)
 		if line =~ '<CURSOR>$\|{CURSOR}$'
+			" the tag is at the end of the line
 			call setline( mtch, substitute( line, '<CURSOR>\|{CURSOR}', '', '' ) )
-			if a:flag_mode == 'v' && getline(".") =~ '^\s*$'
+			if a:flag_mode == 'v' && getline('.') =~ '^\s*$'
+			"if a:flag_mode == 'v' && getline('.') =~ '^\s*\%(<CURSOR>\|{CURSOR}\)\s*$'
+				" the line contains nothing but the tag: remove and join without
+				" changing the second line
 				normal J
+				"call setline( mtch, '' )
+				"normal gJ
 			else
+				" the line contains other characters: remove the tag and start appending
+				"call setline( mtch, substitute( line, '<CURSOR>\|{CURSOR}', '', '' ) )
 				startinsert!
 			endif
 		else
+			" the line contains other characters: remove the tag and start inserting
 			call setline( mtch, substitute( line, '<CURSOR>\|{CURSOR}', '', '' ) )
-			:startinsert
+			startinsert
 		endif
-	else          " no CURSOR found
+	else
+		" no tag found (and cursor not moved)
 		if a:placement == 'below'
-			exe ":".a:pos2       | " to the end of the block; needed for repeated inserts
+			" to the end of the block, needed for repeated inserts
+			exe ":".a:pos2
 		endif
 	endif
 	"
