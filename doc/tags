@@ -189,6 +189,8 @@
 :CtrlPTag	ctrlp.txt	/*:CtrlPTag*
 :CtrlPUndo	ctrlp.txt	/*:CtrlPUndo*
 :DiffReview	patchreview.txt	/*:DiffReview*
+:EasyAlign	easy_align.txt	/*:EasyAlign*
+:EasyAlign!	easy_align.txt	/*:EasyAlign!*
 :Errors	syntastic.txt	/*:Errors*
 :Mark	mark.txt	/*:Mark*
 :MarkClear	mark.txt	/*:MarkClear*
@@ -862,6 +864,8 @@ diffgofile-operation	diffgofile.txt	/*diffgofile-operation*
 diffgofile.txt	diffgofile.txt	/*diffgofile.txt*
 diffreview	patchreview.txt	/*diffreview*
 diffreview-usage	patchreview.txt	/*diffreview-usage*
+easy-align	easy_align.txt	/*easy-align*
+easy_align.txt	easy_align.txt	/*easy_align.txt*
 g:ConflictDetection_AutoDetectEvents	ConflictDetection.txt	/*g:ConflictDetection_AutoDetectEvents*
 g:ConflictDetection_WarnEvents	ConflictDetection.txt	/*g:ConflictDetection_WarnEvents*
 g:CountJump_Context	CountJump.txt	/*g:CountJump_Context*
@@ -961,6 +965,13 @@ g:ctrlp_persistent_input	ctrlp.txt	/*g:ctrlp_persistent_input*
 g:ctrlp_regexp_search	ctrlp.txt	/*g:ctrlp_regexp_search*
 g:diffgofile_directories_up	diffgofile.txt	/*g:diffgofile_directories_up*
 g:diffgofile_environment	diffgofile.txt	/*g:diffgofile_environment*
+g:easy_align_bang_interactive_modes	easy_align.txt	/*g:easy_align_bang_interactive_modes*
+g:easy_align_delimiter_align	easy_align.txt	/*g:easy_align_delimiter_align*
+g:easy_align_delimiters	easy_align.txt	/*g:easy_align_delimiters*
+g:easy_align_ignore_groups	easy_align.txt	/*g:easy_align_ignore_groups*
+g:easy_align_ignore_unmatched	easy_align.txt	/*g:easy_align_ignore_unmatched*
+g:easy_align_indentation	easy_align.txt	/*g:easy_align_indentation*
+g:easy_align_interactive_modes	easy_align.txt	/*g:easy_align_interactive_modes*
 g:loaded_diffgofile	diffgofile.txt	/*g:loaded_diffgofile*
 g:mwAutoLoadMarks	mark.txt	/*g:mwAutoLoadMarks*
 g:mwAutoSaveMarks	mark.txt	/*g:mwAutoSaveMarks*
@@ -1360,6 +1371,7 @@ viewdoc-tabbed	viewdoc.txt	/*viewdoc-tabbed*
 viewdoc-tabbed-fullscreen	viewdoc.txt	/*viewdoc-tabbed-fullscreen*
 viewdoc-windowed	viewdoc.txt	/*viewdoc-windowed*
 viewdoc.txt	viewdoc.txt	/*viewdoc.txt*
+vim-easy-align	easy_align.txt	/*vim-easy-align*
 vim-support	vimsupport.txt	/*vim-support*
 vimsupport	vimsupport.txt	/*vimsupport*
 vimsupport-Ctrl-j	vimsupport.txt	/*vimsupport-Ctrl-j*
