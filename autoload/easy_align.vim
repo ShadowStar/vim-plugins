@@ -28,7 +28,7 @@ let g:loaded_easy_align = 1
 
 let s:easy_align_delimiters_default = {
 \  ' ': { 'pattern': ' ',  'left_margin': '',  'right_margin': '',  'stick_to_left': 0 },
-\  '=': { 'pattern': '===\|<=>\|\(&&\|||\|<<\|>>\)=\|=\~\|=>\|[:+/*!%^=><&|-]\?=[#?]\?',
+\  '=': { 'pattern': '===\|<=>\|\(&&\|||\|<<\|>>\)=\|=\~\|=>\|[:+/*!%^=><&|.-]\?=[#?]\?',
 \                          'left_margin': ' ', 'right_margin': ' ', 'stick_to_left': 0 },
 \  ':': { 'pattern': ':',  'left_margin': '',  'right_margin': ' ', 'stick_to_left': 1 },
 \  ',': { 'pattern': ',',  'left_margin': '',  'right_margin': ' ', 'stick_to_left': 1 },
@@ -414,6 +414,15 @@ function! s:do_align(modes, all_tokens, all_delims, fl, ll, fc, lc, pattern, nth
       let strip = float2nr(ceil((max.token_len - max.strip_len) / 2.0))
       let token = repeat(' ', float2nr(pf1)) .token. repeat(' ', float2nr(p2))
       let token = substitute(token, repeat(' ', strip) . '$', '', '')
+
+      if a:stick_to_left
+        if empty(s:rtrim(token))
+          let center = len(token) / 2
+          let [token, rpad] = [strpart(token, 0, center), strpart(token, center)]
+        else
+          let [token, rpad] = [s:rtrim(token), matchstr(token, '\s*$')]
+        endif
+      endif
     endif
     let tokens[nth] = token
 
