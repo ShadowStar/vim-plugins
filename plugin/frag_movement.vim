@@ -125,6 +125,63 @@ call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'aI', 'V',
 unlet s:diffHunkHeaderPattern
 unlet s:diffHunkEndPattern
 
+let s:diffFileHeaderPattern = '^\%(--- .*\n+++ .*\n@@ -.* \+.* @@\|\*\*\* .*\n--- .*\n\*{15}\)'
+let s:diffFileEndPattern = join(
+\   [
+\	'^.*\n' . s:diffFileHeaderPattern,
+\	'^.*\%$'
+\   ], '\|'
+\)
+
+call CountJump#Motion#MakeBracketMotion('<buffer>', 'd', 'D',
+\   s:diffFileHeaderPattern,
+\   s:diffFileEndPattern,
+\   0
+\)
+
+function! s:diff_file_movement_JumpToHunkBegin( count, isInner )
+    " Enable selection of inner hunk even if the cursor is positioned on the
+    " hunk header.
+    if a:isInner
+	normal! j0
+    endif
+
+    let l:pos = CountJump#CountSearch(a:count, [s:diffFileHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
+    if l:pos == [0, 0] | return l:pos | endif
+
+    if a:isInner
+	normal! j0
+    endif
+    return l:pos
+endfunction
+function! s:diff_file_movement_JumpToHunkEnd( count, isInner )
+    " Due to the multi-line pattern, we somehow must navigate to the actual
+    " start of the diff hunk. This only differs from the cursor position (after
+    " the diff hunk header, position 1) by less than one full line, if at all,
+    " but is significant for certain hunks.
+    call CountJump#CountSearch(1, [s:diffFileHeaderPattern, 'bcW' . (a:isInner ? 'e' : '')])
+
+    let l:pos = CountJump#CountSearch(a:count, [s:diffFileEndPattern, 'W' . (a:isInner ? '' : 'e')])
+
+    if ! a:isInner && line('.') < line('$')
+	normal! k0
+	if getline('.') =~# '\*\{4,}$'
+	    " Further adaptation to exclude the context diff separator line in
+	    " an outer text object.
+	    normal! k0
+	endif
+    endif
+    return l:pos
+endfunction
+
+call CountJump#TextObject#MakeWithJumpFunctions('<buffer>', 'h', 'aI', 'V',
+\   function('s:diff_file_movement_JumpToHunkBegin'),
+\   function('s:diff_file_movement_JumpToHunkEnd'),
+\)
+
+unlet s:diffFileHeaderPattern
+unlet s:diffFileEndPattern
+
 let s:gitHunkHeaderPattern = '^\%(From\|commit\)\s\+\x\{40\}'
 
 let s:gitHunkEndPattern = join(
