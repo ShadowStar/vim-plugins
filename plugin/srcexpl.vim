@@ -8,8 +8,8 @@
 "              Jonathan Lai <laiks.jonathan@gmail.com>                         "
 " Homepage:    http://www.vim.org/scripts/script.php?script_id=2179            "
 " GitHub:      https://github.com/wesleyche/SrcExpl                            "
-" Version:     5.2                                                             "
-" Last Change: March 21th, 2013                                                "
+" Version:     5.3                                                             "
+" Last Change: August 28th, 2013                                                "
 " Licence:     This program is free software; you can redistribute it and / or "
 "              modify it under the terms of the GNU General Public License as  "
 "              published by the Free Software Foundation; either version 2, or "
@@ -38,7 +38,7 @@
 " |~ \___________\||~           .-------------. |            |~ \____________\||
 " |~               |~           \______________\|            |~                |
 " +-__Tag_List__---+-demo.c----------------------------------+-_NERD_tree_-----+
-" |Source Explorer v5.2           .-----------------.                          |
+" |Source Explorer v5.3           .-----------------.                          |
 " |~                              | Source Explorer |\                         |
 " |~                              .-----------------. |                        |
 " |~                              \__________________\|                        |
@@ -216,7 +216,7 @@ let g:SrcExpl_markList = []
 let s:SrcExpl_pluginName = 'Source Explorer'
 
 " Plugin version
-let s:SrcExpl_pluginVer = 5.2
+let s:SrcExpl_pluginVer = 5.3
 
 " Buffer name
 let s:SrcExpl_bufName = 'Source_Explorer'
@@ -490,6 +490,7 @@ function! g:SrcExpl_Refresh()
     " Try to Go to local declaration
     if g:SrcExpl_searchLocalDef != 0
         if !<SID>SrcExpl_GoDecl(l:expr)
+            let s:SrcExpl_lastSymbol = s:SrcExpl_symbol
             return 0
         endif
     endif
@@ -800,6 +801,11 @@ function! <SID>SrcExpl_AdaptPlugins()
             return -1
         endif
     endfor
+
+    " Aslo filter the Quickfix window
+    if &buftype ==# "quickfix"
+        return 0
+    endif
 
     " Safe
     return 0
@@ -1541,10 +1547,10 @@ function! <SID>SrcExpl_Close()
             call <SID>SrcExpl_ReportErr("Not support multiple tab pages")
             return -1
         endif
-        " Close the window
-        call <SID>SrcExpl_WinClose()
         " Do the cleaning work
         call <SID>SrcExpl_CleanUp()
+        " Close the window
+        call <SID>SrcExpl_WinClose()
         " We change the flag to false
         let s:SrcExpl_isRunning = 0
     else
