@@ -27,6 +27,9 @@ setlocal smartindent
 setlocal formatoptions=tcqlron
 setlocal cinoptions=:0,l1,t0,g0,(0
 
+if exists('g:viewdoc_man_cmd')
+	let g:viewdoc_man_cmd=&keywordprg
+endif
 "set tags=tags;/
 
 "
