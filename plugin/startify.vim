@@ -1,7 +1,7 @@
 " Plugin:      https://github.com/mhinz/vim-startify
 " Description: Start screen displaying recently used stuff.
 " Maintainer:  Marco Hinz <http://github.com/mhinz>
-" Version:     1.7
+" Version:     1.8
 
 if exists('g:loaded_startify') || &cp
   finish
@@ -9,9 +9,8 @@ endif
 let g:loaded_startify = 1
 
 augroup startify
-  autocmd!
-  autocmd startify VimEnter *
-        \ if !argc() && (line2byte('$') == -1) && (v:progname =~? '^[gm]\=vi\%[m]\%[\.exe]$') |
+  autocmd VimEnter *
+        \ if !argc() && (line2byte('$') == -1) && (v:progname =~? '^[gm]\=vimx\=\%[\.exe]$') |
         \   call startify#insane_in_the_membrane() |
         \ endif |
         \ autocmd! startify VimEnter
