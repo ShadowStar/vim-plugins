@@ -113,7 +113,9 @@ function! startify#insane_in_the_membrane() abort
   1
   call cursor((s:show_special ? 4 : 2) + s:headoff, 5)
 
+  if v:version >= 704
   doautocmd <nomodeline> startify User
+  endif
 endfunction
 
 " Function: #session_load {{{1
