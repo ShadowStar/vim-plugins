@@ -1,0 +1,134 @@
+*reco.txt*   For Vim version 7.4  Last change: 2013 September 3
+
+1. Description                              |reco|
+2. Requirements                             |reco-requirements|
+3. Recovery                                 |reco-recovery|
+4. DiffSwap                                 |reco-diffswap|
+5. Tips, useful settings                    |reco-tips|
+
+1. Description                              *reco*
+Reco automates Vim recovery from swap file process. First copy of your swap
+and file is made, then Reco answers |SwapExists| questions for you so you don't need
+to bother anymore. And at the end it is deleting old swap files.
+Very useful when Vim crashes and you have to recover whole session and waiste
+your time to answer Swap questions for each file and then manually delete each
+swap. Also Reco has |DiffSwap| function so you can check in new tab difference
+before and after recovery. Reco also keeps original files and swap in |reco_dir|
+until you close Vim.
+
+REMEMBER: Vim recovery is not saving any changes to your file so if you want
+to keep version before recovery just close that buffer. And your file is as 
+before and your swap file is gone so you want get any |SwapExists| message.
+
+IMPORTANT: Reco is called only at |SwapExists| auto-command so Reco won't work
+with Vim -r recovery cmd, also by default Vim is not showing |SwapExists| for
+empty buffers even if there is swap for it. So in that case you proceed with manual 
+manual recovery
+
+2. Requirements                             *reco-requirements* *reco_dir*
+You can set directory where Reco will store temporary data by setting:
+let g:_reco_dir=<your new dir>
+Default direcotry is your home folder. Data are store ther only until you close
+Vim, so there is no extra garbage in home folder because of Reco.
+
+Reco filename format is file full_path where "/" are replaced by "%" i.e:
+/etc/hosts = %etc%hosts
+
+IMPORTANT:
+DO NOT APPEND "/" to end of path, as reco does it for you
+
+3. Recovery                                 *reco-recovery*
+Reco is called each time Vim call auto-command |SwapExists|. Then:
+ -  Reco first copies 'swapfile' and file to recover into |reco_dir|
+ -  Setting |v:swapchoice| to delete swap as answer, so you want see Swap
+    detect window
+ -  Then using copy of swap from |reco_dir| is recovering swap file
+ -  At the end it is setting |VimLeavePre| auto-command to clear |reco_dir|
+
+4. DiffSwap                                 *reco-diffswap* *DiffSwap*
+Reco keeps before recovery copy of your file so if you like to check difference Reco have
+|DiffSwap| function just call it from Ex mode, and Reco will open new tab
+with both versions before and after recovery of your file
+|DiffSwap| file works till you close your Vim instance as then Reco is clearing
+|reco_dir|.
+
+REMEMBER: |DiffSwap| only works if there is before recovery file in |reco_dir|
+
+5. Tips, useful settings
+Few words about Vim recovery and version control settings. Recovery process and
+'swapfile' cover data from last write. Swap file update is control via:
+'updatetime' and 'updatecount' and swap is only updated if you made any 
+changes to buffer.
+I strongly advice to set 'updatetime' to 1000(1s) as then you always have all
+unsaved data in swap file. And because swap is only updated when you made 
+changes, low 'updatetime' is not a big overhead
+
+Another useful feature of Vim is 'undofile'. Undofile is persistent and only
+updated when you write buffer. So when 'swapfile' covers you from last write , 
+'undofile' covers you till last write.
+I do prefer to write buffer each time I'm leaving window. So I always have
+my 'undofile' updated. To do so put in your .vimrc this code:
+
+"Auto-write wants to try to write unnamed,read-only,nofiles etc buffers >
+    function! WriteBuffer()
+    if &mod && !empty(bufname('%')) && empty(&bt)
+    w
+    endif
+    endfunction
+    au BufLeave * :call WriteBuffer()
+<
+Last Vim feature I use and works great with Reco is Vim Sessions. To have
+backup_session made for each session put that code into .vimrc:
+
+"Always save layout vim when enter new buffer >
+    augroup Session
+    let g:_backup_session = "~/.vim/backup_session".getpid()
+    function! BackupSession()
+    if !exists('SessionLoad')
+    exe "mksession! ".g:_backup_session
+    endif
+    endfunction
+    au Session VimLeave * :exe "silent! !rm ".g:_backup_session
+    au Session BufNewFile,BufRead * :call BackupSession()
+<
+
+Then each time you open file or create new file in your Vim instance, vim will
+update backup_session for you. So when you have low 'updatetime' for swap,
+Reco plugin and BackupSession auto-command when Vim crash just do:
+Vim -S <your backup session file>
+And your are in same place as before crash. Pid is necessary if you using more
+then one Vim instance at same time. 
+Each backup_session file is removed with VimLeave auto-command as you only
+need one when Vim crash
+
+
+ALL MY RECOVERY SETTINGS in .vimrc:
+
+let g:_reco_dir = "~/.vim/backup"
+set autowriteall
+set undofile
+set undodir=~/.vim/undo
+set undolevels=2000
+set updatetime=1000
+set directory=~/.vim/swap
+
+"Auto-write want try to write unnamed,read-only,nofiles etc buffers
+function! WriteBuffer()
+if &mod && !empty(bufname('%')) && empty(&bt)
+w
+endif
+endfunction
+au BufLeave * :call WriteBuffer()
+
+"Always save layout vim when enter new buffer 
+augroup Session
+let g:_backup_session = "~/.vim/backup_session".getpid()
+function! BackupSession()
+if !exists('SessionLoad')
+exe "mksession! ".g:_backup_session
+endif
+endfunction
+au Session VimLeave * :exe "silent! !rm ".g:_backup_session
+au Session BufNewFile,BufRead * :call BackupSession()
+
+vim:tw=78:ts=8:ft=help:norl:

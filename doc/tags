@@ -333,6 +333,7 @@ CountJump.txt	CountJump.txt	/*CountJump.txt*
 CountJump.vim	CountJump.txt	/*CountJump.vim*
 CtrlP	ctrlp.txt	/*CtrlP*
 DiffGoFile()	diffgofile.txt	/*DiffGoFile()*
+DiffSwap	reco.txt	/*DiffSwap*
 ExtractSnips()	snipMate.txt	/*ExtractSnips()*
 ExtractSnipsFile()	snipMate.txt	/*ExtractSnipsFile()*
 Filename()	snipMate.txt	/*Filename()*
@@ -1150,6 +1151,12 @@ patchreview_patch	patchreview.txt	/*patchreview_patch*
 patchreview_patch_needs_crlf	patchreview.txt	/*patchreview_patch_needs_crlf*
 patchreview_unified_rejects	patchreview.txt	/*patchreview_unified_rejects*
 patchreview_wiggle	patchreview.txt	/*patchreview_wiggle*
+reco	reco.txt	/*reco*
+reco-diffswap	reco.txt	/*reco-diffswap*
+reco-recovery	reco.txt	/*reco-recovery*
+reco-requirements	reco.txt	/*reco-requirements*
+reco.txt	reco.txt	/*reco.txt*
+reco_dir	reco.txt	/*reco_dir*
 signify	signify.txt	/*signify*
 signify-author	signify.txt	/*signify-author*
 signify-colors	signify.txt	/*signify-colors*
