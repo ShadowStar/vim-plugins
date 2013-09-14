@@ -28,7 +28,7 @@ let g:loaded_easy_align = 1
 
 let s:easy_align_delimiters_default = {
 \  ' ': { 'pattern': ' ',  'left_margin': '',  'right_margin': '',  'stick_to_left': 0 },
-\  '=': { 'pattern': '===\|<=>\|\(&&\|||\|<<\|>>\)=\|=\~\|=>\|[:+/*!%^=><&|.-]\?=[#?]\?',
+\  '=': { 'pattern': '===\|<=>\|\(&&\|||\|<<\|>>\)=\|=\~[#?]\?\|=>\|[:+/*!%^=><&|.-]\?=[#?]\?',
 \                          'left_margin': ' ', 'right_margin': ' ', 'stick_to_left': 0 },
 \  ':': { 'pattern': ':',  'left_margin': '',  'right_margin': ' ', 'stick_to_left': 1 },
 \  ',': { 'pattern': ',',  'left_margin': '',  'right_margin': ' ', 'stick_to_left': 1 },
@@ -480,8 +480,15 @@ function! s:do_align(modes, all_tokens, all_delims, fl, ll, fc, lc, pattern, nth
   endif
 endfunction
 
-function! s:input(str, default)
-  redraw
+function! s:input(str, default, sl)
+  if !a:sl
+    normal! gv
+    redraw
+    execute "normal! \<esc>"
+  else
+    " EasyAlign command can be called without visual selection
+    redraw
+  endif
   call inputsave()
   let got = input(a:str, a:default)
   call inputrestore()
@@ -492,12 +499,13 @@ function! s:input(str, default)
   endtry
 endfunction
 
-function! s:interactive(modes)
+function! s:interactive(modes, sl)
   let mode = s:shift(a:modes, 1)
   let n    = ''
   let ch   = ''
   let opts = {}
   let vals = deepcopy(s:option_values)
+  let regx = 0
 
   while 1
     call s:echon(mode, n, '', opts)
@@ -535,16 +543,20 @@ function! s:interactive(modes)
     elseif ch == "\<C-I>"
       let opts['idt'] = s:shift(vals['indentation'], 1)
     elseif ch == "\<C-L>"
-      let opts['lm'] = s:input("Left margin: ", get(opts, 'lm', ''))
+      let opts['lm'] = s:input("Left margin: ", get(opts, 'lm', ''), a:sl)
     elseif ch == "\<C-R>"
-      let opts['rm'] = s:input("Right margin: ", get(opts, 'rm', ''))
+      let opts['rm'] = s:input("Right margin: ", get(opts, 'rm', ''), a:sl)
     elseif ch == "\<C-U>"
       let opts['iu'] = s:shift(vals['ignore_unmatched'], 1)
     elseif ch == "\<C-G>"
       let opts['ig'] = s:shift(vals['ignore_groups'], 1)
+    elseif c == "\<Left>"
+      let opts['stl'] = 1
+    elseif c == "\<Right>"
+      let opts['stl'] = 0
     elseif ch == "\<C-O>"
-      let modes = tolower(s:input("Mode sequence: ", get(opts, 'm', mode)))
-      if match(modes, '^[lrc]\+$') != -1
+      let modes = tolower(s:input("Mode sequence: ", get(opts, 'm', mode), a:sl))
+      if match(modes, '^[lrc]\+\*\{0,2}$') != -1
         let opts['m'] = modes
         let mode      = modes[0]
         while mode != s:shift(a:modes, 1)
@@ -552,11 +564,17 @@ function! s:interactive(modes)
       else
         silent! call remove(opts, 'm')
       endif
+    elseif ch == "\<C-_>" || ch == "\<C-X>"
+      let ch = s:input('Regular expression: ', '', a:sl)
+      if !empty(ch)
+        let regx = 1
+        break
+      endif
     else
       break
     endif
   endwhile
-  return [mode, n, ch, opts, s:normalize_options(opts)]
+  return [mode, n, ch, opts, s:normalize_options(opts), regx]
 endfunction
 
 function! s:parse_args(args)
@@ -627,14 +645,15 @@ function! easy_align#align(bang, expr) range
   let ioptsr = {}
   let iopts  = {}
   let regexp = 0
+  let sl     = a:firstline == a:lastline  " Possibley w/o selection
 
   try
     if empty(a:expr)
-      let [mode, n, ch, ioptsr, iopts] = s:interactive(copy(modes))
+      let [mode, n, ch, ioptsr, iopts, regexp] = s:interactive(copy(modes), sl)
     else
       let [n, ch, opts, regexp] = s:parse_args(a:expr)
       if empty(n) && empty(ch)
-        let [mode, n, ch, ioptsr, iopts] = s:interactive(copy(modes))
+        let [mode, n, ch, ioptsr, iopts, regexp] = s:interactive(copy(modes), sl)
       elseif empty(ch)
         " Try swapping n and ch
         let [n, ch] = ['', n]
@@ -700,10 +719,19 @@ function! easy_align#align(bang, expr) range
 
   let aseq = get(dict, 'mode_sequence',
         \ recur == 2 ? (mode ==? 'r' ? ['r', 'l'] : ['l', 'r']) : [mode])
+  let mode_expansion = matchstr(aseq, '\*\+$')
+  if mode_expansion == '*'
+    let aseq = aseq[0 : -2]
+    let recur = 1
+  elseif mode_expansion == '**'
+    let aseq = aseq[0 : -3]
+    let recur = 2
+  endif
+  let aseq_list = type(aseq) == 1 ? split(tolower(aseq), '\s*') : map(copy(aseq), 'tolower(v:val)')
 
   try
     call s:do_align(
-    \ type(aseq) == 1 ? split(tolower(aseq), '\s*') : map(copy(aseq), 'tolower(v:val)'),
+    \ aseq_list,
     \ {}, {}, a:firstline, a:lastline,
     \ bvisual ? min([col("'<"), col("'>")]) : 1,
     \ bvisual ? max([col("'<"), col("'>")]) : 0,
