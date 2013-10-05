@@ -30,7 +30,7 @@ The command will go into the interactive mode when no argument is given.
 For convenience, it is advised that you define a mapping for triggering it in
 your `.vimrc`.
 
-    vnoremap <silent> <Enter> :EasyAlign<cr>
+    vnoremap <silent> <Enter> :EasyAlign<Enter>
 
 With this mapping, you can align selected lines of text with a few keystrokes.
 
@@ -97,9 +97,17 @@ described in the following sections.
 | CTRL-O  | mode_sequence    | Input string of /[lrc]+\*{0,2}/              |
 | <Left>  | stick_to_left    | { 'stick_to_left': 1, 'left_margin': 0 }     |
 | <Right> | stick_to_left    | { 'stick_to_left': 0, 'left_margin': 1 }     |
+| <Down>  | *_margin         | { 'left_margin': 0, 'right_margin': 0 }      |
+
+                                              *g:easy_align_last_command*
+
+After a successful alignment, you can repeat the same operation using the
+repeatable, non-interactive command recorded in `g:easy_align_last_command`.
+
+    :<C-R>=g:easy_align_last_command<Enter><Enter>
 
 
-Non-interactive mode
+Non-interactive mode (command line)
 -------------------------------------------------------------------------
 
 Instead of going into the interactive mode, you can type in arguments to
@@ -118,16 +126,16 @@ For example, when aligning the following lines around colons and semi-colons,
 
 try these commands:
 
-- :EasyAlign /[:;]\+/
-- :EasyAlign 2/[:;]\+/
-- :EasyAlign */[:;]\+/
-- :EasyAlign **/[:;]\+/
+    :EasyAlign /[:;]\+/
+    :EasyAlign 2/[:;]\+/
+    :EasyAlign */[:;]\+/
+    :EasyAlign **/[:;]\+/
 
 Notice that you can't append '\zs' to your regular expression to put delimiters
 on the left. It can be done by providing additional options in Vim dictionary
 format.
 
-- :EasyAlign * /[:;]\+/ { 'stick_to_left': 1, 'left_margin': 0 }
+    :EasyAlign * /[:;]\+/ { 'stick_to_left': 1, 'left_margin': 0 }
 
 Then we get:
 
@@ -136,20 +144,38 @@ Then we get:
 
 Option names are fuzzy-matched, so you can write as follows:
 
-- :EasyAlign * /[:;]\+/ { 'stl': 1, 'l': '' }
+    :EasyAlign * /[:;]\+/ { 'stl': 1, 'l': '' }
 
 You can even omit spaces between the arguments, so concisely (or cryptically):
 
-- :EasyAlign*/[:;]\+/{'s':1,'l':''}
+    :EasyAlign*/[:;]\+/{'s':1,'l':''}
 
-The same thing can be done in the interactive mode as well with the following
-key combination.
+Nice. But let's make it even shorter. When you use write regular expression in
+command line, option values can be written in shorthand notation.
 
-- <Enter>
-- *
-- <Left>
-- <CTRL-/> (or <CTRL-X> on GVim)
-  - [:;]\+
+    :EasyAlign*/[:;]\+/s1l0
+
+The following table summarizes the shorthand notation.
+
+| Option           | Expression |
+| --------------   | ---------- |
+| left_margin      | l[0-9]+    |
+| right_margin     | r[0-9]+    |
+| stick_to_left    | s[01]      |
+| ignore_unmatched | iu[01]     |
+| ignore_groups    | ig\[.*\]   |
+| delimiter_align  | d[lrc]     |
+| mode_sequence    | m[lrc*]+   |
+| indentation      | i[ksdn]    |
+
+For your information, the same thing can be done in the interactive mode as well
+with the following key combination.
+
+    - <Enter>
+    - *
+    - <Left>
+    - <CTRL-/> (or <CTRL-X> on GVim)
+      - [:;]\+
 
 
 Partial alignment in blockwise-visual mode
@@ -182,19 +208,19 @@ There are 4 ways to set alignment options (from lowest precedence to highest):
 
 1. Some option values can be set with corresponding global variables
 2. Option values can be specified in the definition of each alignment rule
-3. Option values can be given as a dictionary argument to :EasyAlign command
+3. Option values can be given as arguments to :EasyAlign command
 4. Option values can be set in interactive mode using special shortcut keys
 
-| Option           | Shortcut key        | Global variable                 |
-| ---------------- | ------------------- | ------------------------------- |
-| left_margin      | CTRL-L              |                                 |
-| right_margin     | CTRL-R              |                                 |
-| stick_to_left    | <Left>, <Right>     |                                 |
-| ignore_groups    | CTRL-G              | `g:easy_align_ignore_groups`      |
-| ignore_unmatched | CTRL-U              | `g:easy_align_ignore_unmatched`   |
-| indentation      | CTRL-I              | `g:easy_align_indentation`        |
-| delimiter_align  | CTRL-D              | `g:easy_align_delimiter_align`    |
-| mode_sequence    | CTRL-O              |                                 |
+| Option           | Shortcut key    | Abbreviated | Global variable               |
+| ---------------- | --------------- | ----------- | ----------------------------- |
+| left_margin      | CTRL-L          | l[0-9]+     |                               |
+| right_margin     | CTRL-R          | r[0-9]+     |                               |
+| stick_to_left    | <Left>, <Right> | s[01]       |                               |
+| ignore_groups    | CTRL-G          | ig\[.*\]    | `g:easy_align_ignore_groups`    |
+| ignore_unmatched | CTRL-U          | iu[01]      | `g:easy_align_ignore_unmatched` |
+| indentation      | CTRL-I          | i[ksdn]     | `g:easy_align_indentation`      |
+| delimiter_align  | CTRL-D          | d[lrc]      | `g:easy_align_delimiter_align`  |
+| mode_sequence    | CTRL-O          | m[lrc*]+    |                               |
 
 
 Ignoring delimiters in comments or strings   *g:easy_align_ignore_groups*
