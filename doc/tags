@@ -723,6 +723,7 @@ bashsupport-xterm	bashsupport.txt	/*bashsupport-xterm*
 bashsupport.txt	bashsupport.txt	/*bashsupport.txt*
 bufexplorer	bufexplorer.txt	/*bufexplorer*
 bufexplorer-changelog	bufexplorer.txt	/*bufexplorer-changelog*
+bufexplorer-copyright	bufexplorer.txt	/*bufexplorer-copyright*
 bufexplorer-credits	bufexplorer.txt	/*bufexplorer-credits*
 bufexplorer-customization	bufexplorer.txt	/*bufexplorer-customization*
 bufexplorer-installation	bufexplorer.txt	/*bufexplorer-installation*
