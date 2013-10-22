@@ -192,6 +192,8 @@
 :EasyAlign	easy_align.txt	/*:EasyAlign*
 :EasyAlign!	easy_align.txt	/*:EasyAlign!*
 :Errors	syntastic.txt	/*:Errors*
+:LiveEasyAlign	easy_align.txt	/*:LiveEasyAlign*
+:LiveEasyAlign!	easy_align.txt	/*:LiveEasyAlign!*
 :Mark	mark.txt	/*:Mark*
 :MarkClear	mark.txt	/*:MarkClear*
 :MarkLoad	mark.txt	/*:MarkLoad*
@@ -968,6 +970,7 @@ g:ctrlp_regexp_search	ctrlp.txt	/*g:ctrlp_regexp_search*
 g:diffgofile_directories_up	diffgofile.txt	/*g:diffgofile_directories_up*
 g:diffgofile_environment	diffgofile.txt	/*g:diffgofile_environment*
 g:easy_align_bang_interactive_modes	easy_align.txt	/*g:easy_align_bang_interactive_modes*
+g:easy_align_bypass_fold	easy_align.txt	/*g:easy_align_bypass_fold*
 g:easy_align_delimiter_align	easy_align.txt	/*g:easy_align_delimiter_align*
 g:easy_align_delimiters	easy_align.txt	/*g:easy_align_delimiters*
 g:easy_align_ignore_groups	easy_align.txt	/*g:easy_align_ignore_groups*
