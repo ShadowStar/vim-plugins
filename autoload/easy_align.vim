@@ -47,7 +47,7 @@ let s:known_options = {
 \ 'margin_left':   [0, 1], 'margin_right':     [0, 1], 'stick_to_left':   [0],
 \ 'left_margin':   [0, 1], 'right_margin':     [0, 1], 'indentation':     [1],
 \ 'ignore_groups': [3   ], 'ignore_unmatched': [0   ], 'delimiter_align': [1],
-\ 'mode_sequence': [1   ], 'ignores': [3]
+\ 'mode_sequence': [1   ], 'ignores':          [3],    'filter':          [1]
 \ }
 
 let s:option_values = {
@@ -61,14 +61,16 @@ let s:shorthand = {
 \ 'margin_left':   'lm', 'margin_right':     'rm', 'stick_to_left':   'stl',
 \ 'left_margin':   'lm', 'right_margin':     'rm', 'indentation':     'idt',
 \ 'ignore_groups': 'ig', 'ignore_unmatched': 'iu', 'delimiter_align': 'da',
-\ 'mode_sequence': 'm',  'ignores': 'ig'
+\ 'mode_sequence': 'm',  'ignores':          'ig', 'filter':          'f'
 \ }
 
 if exists("*strwidth")
-  let s:strwidth = function('strwidth')
+  function! s:strwidth(str)
+    return strwidth(a:str) + len(matchstr(a:str, '^\t*')) * (&tabstop - 1)
+  endfunction
 else
   function! s:strwidth(str)
-    return len(split(a:str, '\zs'))
+    return len(split(a:str, '\zs')) + len(matchstr(a:str, '^\t*')) * (&tabstop - 1)
   endfunction
 endif
 
@@ -333,9 +335,16 @@ function! s:do_align(todo, modes, all_tokens, all_delims, fl, ll, fc, lc, nth, r
   let max = { 'pivot_len': 0.0, 'token_len': 0, 'just_len': 0, 'delim_len': 0,
         \ 'indent': 0, 'tokens': 0, 'strip_len': 0 }
   let d = a:dict
+  let [f, fx] = s:parse_filter(d.filter)
 
   " Phase 1
   for line in range(a:fl, a:ll)
+    if f == 1 && getline(line) !~ fx
+      continue
+    elseif f == -1 && getline(line) =~ fx
+      continue
+    endif
+
     if !has_key(a:all_tokens, line)
       " Split line into the tokens by the delimiters
       let [tokens, delims] = s:split_line(
@@ -387,11 +396,13 @@ function! s:do_align(todo, modes, all_tokens, all_delims, fl, ll, fc, lc, nth, r
       continue
     endif
 
-    let indent        = match(tokens[0], '^\s*\zs')
+    let indent = s:strwidth(matchstr(tokens[0], '^\s*'))
     if min_indent < 0 || indent < min_indent
       let min_indent  = indent
     endif
-    if mode ==? 'c' | let token .= matchstr(token, '^\s*') | endif
+    if mode ==? 'c'
+      let token .= substitute(matchstr(token, '^\s*'), '\t', repeat(' ', &tabstop), 'g')
+    endif
     let [pw, tw] = [s:strwidth(prefix), s:strwidth(token)]
     let max.indent    = max([max.indent,    indent])
     let max.token_len = max([max.token_len, tw])
@@ -411,11 +422,11 @@ function! s:do_align(todo, modes, all_tokens, all_delims, fl, ll, fc, lc, nth, r
   if a:nth == 1
     let idt = d.indentation
     if idt ==? 'd'
-      let indent = repeat(' ', max.indent)
+      let indent = max.indent
     elseif idt ==? 's'
-      let indent = repeat(' ', min_indent)
+      let indent = min_indent
     elseif idt ==? 'n'
-      let indent = ''
+      let indent = 0
     elseif idt !=? 'k'
       call s:exit('Invalid indentation: ' . idt)
     end
@@ -428,9 +439,22 @@ function! s:do_align(todo, modes, all_tokens, all_delims, fl, ll, fc, lc, nth, r
       for [line, elems] in items(lines)
         let [nth, prefix, token, delim] = elems
 
-        let token = substitute(token, '^\s*', indent, '')
+        let tindent = matchstr(token, '^\s*')
+        while 1
+          let len = s:strwidth(tindent)
+          if len < indent
+            let tindent .= repeat(' ', indent - len)
+            break
+          elseif len > indent
+            let tindent = tindent[0 : -2]
+          else
+            break
+          endif
+        endwhile
+
+        let token = tindent . s:ltrim(token)
         if mode ==? 'c'
-          let token = substitute(token, '\s*$', indent, '')
+          let token = substitute(token, '\s*$', repeat(' ', indent), '')
         endif
         let [pw, tw] = [s:strwidth(prefix), s:strwidth(token)]
         let max.token_len = max([max.token_len, tw])
@@ -469,7 +493,8 @@ function! s:do_align(todo, modes, all_tokens, all_delims, fl, ll, fc, lc, nth, r
       endif
     elseif mode ==? 'r'
       let pad = repeat(' ', max.just_len - pw - tw)
-      let token = pad . token
+      let indent = matchstr(token, '^\s*')
+      let token = indent . pad . s:ltrim(token)
     elseif mode ==? 'c'
       let p1  = max.pivot_len - (pw + tw / 2.0)
       let p2  = (max.token_len - tw) / 2.0
@@ -478,7 +503,8 @@ function! s:do_align(todo, modes, all_tokens, all_delims, fl, ll, fc, lc, nth, r
       else        | let p2 = floor(p2)
       endif
       let strip = float2nr(ceil((max.token_len - max.strip_len) / 2.0))
-      let token = repeat(' ', float2nr(pf1)) .token. repeat(' ', float2nr(p2))
+      let indent = matchstr(token, '^\s*')
+      let token = indent. repeat(' ', float2nr(pf1)) .s:ltrim(token). repeat(' ', float2nr(p2))
       let token = substitute(token, repeat(' ', strip) . '$', '', '')
 
       if d.stick_to_left
@@ -703,6 +729,16 @@ function! s:interactive(range, modes, n, d, opts, rules, vis, live)
       else
         let warn = 'Invalid regular expression: '.ch
       endif
+    elseif ch == "\<C-F>"
+      let f = s:input("Filter (g/../ or v/../): ", get(opts, 'f', ''), a:vis)
+      let m = matchlist(f, '^[gv]/\(.\{-}\)/\?$')
+      if empty(f)
+        silent! call remove(opts, 'f')
+      elseif !empty(m) && s:valid_regexp(m[1])
+        let opts['f'] = f
+      else
+        let warn = 'Invalid filter expression'
+      endif
     elseif ch =~ '[[:print:]]'
       let check = 1
     else
@@ -756,9 +792,9 @@ function! s:test_regexp(regexp)
 endfunction
 
 let s:shorthand_regex =
-  \ '\s*\('
+  \ '\s*\%('
   \   .'\(lm\?[0-9]\+\)\|\(rm\?[0-9]\+\)\|\(iu[01]\)\|\(s\%(tl\)\?[01]\)\|'
-  \   .'\(da\?[clr]\)\|\(ms\?[lrc*]\+\)\|\(i\%(dt\)\?[kdsn]\)\|\(ig\[.*\]\)'
+  \   .'\(da\?[clr]\)\|\(ms\?[lrc*]\+\)\|\(i\%(dt\)\?[kdsn]\)\|\([gv]/.*/\)\|\(ig\[.*\]\)'
   \ .'\)\+\s*$'
 
 function! s:parse_shorthand_opts(expr)
@@ -773,13 +809,17 @@ function! s:parse_shorthand_opts(expr)
   else
     let match = matchlist(expr, regex)
     if empty(match) | break | endif
-    for m in filter(match[ 2 : -1 ], '!empty(v:val)')
-      for key in ['lm', 'rm', 'l', 'r', 'stl', 's', 'iu', 'da', 'd', 'ms', 'm', 'ig', 'i']
+    for m in filter(match[ 1 : -1 ], '!empty(v:val)')
+      for key in ['lm', 'rm', 'l', 'r', 'stl', 's', 'iu', 'da', 'd', 'ms', 'm', 'ig', 'i', 'g', 'v']
         if stridx(tolower(m), key) == 0
           let rest = strpart(m, len(key))
           if key == 'i' | let key = 'idt' | endif
+          if key == 'g' || key == 'v'
+            let rest = key.rest
+            let key = 'f'
+          endif
 
-          if key == 'idt' || index(['d', 'm'], key[0]) >= 0
+          if key == 'idt' || index(['d', 'f', 'm'], key[0]) >= 0
             let opts[key] = rest
           elseif key == 'ig'
             try
@@ -877,6 +917,15 @@ function! s:parse_args(args)
   endif
 endfunction
 
+function! s:parse_filter(f)
+  let m = matchlist(a:f, '^\([gv]\)/\(.\{-}\)/\?$')
+  if empty(m)
+    return [0, '']
+  else
+    return [m[1] == 'g' ? 1 : -1, m[2]]
+  endif
+endfunction
+
 function! s:interactive_modes(bang)
   return get(g:,
     \ (a:bang ? 'easy_align_bang_interactive_modes' : 'easy_align_interactive_modes'),
@@ -936,6 +985,8 @@ function! s:build_dict(delimiters, ch, regexp, opts)
     \ get(dict, 'ignore_unmatched', get(g:, 'easy_align_ignore_unmatched', 2))
   let dict.ignore_groups =
     \ get(dict, 'ignore_groups', get(dict, 'ignores', s:ignored_syntax()))
+  let dict.filter =
+    \ get(dict, 'filter', '')
   return dict
 endfunction
 
