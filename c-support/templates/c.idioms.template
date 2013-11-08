@@ -24,6 +24,30 @@ static void<CURSOR>
 <SPLIT>	return <+return_value+>;
 }
 /* ----  end of static function |FUNCTION_NAME|  ---- */
+== Idioms.daemon == map:idm, shortcut:d ==
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+void __init_daemon(void)
+{
+	switch (fork()) {
+	case -1:
+		exit(EXIT_FAILURE);
+	case 0:
+		if (setsid() < 0)
+			exit(EXIT_FAILURE);
+		umask(0);
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		close(STDERR_FILENO);
+		break;
+	default:
+		exit(EXIT_SUCCESS);
+	}
+}
+
 == Idioms.main == map:im, shortcut:m  ==
 #include <stdio.h>
 #include <stdint.h>
