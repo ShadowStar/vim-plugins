@@ -47,15 +47,15 @@ function! s:GotoLine(file)
 endfunction
 
 function! OopsTrace(line)
-    let symbols = matchlist(a:line, '\(\w\+\)+\(\w\+\)/\w\+\( \[\(\w\+\)\]\)\?')
+    let symbols = matchlist(a:line, ' \(\w\+\)\(\.\(\.\|\w\)\+\)\?+\(\w\+\)/\w\+\( \[\(\w\+\)\]\)\?')
 
     if empty(symbols)
         return
     endif
 
     let function = symbols[1]
-    let offset   = symbols[2]
-    let module   = symbols[4]
+    let offset   = symbols[4]
+    let module   = symbols[6]
 
     if exists("g:oops_path")
         let oops_path = g:oops_path
