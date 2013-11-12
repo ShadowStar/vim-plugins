@@ -474,6 +474,17 @@ SudoEdit-manual	SudoEdit.txt	/*SudoEdit-manual*
 SudoEdit.txt	SudoEdit.txt	/*SudoEdit.txt*
 SudoRead	SudoEdit.txt	/*SudoRead*
 SudoWrite	SudoEdit.txt	/*SudoWrite*
+TabwinsAddingNewBuilders	tabwins.txt	/*TabwinsAddingNewBuilders*
+TabwinsBugs	tabwins.txt	/*TabwinsBugs*
+TabwinsConfiguration	tabwins.txt	/*TabwinsConfiguration*
+TabwinsContents	tabwins.txt	/*TabwinsContents*
+TabwinsCredits	tabwins.txt	/*TabwinsCredits*
+TabwinsDistributions	tabwins.txt	/*TabwinsDistributions*
+TabwinsIntroduction	tabwins.txt	/*TabwinsIntroduction*
+TabwinsLicense	tabwins.txt	/*TabwinsLicense*
+TabwinsMenu	tabwins.txt	/*TabwinsMenu*
+TabwinsUsage	tabwins.txt	/*TabwinsUsage*
+TabwinsVandH	tabwins.txt	/*TabwinsVandH*
 Tlist_Get_Filenames()	taglist.txt	/*Tlist_Get_Filenames()*
 Tlist_Get_Tag_Prototype_By_Line()	taglist.txt	/*Tlist_Get_Tag_Prototype_By_Line()*
 Tlist_Get_Tagname_By_Line()	taglist.txt	/*Tlist_Get_Tagname_By_Line()*
@@ -1271,6 +1282,7 @@ syntastic-notes	syntastic.txt	/*syntastic-notes*
 syntastic-pymode	syntastic.txt	/*syntastic-pymode*
 syntastic-statusline-flag	syntastic.txt	/*syntastic-statusline-flag*
 syntastic.txt	syntastic.txt	/*syntastic.txt*
+tabwins.txt	tabwins.txt	/*tabwins.txt*
 taglist-commands	taglist.txt	/*taglist-commands*
 taglist-debug	taglist.txt	/*taglist-debug*
 taglist-extend	taglist.txt	/*taglist-extend*
