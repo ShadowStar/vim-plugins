@@ -7,11 +7,12 @@
 *.sln.docstates
 
 # Build results
-
 [Dd]ebug/
+[Dd]ebugPublic/
 [Rr]elease/
 x64/
 build/
+bld/
 [Bb]in/
 [Oo]bj/
 
@@ -21,6 +22,10 @@ build/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+
+#NUNIT
+*.VisualState.xml
+TestResult.xml
 
 *_i.c
 *_p.c
@@ -47,6 +52,9 @@ build/
 *.svclog
 *.scc
 
+# Chutzpah Test files
+_Chutzpah*
+
 # Visual C++ cache files
 ipch/
 *.aps
@@ -71,6 +79,9 @@ _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
 
+# JustCode is a .NET coding addin-in
+.JustCode
+
 # TeamCity is a build add-in
 _TeamCity*
 
@@ -81,6 +92,10 @@ _TeamCity*
 *.ncrunch*
 _NCrunch_*
 .*crunch*.local.xml
+
+# MightyMoose
+*.mm.*
+AutoTest.Net/
 
 # Installshield output folder
 [Ee]xpress/
@@ -100,13 +115,16 @@ publish/
 
 # Publish Web Output
 *.Publish.xml
+*.azurePubxml
 
 # NuGet Packages Directory
 ## TODO: If you have NuGet Package Restore enabled, uncomment the next line
 #packages/
+## TODO: If the tool you use requires repositories.config, also uncomment the next line
+#!packages/repositories.config
 
 # Windows Azure Build Output
-csx
+csx/
 *.build.csdef
 
 # Windows Store app package directory
@@ -160,7 +178,4 @@ Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
-
-# Mac crap
-.DS_Store
 
