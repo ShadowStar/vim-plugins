@@ -1004,6 +1004,7 @@ g:patchreview_patch	patchreview.txt	/*g:patchreview_patch*
 g:patchreview_patch_needs_crlf	patchreview.txt	/*g:patchreview_patch_needs_crlf*
 g:patchreview_postfunc	patchreview.txt	/*g:patchreview_postfunc*
 g:patchreview_prefunc	patchreview.txt	/*g:patchreview_prefunc*
+g:patchreview_split_right	patchreview.txt	/*g:patchreview_split_right*
 g:patchreview_unified_rejects	patchreview.txt	/*g:patchreview_unified_rejects*
 g:patchreview_wiggle	patchreview.txt	/*g:patchreview_wiggle*
 g:snippets_dir	snipMate.txt	/*g:snippets_dir*
@@ -1173,6 +1174,7 @@ patchreview_patch	patchreview.txt	/*patchreview_patch*
 patchreview_patch_needs_crlf	patchreview.txt	/*patchreview_patch_needs_crlf*
 patchreview_postfunc	patchreview.txt	/*patchreview_postfunc*
 patchreview_prefunc	patchreview.txt	/*patchreview_prefunc*
+patchreview_split_right	patchreview.txt	/*patchreview_split_right*
 patchreview_unified_rejects	patchreview.txt	/*patchreview_unified_rejects*
 patchreview_wiggle	patchreview.txt	/*patchreview_wiggle*
 reco	reco.txt	/*reco*
