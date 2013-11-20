@@ -47,15 +47,15 @@ function! s:GotoLine(file)
 endfunction
 
 function! OopsTrace(line)
-    let symbols = matchlist(a:line, ' \(\w\+\)\(\.\(\.\|\w\)\+\)\?+\(\w\+\)/\w\+\( \[\(\w\+\)\]\)\?')
+    let symbols = matchlist(a:line, '\(\(\w\|\.\)\+\)+\(\w\+\)/\w\+\( \[\(\w\+\)\]\)\?')
 
     if empty(symbols)
         return
     endif
 
     let function = symbols[1]
-    let offset   = symbols[4]
-    let module   = symbols[6]
+    let offset   = symbols[3]
+    let module   = symbols[5]
 
     if exists("g:oops_path")
         let oops_path = g:oops_path
@@ -79,8 +79,19 @@ function! OopsTrace(line)
         let module = substitute(module, '\n$', '', '')
     endif
 
-    let func_offset_cmd = "nm ". module . '| awk "/ [Tt] ' . function . '\$/ { print \"0x\" \$1; }"'
-    let func_offset = system(func_offset_cmd) - 1
+    if offset != 0
+        " this is necssary so we return to the caller, not the next
+        " instruction to be executed after return
+        let offset = offset - 1
+    endif
+
+    let func_offset_cmd = "nm ". module . '| awk "/ [Tt] ' . function . '\$/ { print \"0x\" \$1; }" | head -n1'
+    let func_offset = system(func_offset_cmd)
+
+    if func_offset == ""
+        echo "Symbol lookup failed"
+        return
+    endif
 
     let abs_offset = system("printf 0x%x " . (func_offset + offset))
 
