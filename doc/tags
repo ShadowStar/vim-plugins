@@ -149,6 +149,7 @@
 --	tabwins.txt	/*--*
 --	tabwins.txt	/*--*
 --	tabwins.txt	/*--*
+--	tabwins.txt	/*--*
 .snippet	snipMate.txt	/*.snippet*
 .snippets	snipMate.txt	/*.snippets*
 :AcpDisable	acp.txt	/*:AcpDisable*
@@ -1352,7 +1353,7 @@ template-support-templates	templatesupport.txt	/*template-support-templates*
 template-support-visual	templatesupport.txt	/*template-support-visual*
 templatesupport.txt	templatesupport.txt	/*templatesupport.txt*
 trailing-whitespace.txt	trailing-whitespace.txt	/*trailing-whitespace.txt*
-v2.2.0	tabwins.txt	/*v2.2.0*
+v3.0.0	tabwins.txt	/*v3.0.0*
 v_<Leader>m	mark.txt	/*v_<Leader>m*
 v_<Leader>r	mark.txt	/*v_<Leader>r*
 v_[=	ConflictMotions.txt	/*v_[=*
