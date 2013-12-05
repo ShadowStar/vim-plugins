@@ -16,23 +16,23 @@
 #       RETURNS:  
 #-------------------------------------------------------------------------------
 == Comments.file header == start, map:ch ==
-#!/bin/bash - 
+#!/bin/bash -
 #===============================================================================
 #
-#          FILE: |FILENAME|
-# 
-#         USAGE: ./|FILENAME| 
-# 
-#   DESCRIPTION: 
-# 
-#       OPTIONS: ---
-#  REQUIREMENTS: ---
-#          BUGS: ---
-#         NOTES: ---
-#        AUTHOR: |AUTHOR| (|AUTHORREF|), |EMAIL|
-#  ORGANIZATION: |ORGANIZATION|
-#       CREATED: |DATE| |TIME|
-#      REVISION:  ---
+#          File: |FILENAME|
+#
+#         Usage: ./|FILENAME| 
+#
+#   Description: 
+#
+#       Options: ---
+#  Requirements: ---
+#          Bugs: ---
+#         Notes: ---
+#        Author: |AUTHOR| (|AUTHORREF|), |EMAIL|
+#  Organization: |ORGANIZATION|
+#       Created: |DATE| |TIME|
+#      Revision:  ---
 #===============================================================================
 
 set -o nounset                              # Treat unset variables as an error
