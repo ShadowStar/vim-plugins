@@ -417,6 +417,8 @@ let g:loaded_syntastic_plugin = 1
 set imdisable
 set iminsert=0
 
+let g:update_time_time_format = ' %m/%d %H:%M:%S'
+let g:update_time_end_line = 30
 "if filereadable(".vimrc")
 "	source .vimrc
 "endif
