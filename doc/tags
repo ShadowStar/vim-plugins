@@ -295,6 +295,7 @@
 <Leader>x<	ConflictMotions.txt	/*<Leader>x<*
 <Leader>x>	ConflictMotions.txt	/*<Leader>x>*
 <Leader>xd	ConflictMotions.txt	/*<Leader>xd*
+<Plug>(EasyAlign)	easy_align.txt	/*<Plug>(EasyAlign)*
 <k1>	mark.txt	/*<k1>*
 AnsiEsc	AnsiEsc.txt	/*AnsiEsc*
 AnsiEsc-contents	AnsiEsc.txt	/*AnsiEsc-contents*
