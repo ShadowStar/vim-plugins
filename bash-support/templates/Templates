@@ -11,7 +11,7 @@ SetMacro( 'COMPANY',     'Juson Tech' )
 SetMacro( 'LICENSE',     'GNU General Public License' )
 
 SetFormat( 'DATE', '%D'      )
-SetFormat( 'TIME', '%H:%M'   )
+SetFormat( 'TIME', '%H:%M:%S'   )
 SetFormat( 'YEAR', 'year %Y' )
 
 SetStyle( 'default' )

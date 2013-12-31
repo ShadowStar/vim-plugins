@@ -11,7 +11,7 @@ SetMacro( 'LICENSE',     'BSD License' )
 SetMacro( 'ORGANIZATION','Juson Tech' )
 
 SetFormat( 'DATE', '%D' )
-SetFormat( 'TIME', '%H:%M' )
+SetFormat( 'TIME', '%H:%M:%S' )
 SetFormat( 'YEAR', 'year %Y' )
 
 SetStyle( 'default' )
