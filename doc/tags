@@ -1118,11 +1118,13 @@ g:sudoAuth	SudoEdit.txt	/*g:sudoAuth*
 g:sudoAuthArg	SudoEdit.txt	/*g:sudoAuthArg*
 g:sudo_askpass	SudoEdit.txt	/*g:sudo_askpass*
 g:sudo_no_gui	SudoEdit.txt	/*g:sudo_no_gui*
+g:tcomment#blank_lines	tcomment.txt	/*g:tcomment#blank_lines*
 g:tcomment#ignore_char_type	tcomment.txt	/*g:tcomment#ignore_char_type*
+g:tcomment#ignore_comment_def	tcomment.txt	/*g:tcomment#ignore_comment_def*
 g:tcomment#replacements_c	tcomment.txt	/*g:tcomment#replacements_c*
 g:tcomment#replacements_xml	tcomment.txt	/*g:tcomment#replacements_xml*
+g:tcomment#rstrip_on_uncomment	tcomment.txt	/*g:tcomment#rstrip_on_uncomment*
 g:tcomment#syntax_substitute	tcomment.txt	/*g:tcomment#syntax_substitute*
-g:tcommentBlankLines	tcomment.txt	/*g:tcommentBlankLines*
 g:tcommentBlockC2	tcomment.txt	/*g:tcommentBlockC2*
 g:tcommentBlockXML	tcomment.txt	/*g:tcommentBlockXML*
 g:tcommentGuessFileType	tcomment.txt	/*g:tcommentGuessFileType*
