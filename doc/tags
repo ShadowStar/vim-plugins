@@ -328,6 +328,8 @@
 <Leader>x>	ConflictMotions.txt	/*<Leader>x>*
 <Leader>xd	ConflictMotions.txt	/*<Leader>xd*
 <Plug>(EasyAlign)	easy_align.txt	/*<Plug>(EasyAlign)*
+<Plug>(EasyAlignRepeat)	easy_align.txt	/*<Plug>(EasyAlignRepeat)*
+<Plug>(LiveEasyAlign)	easy_align.txt	/*<Plug>(LiveEasyAlign)*
 <k1>	mark.txt	/*<k1>*
 AnsiEsc	AnsiEsc.txt	/*AnsiEsc*
 AnsiEsc-contents	AnsiEsc.txt	/*AnsiEsc-contents*
@@ -967,7 +969,6 @@ easy-align-usage	easy_align.txt	/*easy-align-usage*
 easy-align-using-easyalign-in-command-line	easy_align.txt	/*easy-align-using-easyalign-in-command-line*
 easy-align-using-regular-expressions	easy_align.txt	/*easy-align-using-regular-expressions*
 easyalign	easy_align.txt	/*easyalign*
-g:AlignSkip	easy_align.txt	/*g:AlignSkip*
 g:CMake_Executable	toolboxcmake.txt	/*g:CMake_Executable*
 g:CMake_MakeTool	toolboxcmake.txt	/*g:CMake_MakeTool*
 g:ConflictDetection_AutoDetectEvents	ConflictDetection.txt	/*g:ConflictDetection_AutoDetectEvents*
@@ -1072,12 +1073,14 @@ g:ctrlp_regexp_search	ctrlp.txt	/*g:ctrlp_regexp_search*
 g:diffgofile_directories_up	diffgofile.txt	/*g:diffgofile_directories_up*
 g:diffgofile_environment	diffgofile.txt	/*g:diffgofile_environment*
 g:drawit_insertmode	DrawIt.txt	/*g:drawit_insertmode*
+g:easy_align_bang_interactive_modes	easy_align.txt	/*g:easy_align_bang_interactive_modes*
 g:easy_align_bypass_fold	easy_align.txt	/*g:easy_align_bypass_fold*
 g:easy_align_delimiter_align	easy_align.txt	/*g:easy_align_delimiter_align*
 g:easy_align_delimiters	easy_align.txt	/*g:easy_align_delimiters*
 g:easy_align_ignore_groups	easy_align.txt	/*g:easy_align_ignore_groups*
 g:easy_align_ignore_unmatched	easy_align.txt	/*g:easy_align_ignore_unmatched*
 g:easy_align_indentation	easy_align.txt	/*g:easy_align_indentation*
+g:easy_align_interactive_modes	easy_align.txt	/*g:easy_align_interactive_modes*
 g:easy_align_last_command	easy_align.txt	/*g:easy_align_last_command*
 g:loaded_diffgofile	diffgofile.txt	/*g:loaded_diffgofile*
 g:mwAutoLoadMarks	mark.txt	/*g:mwAutoLoadMarks*
