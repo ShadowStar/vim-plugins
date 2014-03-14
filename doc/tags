@@ -127,12 +127,12 @@
 'syntastic_check_on_wq'	syntastic.txt	/*'syntastic_check_on_wq'*
 'syntastic_debug'	syntastic.txt	/*'syntastic_debug'*
 'syntastic_debug_file'	syntastic.txt	/*'syntastic_debug_file'*
-'syntastic_delayed_redraws'	syntastic.txt	/*'syntastic_delayed_redraws'*
 'syntastic_echo_current_error'	syntastic.txt	/*'syntastic_echo_current_error'*
 'syntastic_enable_balloons'	syntastic.txt	/*'syntastic_enable_balloons'*
 'syntastic_enable_highlighting'	syntastic.txt	/*'syntastic_enable_highlighting'*
 'syntastic_enable_signs'	syntastic.txt	/*'syntastic_enable_signs'*
 'syntastic_error_symbol'	syntastic.txt	/*'syntastic_error_symbol'*
+'syntastic_extra_filetypes'	syntastic.txt	/*'syntastic_extra_filetypes'*
 'syntastic_filetype_map'	syntastic.txt	/*'syntastic_filetype_map'*
 'syntastic_full_redraws'	syntastic.txt	/*'syntastic_full_redraws'*
 'syntastic_id_checkers'	syntastic.txt	/*'syntastic_id_checkers'*
@@ -969,6 +969,7 @@ easy-align-usage	easy_align.txt	/*easy-align-usage*
 easy-align-using-easyalign-in-command-line	easy_align.txt	/*easy-align-using-easyalign-in-command-line*
 easy-align-using-regular-expressions	easy_align.txt	/*easy-align-using-regular-expressions*
 easyalign	easy_align.txt	/*easyalign*
+filter-overrides	syntastic.txt	/*filter-overrides*
 g:CMake_Executable	toolboxcmake.txt	/*g:CMake_Executable*
 g:CMake_MakeTool	toolboxcmake.txt	/*g:CMake_MakeTool*
 g:ConflictDetection_AutoDetectEvents	ConflictDetection.txt	/*g:ConflictDetection_AutoDetectEvents*
@@ -1384,6 +1385,7 @@ syntastic-error-window	syntastic.txt	/*syntastic-error-window*
 syntastic-filetype-checkers	syntastic.txt	/*syntastic-filetype-checkers*
 syntastic-filtering-errors	syntastic.txt	/*syntastic-filtering-errors*
 syntastic-fish	syntastic.txt	/*syntastic-fish*
+syntastic-fizsh	syntastic.txt	/*syntastic-fizsh*
 syntastic-functionality	syntastic.txt	/*syntastic-functionality*
 syntastic-global-options	syntastic.txt	/*syntastic-global-options*
 syntastic-highlighting	syntastic.txt	/*syntastic-highlighting*
