@@ -735,6 +735,7 @@ b:VCSCommandCommand	vcscommand.txt	/*b:VCSCommandCommand*
 b:VCSCommandOriginalBuffer	vcscommand.txt	/*b:VCSCommandOriginalBuffer*
 b:VCSCommandSourceFile	vcscommand.txt	/*b:VCSCommandSourceFile*
 b:VCSCommandVCSType	vcscommand.txt	/*b:VCSCommandVCSType*
+b:tcomment_def_{NAME}	tcomment.txt	/*b:tcomment_def_{NAME}*
 bash-support	bashsupport.txt	/*bash-support*
 bashsupport	bashsupport.txt	/*bashsupport*
 bashsupport-Ctrl-j	bashsupport.txt	/*bashsupport-Ctrl-j*
@@ -1554,6 +1555,7 @@ taglist.txt	taglist.txt	/*taglist.txt*
 tcomment#Comment()	tcomment.txt	/*tcomment#Comment()*
 tcomment#CommentAs()	tcomment.txt	/*tcomment#CommentAs()*
 tcomment#DefineType()	tcomment.txt	/*tcomment#DefineType()*
+tcomment#GetCommentDef()	tcomment.txt	/*tcomment#GetCommentDef()*
 tcomment#GuessCommentType()	tcomment.txt	/*tcomment#GuessCommentType()*
 tcomment#Operator()	tcomment.txt	/*tcomment#Operator()*
 tcomment#OperatorAnyway()	tcomment.txt	/*tcomment#OperatorAnyway()*
