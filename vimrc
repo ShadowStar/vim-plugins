@@ -379,6 +379,8 @@ let g:BASH_FormatYear            = 'year %Y'
 let g:C_Ctrl_j = 'off'
 let g:C_Dictionary_File = $HOME.'/.vim/c-support/wordlists/std-keywords.list'
 let g:BASH_Ctrl_j = 'off'
+let g:Awk_Ctrl_j = 'off'
+let g:Vim_Ctrl_j = 'off'
 
 let g:SrcExpl_winHeight = 8
 let g:SrcExpl_refreshTime = 100
