@@ -969,8 +969,10 @@ function! s:CreateAdditionalMaps ()
 		inoremap    <buffer>  <silent>  <S-F1>        <C-C>:call Vim_Help()<CR>
 	endif
 	"
-"	nmap    <buffer>  <silent>  <C-j>    i<C-R>=Vim_JumpForward()<CR>
-	imap    <buffer>  <silent>  <C-j>     <C-R>=Vim_JumpForward()<CR>
+	if !exists("g:Vim_Ctrl_j") || ( exists("g:Vim_Ctrl_j") && g:Vim_Ctrl_j != 'off' )
+		nnoremap <buffer>  <silent>  <C-j>    i<C-R>=Vim_JumpForward()<CR>
+		inoremap <buffer>  <silent>  <C-j>     <C-R>=Vim_JumpForward()<CR>
+	endif
 	"
 	"-------------------------------------------------------------------------------
 	" settings - reset local leader
