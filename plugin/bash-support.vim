@@ -1042,8 +1042,10 @@ function! s:CreateAdditionalMaps ()
 	 noremap  <buffer>  <silent>  <LocalLeader>hbs        :call BASH_HelpBashSupport()<CR>
 	inoremap  <buffer>  <silent>  <LocalLeader>hbs   <C-C>:call BASH_HelpBashSupport()<CR>
 	"
-	nnoremap    <buffer>  <silent>  <C-j>    i<C-R>=BASH_JumpForward()<CR>
-	inoremap    <buffer>  <silent>  <C-j>     <C-R>=BASH_JumpForward()<CR>
+	if !exists("g:BASH_Ctrl_j") || ( exists("g:BASH_Ctrl_j") && g:BASH_Ctrl_j != 'off' )
+		nnoremap    <buffer>  <silent>  <C-j>    i<C-R>=BASH_JumpForward()<CR>
+		inoremap    <buffer>  <silent>  <C-j>     <C-R>=BASH_JumpForward()<CR>
+	endif
 	"
 	"-------------------------------------------------------------------------------
 	" settings - reset local leader
