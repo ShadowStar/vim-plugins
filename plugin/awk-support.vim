@@ -954,8 +954,10 @@ function! s:CreateAdditionalMaps ()
 	 noremap  <buffer>  <silent>  <LocalLeader>hp         :call Awk_HelpAwkSupport()<CR>
 	inoremap  <buffer>  <silent>  <LocalLeader>hp    <C-C>:call Awk_HelpAwkSupport()<CR>
 	"
-	nnoremap    <buffer>  <silent>  <C-j>    i<C-R>=Awk_JumpForward()<CR>
-	inoremap    <buffer>  <silent>  <C-j>     <C-R>=Awk_JumpForward()<CR>
+	if !exists("g:Awk_Ctrl_j") || ( exists("g:Awk_Ctrl_j") && g:Awk_Ctrl_j != 'off' )
+		nnoremap    <buffer>  <silent>  <C-j>    i<C-R>=Awk_JumpForward()<CR>
+		inoremap    <buffer>  <silent>  <C-j>     <C-R>=Awk_JumpForward()<CR>
+	endif
 	"
 	"-------------------------------------------------------------------------------
 	" settings - reset local leader
