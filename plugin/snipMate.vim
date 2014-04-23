@@ -177,7 +177,7 @@ fun! TriggerSnippet()
 		endif
 	endfor
 
-	if exists('SuperTabKey')
+	if word != '' && exists('SuperTabKey')
 		call feedkeys(SuperTabKey)
 		return ''
 	endif
