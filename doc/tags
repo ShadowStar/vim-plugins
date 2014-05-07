@@ -389,16 +389,12 @@ AnsiEsc-history	AnsiEsc.txt	/*AnsiEsc-history*
 AnsiEsc-manual	AnsiEsc.txt	/*AnsiEsc-manual*
 AnsiEsc.txt	AnsiEsc.txt	/*AnsiEsc.txt*
 ArrangeColumn_CSV	ft-csv.txt	/*ArrangeColumn_CSV*
-Bash_ResetMapLeader()	bashsupport.txt	/*Bash_ResetMapLeader()*
-Bash_SetMapLeader()	bashsupport.txt	/*Bash_SetMapLeader()*
 CSV-Functions	ft-csv.txt	/*CSV-Functions*
 CSVCol()	ft-csv.txt	/*CSVCol()*
 CSVField()	ft-csv.txt	/*CSVField()*
 CSVFixed	ft-csv.txt	/*CSVFixed*
 CSVPat()	ft-csv.txt	/*CSVPat()*
 CSV_WCol()	ft-csv.txt	/*CSV_WCol()*
-C_ResetMapLeader()	csupport.txt	/*C_ResetMapLeader()*
-C_SetMapLeader()	csupport.txt	/*C_SetMapLeader()*
 ClearAllCtrlPCaches	ctrlp.txt	/*ClearAllCtrlPCaches*
 ClearCtrlPCache	ctrlp.txt	/*ClearCtrlPCache*
 ColorV	colorv.txt	/*ColorV*
@@ -911,7 +907,6 @@ csupport-templates-names	csupport.txt	/*csupport-templates-names*
 csupport-tips	csupport.txt	/*csupport-tips*
 csupport-toolbox	csupport.txt	/*csupport-toolbox*
 csupport-toolbox-make	csupport.txt	/*csupport-toolbox-make*
-csupport-toolbox-others	csupport.txt	/*csupport-toolbox-others*
 csupport-troubleshooting	csupport.txt	/*csupport-troubleshooting*
 csupport-usage-gvim	csupport.txt	/*csupport-usage-gvim*
 csupport-usage-vim	csupport.txt	/*csupport-usage-vim*
@@ -1095,7 +1090,6 @@ easyalign	easy_align.txt	/*easyalign*
 filter-overrides	syntastic.txt	/*filter-overrides*
 ft-csv.txt	ft-csv.txt	/*ft-csv.txt*
 g:CMake_Executable	toolboxcmake.txt	/*g:CMake_Executable*
-g:CMake_JumpToError	toolboxcmake.txt	/*g:CMake_JumpToError*
 g:CMake_MakeTool	toolboxcmake.txt	/*g:CMake_MakeTool*
 g:ConflictDetection_AutoDetectEvents	ConflictDetection.txt	/*g:ConflictDetection_AutoDetectEvents*
 g:ConflictDetection_WarnEvents	ConflictDetection.txt	/*g:ConflictDetection_WarnEvents*
@@ -1373,12 +1367,10 @@ mmtemplates#core#InsertTemplate()	templatesupport.txt	/*mmtemplates#core#InsertT
 mmtemplates#core#JumpToTag()	templatesupport.txt	/*mmtemplates#core#JumpToTag()*
 mmtemplates#core#NewLibrary()	templatesupport.txt	/*mmtemplates#core#NewLibrary()*
 mmtemplates#core#ReadTemplates()	templatesupport.txt	/*mmtemplates#core#ReadTemplates()*
-mmtemplates#core#ResetMapleader()	templatesupport.txt	/*mmtemplates#core#ResetMapleader()*
 mmtemplates#core#Resource()	templatesupport.txt	/*mmtemplates#core#Resource()*
-mmtemplates#core#SetMapleader()	templatesupport.txt	/*mmtemplates#core#SetMapleader()*
-mmtoolbox#cmake#Property()	toolboxcmake.txt	/*mmtoolbox#cmake#Property()*
-mmtoolbox#doxygen#Property()	toolboxdoxygen.txt	/*mmtoolbox#doxygen#Property()*
-mmtoolbox#make#Property()	toolboxmake.txt	/*mmtoolbox#make#Property()*
+mmtoolbox#cmake#Property	toolboxcmake.txt	/*mmtoolbox#cmake#Property*
+mmtoolbox#doxygen#Property	toolboxdoxygen.txt	/*mmtoolbox#doxygen#Property*
+mmtoolbox#make#Property	toolboxmake.txt	/*mmtoolbox#make#Property*
 mmtoolbox#tools#AddMaps()	toolbox.txt	/*mmtoolbox#tools#AddMaps()*
 mmtoolbox#tools#AddMenus()	toolbox.txt	/*mmtoolbox#tools#AddMenus()*
 mmtoolbox#tools#GetList()	toolbox.txt	/*mmtoolbox#tools#GetList()*
@@ -1645,7 +1637,6 @@ templatesupport.txt	templatesupport.txt	/*templatesupport.txt*
 toolbox	toolbox.txt	/*toolbox*
 toolbox-cmake	toolboxcmake.txt	/*toolbox-cmake*
 toolbox-cmake-api	toolboxcmake.txt	/*toolbox-cmake-api*
-toolbox-cmake-change-log	toolboxcmake.txt	/*toolbox-cmake-change-log*
 toolbox-cmake-commands	toolboxcmake.txt	/*toolbox-cmake-commands*
 toolbox-cmake-config	toolboxcmake.txt	/*toolbox-cmake-config*
 toolbox-cmake-contents	toolboxcmake.txt	/*toolbox-cmake-contents*
@@ -1653,7 +1644,6 @@ toolbox-cmake-intro	toolboxcmake.txt	/*toolbox-cmake-intro*
 toolbox-cmake-issues	toolboxcmake.txt	/*toolbox-cmake-issues*
 toolbox-doxygen	toolboxdoxygen.txt	/*toolbox-doxygen*
 toolbox-doxygen-api	toolboxdoxygen.txt	/*toolbox-doxygen-api*
-toolbox-doxygen-change-log	toolboxdoxygen.txt	/*toolbox-doxygen-change-log*
 toolbox-doxygen-commands	toolboxdoxygen.txt	/*toolbox-doxygen-commands*
 toolbox-doxygen-config	toolboxdoxygen.txt	/*toolbox-doxygen-config*
 toolbox-doxygen-contents	toolboxdoxygen.txt	/*toolbox-doxygen-contents*
