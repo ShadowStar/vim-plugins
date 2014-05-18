@@ -33,7 +33,7 @@ endif
 " let h = ViewDoc_pman('error_reporting')
 " let h = ViewDoc_pman('error_reporting(3)')
 " let h = ViewDoc_pman('2 error_reporting')
-function ViewDoc_pman(topic, ...)
+function s:ViewDoc_pman(topic, ...)
 	let sect = ''
 	let name = a:topic
 	let m = matchlist(name, '('.s:re_mansect.')\.\?$')
@@ -51,8 +51,13 @@ function ViewDoc_pman(topic, ...)
 		\ }
 endfunction
 
-let g:ViewDoc_pman = function('ViewDoc_pman')
-let g:ViewDoc_php  = function('ViewDoc_pman')
+" use function(s:SID().'Foo') instead of function('s:Foo') for
+" compatibility with Vim-7.3.x (7.3.762 at least)
+function s:SID()
+	return matchstr(expand('<sfile>'), '\zs<SNR>\d\+_\zeSID$')
+endfunction
+let g:ViewDoc_pman = function(s:SID().'ViewDoc_pman')
+let g:ViewDoc_php  = function(s:SID().'ViewDoc_pman')
 
 
 """ Internal
