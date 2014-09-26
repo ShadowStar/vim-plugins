@@ -20,6 +20,7 @@ setlocal keywordprg=man\ -S\ 2:3
 setlocal wildignore+=*.ko,*.mod.c,*.order,modules.builtin
 setlocal tabstop=8
 setlocal shiftwidth=8
+setlocal softtabstop=8
 setlocal textwidth=80
 setlocal noexpandtab
 setlocal cindent
