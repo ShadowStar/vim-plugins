@@ -1192,6 +1192,7 @@ g:acp_mappingDriven	acp.txt	/*g:acp_mappingDriven*
 g:bufExplorerChgWin	bufexplorer.txt	/*g:bufExplorerChgWin*
 g:bufExplorerDefaultHelp	bufexplorer.txt	/*g:bufExplorerDefaultHelp*
 g:bufExplorerDetailedHelp	bufexplorer.txt	/*g:bufExplorerDetailedHelp*
+g:bufExplorerDisableDefaultKeyMapping	bufexplorer.txt	/*g:bufExplorerDisableDefaultKeyMapping*
 g:bufExplorerFindActive	bufexplorer.txt	/*g:bufExplorerFindActive*
 g:bufExplorerFuncRef	bufexplorer.txt	/*g:bufExplorerFuncRef*
 g:bufExplorerReverseSort	bufexplorer.txt	/*g:bufExplorerReverseSort*
