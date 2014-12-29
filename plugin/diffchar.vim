@@ -271,10 +271,10 @@ nnoremap <silent> <Plug>JumpDiffCharPrevEnd
 nnoremap <silent> <Plug>JumpDiffCharNextEnd
 				\ :call <SID>JumpDiffChar(1, 0)<CR>
 if !hasmapto('<Plug>ToggleDiffCharAllLines', 'n')
-	nmap <silent> <F7> <Plug>ToggleDiffCharAllLines
+	nmap <silent> <leader>da <Plug>ToggleDiffCharAllLines
 endif
 if !hasmapto('<Plug>ToggleDiffCharCurrentLine', 'n')
-	nmap <silent> <F8> <Plug>ToggleDiffCharCurrentLine
+	nmap <silent> <leader>dc <Plug>ToggleDiffCharCurrentLine
 endif
 if !hasmapto('<Plug>JumpDiffCharPrevStart', 'n')
 	nmap <silent> [b <Plug>JumpDiffCharPrevStart
