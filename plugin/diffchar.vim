@@ -1029,7 +1029,7 @@ function! s:RefreshDiffCharWin()
 	" find diffchar windows and set their winnr to t:DChar.win again
 	let t:DChar.win = {}
 	for win in range(1, winnr('$'))
-		let id = getwinvar(win, "DCharID", 0)
+		let id = getwinvar(win, "DCharID")
 		if id | let t:DChar.win[id] = win | endif
 	endfor
 endfunction
