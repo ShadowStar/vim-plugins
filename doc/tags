@@ -57,7 +57,10 @@
 'Tlist_Use_SingleClick'	taglist.txt	/*'Tlist_Use_SingleClick'*
 'Tlist_WinHeight'	taglist.txt	/*'Tlist_WinHeight'*
 'Tlist_WinWidth'	taglist.txt	/*'Tlist_WinWidth'*
+'b:syntastic_<checker>_exec'	syntastic.txt	/*'b:syntastic_<checker>_exec'*
 'b:syntastic_checkers'	syntastic.txt	/*'b:syntastic_checkers'*
+'b:syntastic_mode'	syntastic.txt	/*'b:syntastic_mode'*
+'b:syntastic_skip_checks'	syntastic.txt	/*'b:syntastic_skip_checks'*
 'ctrl-p'	ctrlp.txt	/*'ctrl-p'*
 'ctrlp'	ctrlp.txt	/*'ctrlp'*
 'ctrlp-<c-p>'	ctrlp.txt	/*'ctrlp-<c-p>'*
@@ -119,6 +122,7 @@
 'syntastic_<filetype>_<checker>_exe'	syntastic.txt	/*'syntastic_<filetype>_<checker>_exe'*
 'syntastic_<filetype>_<checker>_exec'	syntastic.txt	/*'syntastic_<filetype>_<checker>_exec'*
 'syntastic_<filetype>_<checker>_quiet_messages'	syntastic.txt	/*'syntastic_<filetype>_<checker>_quiet_messages'*
+'syntastic_<filetype>_<checker>_sort'	syntastic.txt	/*'syntastic_<filetype>_<checker>_sort'*
 'syntastic_aggregate_errors'	syntastic.txt	/*'syntastic_aggregate_errors'*
 'syntastic_always_populate_loc_list'	syntastic.txt	/*'syntastic_always_populate_loc_list'*
 'syntastic_auto_jump'	syntastic.txt	/*'syntastic_auto_jump'*
@@ -133,6 +137,7 @@
 'syntastic_enable_highlighting'	syntastic.txt	/*'syntastic_enable_highlighting'*
 'syntastic_enable_signs'	syntastic.txt	/*'syntastic_enable_signs'*
 'syntastic_error_symbol'	syntastic.txt	/*'syntastic_error_symbol'*
+'syntastic_exit_checks'	syntastic.txt	/*'syntastic_exit_checks'*
 'syntastic_extra_filetypes'	syntastic.txt	/*'syntastic_extra_filetypes'*
 'syntastic_filetype_map'	syntastic.txt	/*'syntastic_filetype_map'*
 'syntastic_full_redraws'	syntastic.txt	/*'syntastic_full_redraws'*
@@ -294,7 +299,6 @@
 :SrcExplClose	srcexpl.txt	/*:SrcExplClose*
 :SrcExplToggle	srcexpl.txt	/*:SrcExplToggle*
 :SyntasticCheck	syntastic.txt	/*:SyntasticCheck*
-:SyntasticErrors	syntastic.txt	/*:SyntasticErrors*
 :SyntasticInfo	syntastic.txt	/*:SyntasticInfo*
 :SyntasticReset	syntastic.txt	/*:SyntasticReset*
 :SyntasticSetLoclist	syntastic.txt	/*:SyntasticSetLoclist*
@@ -1574,6 +1578,7 @@ syntastic-commands	syntastic.txt	/*syntastic-commands*
 syntastic-composite	syntastic.txt	/*syntastic-composite*
 syntastic-config-exec	syntastic.txt	/*syntastic-config-exec*
 syntastic-config-makeprg	syntastic.txt	/*syntastic-config-makeprg*
+syntastic-config-sort	syntastic.txt	/*syntastic-config-sort*
 syntastic-contents	syntastic.txt	/*syntastic-contents*
 syntastic-eclim	syntastic.txt	/*syntastic-eclim*
 syntastic-error-signs	syntastic.txt	/*syntastic-error-signs*
@@ -1592,7 +1597,9 @@ syntastic-notes	syntastic.txt	/*syntastic-notes*
 syntastic-powershell	syntastic.txt	/*syntastic-powershell*
 syntastic-pymode	syntastic.txt	/*syntastic-pymode*
 syntastic-quickstart	syntastic.txt	/*syntastic-quickstart*
+syntastic-recommended	syntastic.txt	/*syntastic-recommended*
 syntastic-statusline-flag	syntastic.txt	/*syntastic-statusline-flag*
+syntastic-vim-auto-save	syntastic.txt	/*syntastic-vim-auto-save*
 syntastic-vim-virtualenv	syntastic.txt	/*syntastic-vim-virtualenv*
 syntastic-ycm	syntastic.txt	/*syntastic-ycm*
 syntastic.txt	syntastic.txt	/*syntastic.txt*
