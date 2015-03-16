@@ -1137,6 +1137,12 @@ g:ConflictDetection_AutoDetectEvents	ConflictDetection.txt	/*g:ConflictDetection
 g:ConflictDetection_WarnEvents	ConflictDetection.txt	/*g:ConflictDetection_WarnEvents*
 g:CountJump_Context	CountJump.txt	/*g:CountJump_Context*
 g:Doxygen_Executable	toolboxdoxygen.txt	/*g:Doxygen_Executable*
+g:GITLOG_check_file_deferences	gitlog.txt	/*g:GITLOG_check_file_deferences*
+g:GITLOG_directory_default	gitlog.txt	/*g:GITLOG_directory_default*
+g:GITLOG_ignore_directories	gitlog.txt	/*g:GITLOG_ignore_directories*
+g:GITLOG_ignore_suffixes	gitlog.txt	/*g:GITLOG_ignore_suffixes*
+g:GITLOG_show_only_changes	gitlog.txt	/*g:GITLOG_show_only_changes*
+g:GITLOG_walk_full_tree	gitlog.txt	/*g:GITLOG_walk_full_tree*
 g:LogViewer_Filetypes	LogViewer.txt	/*g:LogViewer_Filetypes*
 g:LogViewer_SyncAll	LogViewer.txt	/*g:LogViewer_SyncAll*
 g:LogViewer_SyncUpdate	LogViewer.txt	/*g:LogViewer_SyncUpdate*
@@ -1344,6 +1350,7 @@ g:viewdoc_pydoc_cmd	viewdoc.txt	/*g:viewdoc_pydoc_cmd*
 g:viewdoc_ri_cmd	viewdoc.txt	/*g:viewdoc_ri_cmd*
 g:viewdoc_ri_format	viewdoc.txt	/*g:viewdoc_ri_format*
 gitlog	gitlog.txt	/*gitlog*
+gitlog-config	gitlog.txt	/*gitlog-config*
 gitlog-contents	gitlog.txt	/*gitlog-contents*
 gitlog-description	gitlog.txt	/*gitlog-description*
 gitlog-history	gitlog.txt	/*gitlog-history*
