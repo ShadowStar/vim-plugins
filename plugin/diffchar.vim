@@ -83,6 +83,14 @@
 "          algorithm, apply external diff command when more lines
 "     exd: 1 = initially show exact differences, 0 = vim original ones
 "
+" Update : 5.1
+" * Since vim 7.4.682, it has become impossible to overwrite the vim's diff
+"   highlights with this plugin. Then, for example, DiffText bold typeface
+"   will be left in all the diff highlighted lines (for more info, see
+"   https://groups.google.com/forum/?hl=en_US#!topic/vim_use/1jQnbTva2fY).
+"   This update provides a workaround to reduce its effect and to show the
+"   differences mostly same as before.
+"
 " Update : 5.0
 " * Significantly improved the way to trace and show the differences and
 "   make them 1.5 ~ 2.0 times faster.
@@ -240,15 +248,15 @@
 "   the initial version.
 "
 " Author: Rick Howe
-" Last Change: 2015/05/07
+" Last Change: 2015/05/30
 " Created:
 " Requires:
-" Version: 5.0
+" Version: 5.1
 
 if exists("g:loaded_diffchar")
 	finish
 endif
-let g:loaded_diffchar = 5.0
+let g:loaded_diffchar = 5.1
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -271,10 +279,10 @@ nnoremap <silent> <Plug>JumpDiffCharPrevEnd
 nnoremap <silent> <Plug>JumpDiffCharNextEnd
 				\ :call <SID>JumpDiffChar(1, 0)<CR>
 if !hasmapto('<Plug>ToggleDiffCharAllLines', 'n')
-	nmap <silent> <leader>da <Plug>ToggleDiffCharAllLines
+	nmap <silent> <F7> <Plug>ToggleDiffCharAllLines
 endif
 if !hasmapto('<Plug>ToggleDiffCharCurrentLine', 'n')
-	nmap <silent> <leader>dc <Plug>ToggleDiffCharCurrentLine
+	nmap <silent> <F8> <Plug>ToggleDiffCharCurrentLine
 endif
 if !hasmapto('<Plug>JumpDiffCharPrevStart', 'n')
 	nmap <silent> [b <Plug>JumpDiffCharPrevStart
@@ -714,6 +722,8 @@ function! s:ShowDiffChar(sl, el)
 	if empty(t:DChar.hlc[1]) || empty(t:DChar.hlc[2])
 		call s:MarkDiffCharID(0)
 		unlet t:DChar
+	elseif has("patch-7.4.682")
+		call s:ToggleDiffTextHL(1)
 	endif
 endfunction
 
@@ -758,6 +768,9 @@ function! s:ResetDiffChar(sl, el)
 
 	" reset t:DChar when no DiffChar highlightings in either buffer
 	if empty(t:DChar.hlc[1]) || empty(t:DChar.hlc[2])
+		if has("patch-7.4.682")
+			call s:ToggleDiffTextHL(0)
+		endif
 		call s:MarkDiffCharID(0)
 		unlet t:DChar
 	endif
@@ -1016,7 +1029,7 @@ function! s:RefreshDiffCharWin()
 	" find diffchar windows and set their winnr to t:DChar.win again
 	let t:DChar.win = {}
 	for win in range(1, winnr('$'))
-		let id = getwinvar(win, "DCharID")
+		let id = getwinvar(win, "DCharID", 0)
 		if id | let t:DChar.win[id] = win | endif
 	endfor
 endfunction
@@ -1079,6 +1092,84 @@ function! s:TraceDiffChar(u1, u2)
 
 	return ses[1:]		" remove the first entry
 endfunction
+
+if has("patch-7.4.682")
+function! s:ToggleDiffTextHL(on)
+	" no need in no-diff mode
+	if !exists("t:DChar.vdl") | return | endif
+
+	" number of tabpages where DiffText area has been overwritten
+	let tn = len(filter(map(range(1, tabpagenr('$')),
+			\'gettabvar(v:val, "DChar")'),
+			\'!empty(v:val) && exists("v:val.dtm")'))
+
+	if a:on
+		call s:OverwriteDiffTextArea()
+		if tn == 0
+			" disable HL at the first ON among all tabpages
+			let s:originalHL = &highlight
+			let &highlight = join(filter(split(s:originalHL, ','),
+					\'v:val !~ "^\\CT"'), ',') . ",Tn"
+		endif
+	else
+		call s:RestoreDiffTextArea()
+		if tn == 1
+			" restore HL at the last OFF among all tabpages
+			let &highlight = s:originalHL
+			unlet s:originalHL
+		endif
+	endif
+endfunction
+
+function! s:OverwriteDiffTextArea()
+	" overwrite diff's DiffText area with DiffText match
+	if exists("t:DChar.dtm") | return | endif
+	let t:DChar.dtm = {}
+	let dc = hlID("DiffChange") | let dt = hlID("DiffText")
+	let cwin = winnr()
+	for k in [1, 2]
+		exec t:DChar.win[k] . "wincmd w"
+		let t:DChar.dtm[k] = []
+		for l in t:DChar.vdl[k]
+			if index([dc, dt], diff_hlID(l, 1)) != -1
+				" normal case
+				let c2 = col([l, '$'])
+				while c2 > 0 && diff_hlID(l, c2) != dt
+					let c2 -= 1
+				endwhile
+				if c2 == 0 | continue | endif
+				let c1 = 1
+				while c1 < c2 && diff_hlID(l, c1) != dt
+					let c1 += 1
+				endwhile
+			else
+				" DiffCharExpr() exceptional case
+				let h = t:DChar.hlc[k][l]
+				let c1 = h[0][0] == 'd' ?
+						\h[0][1][1] : h[0][1][0]
+				let c2 = h[-1][0] == 'd' ?
+						\h[-1][1][0] : h[-1][1][1]
+				if c1 > c2 | continue | endif
+			endif
+			let t:DChar.dtm[k] += [matchaddpos("DiffText",
+					\[[l, c1, c2 - c1 + 1]], -1)]
+		endfor
+	endfor
+	exec cwin . "wincmd w"
+endfunction
+
+function! s:RestoreDiffTextArea()
+	" delete all the overwritten DiffText matches
+	if !exists("t:DChar.dtm") | return | endif
+	let cwin = winnr()
+	for k in [1, 2]
+		exec t:DChar.win[k] . "wincmd w"
+		call map(t:DChar.dtm[k], 'matchdelete(v:val)')
+	endfor
+	exec cwin . "wincmd w"
+	unlet t:DChar.dtm
+endfunction
+endif
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
