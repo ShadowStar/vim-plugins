@@ -344,6 +344,7 @@
 :VCSVimDiff	vcscommand.txt	/*:VCSVimDiff*
 :ViewDoc	viewdoc.txt	/*:ViewDoc*
 :ViewDocBashHelp	viewdoc.txt	/*:ViewDocBashHelp*
+:ViewDocGo	viewdoc.txt	/*:ViewDocGo*
 :ViewDocHelp	viewdoc.txt	/*:ViewDocHelp*
 :ViewDocInfman	viewdoc.txt	/*:ViewDocInfman*
 :ViewDocInfo	viewdoc.txt	/*:ViewDocInfo*
@@ -354,6 +355,7 @@
 :ViewDocRi	viewdoc.txt	/*:ViewDocRi*
 :bashhelp	viewdoc.txt	/*:bashhelp*
 :doc	viewdoc.txt	/*:doc*
+:godoc	viewdoc.txt	/*:godoc*
 :infman	viewdoc.txt	/*:infman*
 :info	viewdoc.txt	/*:info*
 :man	viewdoc.txt	/*:man*
@@ -687,6 +689,7 @@ VertFold_CSV	ft-csv.txt	/*VertFold_CSV*
 ViewDoc()	viewdoc.txt	/*ViewDoc()*
 ViewDoc_DEFAULT	viewdoc.txt	/*ViewDoc_DEFAULT*
 ViewDoc_bashhelp	viewdoc.txt	/*ViewDoc_bashhelp*
+ViewDoc_godoc	viewdoc.txt	/*ViewDoc_godoc*
 ViewDoc_help	viewdoc.txt	/*ViewDoc_help*
 ViewDoc_help_custom	viewdoc.txt	/*ViewDoc_help_custom*
 ViewDoc_infman	viewdoc.txt	/*ViewDoc_infman*
@@ -1339,6 +1342,7 @@ g:tcommentTextObjectInlineComment	tcomment.txt	/*g:tcommentTextObjectInlineComme
 g:tcomment_types	tcomment.txt	/*g:tcomment_types*
 g:viewdoc_copy_to_search_reg	viewdoc.txt	/*g:viewdoc_copy_to_search_reg*
 g:viewdoc_dontswitch	viewdoc.txt	/*g:viewdoc_dontswitch*
+g:viewdoc_godoc_cmd	viewdoc.txt	/*g:viewdoc_godoc_cmd*
 g:viewdoc_infman_cmd	viewdoc.txt	/*g:viewdoc_infman_cmd*
 g:viewdoc_info_cmd	viewdoc.txt	/*g:viewdoc_info_cmd*
 g:viewdoc_info_path	viewdoc.txt	/*g:viewdoc_info_path*
