@@ -167,6 +167,8 @@
 .snippet	snipMate.txt	/*.snippet*
 .snippets	snipMate.txt	/*.snippets*
 /MyProjectDir/	dbext.txt	/*\/MyProjectDir\/*
+/MyProjectDir/	dbext.txt	/*\/MyProjectDir\/*
+/MyProjectDir2/	dbext.txt	/*\/MyProjectDir2\/*
 /MyProjectDir2/	dbext.txt	/*\/MyProjectDir2\/*
 :AcpDisable	acp.txt	/*:AcpDisable*
 :AcpEnable	acp.txt	/*:AcpEnable*
