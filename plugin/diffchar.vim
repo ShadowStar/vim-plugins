@@ -18,24 +18,28 @@
 "      (file A) The <|swift brown|> fox jumped over the <|lazy|> dog.
 "      (file B) The <|lazy|> fox jumped over the <|swift brown|> dog.
 "
+" This plugin has been using "An O(NP) Sequence Comparison Algorithm"
+" developed by S.Wu, et al., which always finds an optimum sequence quickly.
+" But for longer lines and less-similar files, it takes time to complete the
+" diff tracing. At update 5.2, this plugin splits the tracing with the diff
+" command. Firstly applies the internal O(NP) algorithm. If not completed
+" within the time specified by a g:DiffSplitTime global (and tabpage)
+" variable, continuously switches to the diff command at that point, and
+" then joins both results. This approach provides a stable performance and
+" reasonable accuracy, because the diff command effectively optimizes
+" between them. The default of its variable is 500 ms, which would be useful
+" for smaller files. If prefer to always apply the internal algorithm for
+" accuracy (or the diff command for performance) only, set some large value
+" (or 0) to the variable.
+"
 " Since update 4.7, this plugin has set the DiffCharExpr() to the diffexpr
 " option, if it is empty. This function would be useful for smaller files.
 " If the total number of lines on both diff windows <= 200, by default,
-" it applies the internal difference algorithm to make the diff faster.
+" it applies this plugin's internal algorithm to make the diff faster.
 " And, by default, it initially shows the exact differences for all lines
 " whenever diff mode begins. You can change these arguments of this function
 " like "set diffexpr=DiffCharExpr(100, 0)", but if prefer not to use this
-" enhancement, set g:DiffExpr = 0.
-"
-" Until update 5.0, this plugin has always traced the exact differences.
-" But for long and less-similar files and lines, it may take time to complete.
-" At 5.0, the g:DiffMaxRatio global (and tabpage) variable, which is an
-" assumption of how much % the differences exist at a maximum, is introduced.
-" Once the difference ratio actually exceeds g:DiffMaxRatio while tracing,
-" this plugin recursively splits the tracing at that unit and then joins each
-" results. Its default is 100%, meaning it still finds the exact differences
-" as before. Try to decrease this ratio if performance is more important than
-" diff accuracy.
+" enhancement, set 0 to g:DiffExpr.
 "
 " This plugin has been always positively supporting mulltibyte characters.
 "
@@ -75,13 +79,23 @@
 "     0 : disable (default)
 "     1 : enable
 "       (notes : available on vim 7.4)
-" g:DiffMaxRatio - a maximum difference ratio to trace
-"     0 ~ 100 : (100% as default)
+" g:DiffSplitTime - a time length (ms) to apply the internal algorithm first
+"     0 ~ : (500 as default)
 "
 " DiffCharExpr(mxi, exd) function for the diffexpr option
 "     mxi: the maximum number of total lines of both windows to apply internal
-"          algorithm, apply external diff command when more lines
+"          algorithm, apply diff command when more lines
 "     exd: 1 = initially show exact differences, 0 = vim original ones
+"
+" Update : 5.2
+" * Enhanced to provide a stable performance even for less-similar long files.
+"   The new approach applies this plugin's algorithm first, and if not
+"   completed within the specified time, continuously splits the tracing with
+"   the diff command, and join both results.
+" * Fixed: when diff command does not choose minimal algorithm and it shows
+"   the equivalent lines as "changed", this plugin sometimes makes an error.
+" * Fixed: if file encoding is not same as buffer encoding, a difference may
+"   not be correctly detected in DiffCharExpr().
 "
 " Update : 5.1
 " * Since vim 7.4.682, it has become impossible to overwrite the vim's diff
@@ -248,15 +262,15 @@
 "   the initial version.
 "
 " Author: Rick Howe
-" Last Change: 2015/05/30
+" Last Change: 2015/08/15
 " Created:
 " Requires:
-" Version: 5.1
+" Version: 5.2
 
 if exists("g:loaded_diffchar")
 	finish
 endif
-let g:loaded_diffchar = 5.1
+let g:loaded_diffchar = 5.2
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -279,10 +293,10 @@ nnoremap <silent> <Plug>JumpDiffCharPrevEnd
 nnoremap <silent> <Plug>JumpDiffCharNextEnd
 				\ :call <SID>JumpDiffChar(1, 0)<CR>
 if !hasmapto('<Plug>ToggleDiffCharAllLines', 'n')
-	nmap <silent> <leader>da <Plug>ToggleDiffCharAllLines
+	nmap <silent> <F7> <Plug>ToggleDiffCharAllLines
 endif
 if !hasmapto('<Plug>ToggleDiffCharCurrentLine', 'n')
-	nmap <silent> <leader>dc <Plug>ToggleDiffCharCurrentLine
+	nmap <silent> <F8> <Plug>ToggleDiffCharCurrentLine
 endif
 if !hasmapto('<Plug>JumpDiffCharPrevStart', 'n')
 	nmap <silent> [b <Plug>JumpDiffCharPrevStart
@@ -323,12 +337,12 @@ let g:DiffUpdate = 0		" disable
 endif
 endif
 
-" Set a maximum diff ratio to trace the unit differences
-if !exists("g:DiffMaxRatio")
-let g:DiffMaxRatio = 100	" how much % diffs exist at most
+" Set a time length (ms) to apply this plugin's internal algorithm first
+if !exists("g:DiffSplitTime")
+let g:DiffSplitTime = 500	" if timeout, split to diff command
 endif
 
-" Set a diff expression
+" Set a diff expression if empty
 if !exists("g:DiffExpr") || g:DiffExpr
 if empty(&diffexpr)
 let &diffexpr = "DiffCharExpr(200, 1)"	" set # of lines and show exact diffs
@@ -348,7 +362,7 @@ function! DiffCharExpr(mxi, exd)
 
 	" get a list of diff commands
 	let dfcmd = (len(f1 + f2) <= a:mxi) ?
-		\s:ApplyIntDiffAlgorithm(f1, f2) : s:ApplyExtDiffCommand()
+		\s:ApplyInternalAlgorithm(f1, f2) : s:ApplyDiffCommand()
 
 	" write to output file
 	call writefile(dfcmd, v:fname_out)
@@ -356,50 +370,54 @@ function! DiffCharExpr(mxi, exd)
 	" return if no need to show exact differences
 	if exists("t:DChar") || !a:exd | return | endif
 
-	" find 'c' command and extract the line to be replaced
-	let [r1, r2] = [[], []]
-	let cpt = '^\(\d\+\)\%(,\(\d\+\)\)\=c\(\d\+\)\%(,\(\d\+\)\)\=$'
-	let rep = '\1 \2 \3 \4'
+	" find 'c' command and extract the line to be changed
+	let [c1, c2] = [[], []]
 	for ct in filter(dfcmd, 'v:val =~ "c"')
-		let cl = split(substitute(ct, cpt, rep, ''), ' ', 1)
-		let nr = min([empty(cl[1]) ? 0 : cl[1] - cl[0],
+		let cl = split(substitute(ct,
+			\'^\(\d\+\)\%(,\(\d\+\)\)\=c\(\d\+\)\%(,\(\d\+\)\)\=$',
+			\'\1 \2 \3 \4', ''), ' ', 1)
+		let cn = min([empty(cl[1]) ? 0 : cl[1] - cl[0],
 					\empty(cl[3]) ? 0 : cl[3] - cl[2]])
-		let [r1, r2] += [range(cl[0], cl[0] + nr),
-						\range(cl[2], cl[2] + nr)]
+		let [c1, c2] += [range(cl[0], cl[0] + cn),
+						\range(cl[2], cl[2] + cn)]
 	endfor
 
-	" return if no replaced lines
-	if empty(r1) | return | endif
+	" return if no changed lines
+	if empty(c1) | return | endif
 
 	" initialize diffchar
 	if s:InitializeDiffChar() == -1 | return | endif
 
-	" check which window is v:fname_in/v:fname_new and
-	" set those window numbers and replaced lines
-	let t:DChar.win = {}
-	let t:DChar.vdl = {}
-	for w in range(1, winnr('$'))
-		if !getwinvar(w, "&diff") | continue | endif
-		for k in [1, 2]
-			if !has_key(t:DChar.win, k) &&
-				\getbufline(winbufnr(w), r{k}[-1]) ==#
-							\[f{k}[r{k}[-1] - 1]]
-				let [t:DChar.win[k], t:DChar.vdl[k]] = [w, r{k}]
-				break
+	" try to find which window is for v:fname_in/v:fname_new
+	let w = filter(range(1, winnr('$')), 'getwinvar(v:val, "&diff")')
+	for w1 in w
+		for w2 in w
+			if w1 == w2 | continue | endif
+			let [b1, b2] =
+				\[getbufline(winbufnr(w1), c1[-1]),
+				\getbufline(winbufnr(w2), c2[-1])]
+			if b1 !=# b2 &&
+				\b1 ==# [iconv(f1[c1[-1] - 1],
+					\getwinvar(w1, "&fileencoding"),
+					\getwinvar(w1, "&encoding"))] &&
+				\b2 ==# [iconv(f2[c2[-1] - 1],
+					\getwinvar(w2, "&fileencoding"),
+					\getwinvar(w2, "&encoding"))]
+				" found and set winnr and changed lines
+				let [t:DChar.win[1], t:DChar.win[2]] = [w1, w2]
+				let [t:DChar.vdl[1], t:DChar.vdl[2]] = [c1, c2]
+				" highlight the changed lines
+				call s:MarkDiffCharID(1)
+				call s:ShowDiffChar(1, line('$'))
+				return
 			endif
 		endfor
 	endfor
-
-	" highlight the exact differences on the replaced lines
-	if exists("t:DChar.win[1]") && exists("t:DChar.win[2]")
-		call s:MarkDiffCharID(1)
-		call s:ShowDiffChar(1, line('$'))
-	else
-		unlet t:DChar
-	endif
+	" not found and clear
+	unlet t:DChar
 endfunction
 
-function! s:ApplyIntDiffAlgorithm(f1, f2)
+function! s:ApplyInternalAlgorithm(f1, f2)
 	" handle icase and iwhite diff options
 	let save_igc = &ignorecase
 	let &ignorecase = (&diffopt =~ "icase")
@@ -440,7 +458,7 @@ function! s:ApplyIntDiffAlgorithm(f1, f2)
 	return dfcmd
 endfunction
 
-function! s:ApplyExtDiffCommand()
+function! s:ApplyDiffCommand()
 	" execute a diff command
 	let opt = "-a --binary "
 	if &diffopt =~ "icase" | let opt .= "-i " | endif
@@ -492,7 +510,7 @@ function! s:InitializeDiffChar()
 	exec cwin . "wincmd w"
 
 	" set ignorecase and ignorespace flags
-	let t:DChar.igc = (&diffopt =~ "icase")	
+	let t:DChar.igc = (&diffopt =~ "icase")
 	let t:DChar.igs = (&diffopt =~ "iwhite")
 
 	" set line and its highlight id record
@@ -571,12 +589,10 @@ function! s:InitializeDiffChar()
 		endif
 	endif
 
-	" set a maximum difference ratio for the units
-	if !exists("t:DiffMaxRatio")
-		let t:DiffMaxRatio = g:DiffMaxRatio
+	" Set a time length (ms) to apply the internal algorithm first
+	if !exists("t:DiffSplitTime")
+		let t:DiffSplitTime = g:DiffSplitTime
 	endif
-	let t:DChar.mxr = t:DiffMaxRatio < 0 ? 0 :
-				\t:DiffMaxRatio > 100 ? 100 : t:DiffMaxRatio
 endfunction
 
 function! s:ShowDiffChar(sl, el)
@@ -601,20 +617,20 @@ function! s:ShowDiffChar(sl, el)
 	for k in [1, 2]
 		let hl = map(keys(t:DChar.hlc[k]), 'eval(v:val)')
 		call filter(d{k}, 'index(hl, v:val) == -1')
-		let t{k} = []
+		let u{k} = []
 		for d in d{k}
-			let t{k} += getbufline(winbufnr(t:DChar.win[k]), d)
+			let u{k} += getbufline(winbufnr(t:DChar.win[k]), d)
 		endfor
-		let n{k} = len(t{k})
+		let n{k} = len(u{k})
 	endfor
 
 	" remove redundant lines in either window
 	if n1 > n2
-		unlet t1[n2 - n1 :]
+		unlet u1[n2 - n1 :]
 		unlet d1[n2 - n1 :]
 		let n1 = n2
 	elseif n1 < n2
-		unlet t2[n1 - n2 :]
+		unlet u2[n1 - n2 :]
 		unlet d2[n1 - n2 :]
 		let n2 = n1
 	endif
@@ -623,72 +639,39 @@ function! s:ShowDiffChar(sl, el)
 	let save_igc = &ignorecase
 	let &ignorecase = t:DChar.igc
 
+	" remove equivalent lines
+	for n in range(n1 - 1, 0, -1)
+		if u1[n] == u2[n]
+			unlet u1[n] | unlet d1[n]
+			unlet u2[n] | unlet d2[n]
+			let [n1, n2] -= [1, 1]
+		endif
+	endfor
+	if n1 == 0
+		let &ignorecase = save_igc
+		unlet t:DChar
+		return
+	endif
+
+	" a list of actual difference units for tracing
+	call map(u1, 'split(v:val, t:DChar.spt)')
+	call map(u2, 'split(v:val, t:DChar.spt)')
+
+	" trace with this plugin's algorithm first,
+	" if timeout, split to the diff command
+	let cbx = s:TraceWithInternalAlgorithm(u1, u2)
+	let cmp = empty(cbx) ? 0 : max(keys(cbx)) + 1
+	if cmp < n1
+		for [ln, cx] in
+			\ items(s:TraceWithDiffCommand(u1[cmp :], u2[cmp :]))
+			let cbx[ln + cmp] = cx
+		endfor
+	endif
+
 	" a list of different lines and columns
 	let [lc1, lc2] = [{}, {}]
-
-	" compare each line and trace difference units
-	for n in range(n1)
-		" split each line to the difference units
-		let [u1, u2] =
-			\[split(t1[n], t:DChar.spt), split(t2[n], t:DChar.spt)]
-
-		" set unit lists for tracing
-		let [u1t, u2t] = [copy(u1), copy(u2)]
-
-		" handle ignorespace option
-		if t:DChar.igs
-			for k in [1, 2]
-				if !empty(u{k}t)
-					" convert \s\+ to a single space
-					call map(u{k}t, 'substitute
-						\(v:val, "\\s\\+", " ", "g")')
-					" remove/unlet the last \s\+$
-					let u{k}t[-1] = substitute
-						\(u{k}t[-1], '\s\+$', '', '')
-					if empty(u{k}t[-1])
-						unlet u{k}t[-1]
-					endif
-				endif
-			endfor
-		endif
-
-		" skip diff tracing if no diff exists
-		if u1t == u2t | continue | endif
-
-		" start diff tracing
-		let [c1, c2, p1, p2, l1, l2] = [[], [], 0, 0, 1, 1]
-		for ed in split(s:TraceDiffChar(u1t, u2t),
-						\'\%(=\+\|[+-]\+\)\zs')
-			let qn = len(ed)
-			if ed[0] == '='		" one or more '='
-				let [l1, l2, p1, p2] += [
-					\len(join(u1[p1 : p1 + qn - 1], '')),
-					\len(join(u2[p2 : p2 + qn - 1], '')),
-					\qn, qn]
-			else			" one or more '[+-]'
-				let q1 = len(escape(ed, '-')) - qn
-				let q2 = qn - q1
-				let [e1, e2] = (q1 == 0) ? ['d', 'a'] :
-					\(q2 == 0) ? ['a', 'd'] : ['c', 'c']
-				for k in [1, 2]
-					if q{k} > 0
-						let r = len(join(u{k}[
-							\p{k} : p{k} + q{k} - 1
-							\], ''))
-						let h{k} = [l{k}, l{k} + r - 1]
-						let [l{k}, p{k}] += [r, q{k}]
-					else
-						let h{k} = [l{k} - 1, l{k}]
-					endif
-				endfor
-				let [c1, c2] += [[[e1, h1]], [[e2, h2]]]
-			endif
-		endfor
-
-		" add diff lines and columns to the list
-		if !empty(c1) || !empty(c2)
-			let [lc1[d1[n]], lc2[d2[n]]] = [c1, c2]
-		endif
+	for [ln, cx] in items(cbx)
+		let [lc1[d1[ln]], lc2[d2[ln]]] = [cx[0], cx[1]]
 	endfor
 
 	" restore ignorecase flag
@@ -725,6 +708,262 @@ function! s:ShowDiffChar(sl, el)
 	elseif has("patch-7.4.682")
 		call s:ToggleDiffTextHL(1)
 	endif
+endfunction
+
+function! s:TraceWithInternalAlgorithm(u1, u2)
+	" a list of commands with byte index per line
+	let cbx = {}
+
+	" start timer
+	let st = reltime()
+
+	" compare each line and trace difference units
+	for ln in range(len(a:u1))
+		" if timeout, break here
+		if str2float(reltimestr(reltime(st))) >
+						\t:DiffSplitTime / 1000.0
+			break
+		endif
+
+		" set unit lists for tracing
+		let [u1, u2] = [a:u1[ln], a:u2[ln]]
+		let [u1t, u2t] = [u1, u2]
+
+		" handle ignorespace option
+		if t:DChar.igs
+			for k in [1, 2]
+				if !empty(u{k}t)
+					" convert \s\+ to a single space
+					call map(u{k}t, 'substitute
+						\(v:val, "\\s\\+", " ", "g")')
+					" remove/unlet the last \s\+$
+					let u{k}t[-1] = substitute
+						\(u{k}t[-1], '\s\+$', '', '')
+					if empty(u{k}t[-1])
+						unlet u{k}t[-1]
+					endif
+				endif
+			endfor
+		endif
+
+		" skip diff tracing if no diff exists
+		if u1t == u2t | continue | endif
+
+		" start diff tracing
+		let [c1, c2, p1, p2, l1, l2] = [[], [], 0, 0, 1, 1]
+		for ed in split(s:TraceDiffChar(u1t, u2t),
+						\'\%(=\+\|[+-]\+\)\zs')
+			let qn = len(ed)
+			if ed[0] == '='		" one or more '='
+				let [l1, l2, p1, p2] += [
+					\len(join(u1[p1 : p1 + qn - 1], '')),
+					\len(join(u2[p2 : p2 + qn - 1], '')),
+					\qn, qn]
+			else			" one or more '[+-]'
+				let q1 = len(escape(ed, '-')) - qn
+				let q2 = qn - q1
+				for k in [1, 2]
+					if q{k} > 0
+						let r = len(join(u{k}[
+							\p{k} : p{k} + q{k} - 1
+							\], ''))
+						let h{k} = [l{k}, l{k} + r - 1]
+						let [l{k}, p{k}] += [r, q{k}]
+					else
+						let h{k} = [l{k} - 1, l{k}]
+					endif
+				endfor
+				let [e1, e2] = (q1 == 0) ? ['d', 'a'] :
+					\(q2 == 0) ? ['a', 'd'] : ['c', 'c']
+				let [c1, c2] += [[[e1, h1]], [[e2, h2]]]
+			endif
+		endfor
+
+		if !empty(c1) || !empty(c2)
+			let cbx[ln] = [c1, c2]
+		endif
+	endfor
+
+	return cbx
+endfunction
+
+function! s:TraceWithDiffCommand(u1, u2)
+	" prepare 2 input files for diff
+	let [utd, lnb, lne, lns] = [':', '{', '}', '#####']
+	for k in [1, 2]
+		" insert its number + unit delimiter per unit, and
+		" enclose the line with its number + begin/end symbols + id,
+		" and append a line separator
+		let v{k} = []
+		for n in range(len(a:u{k}))
+			let l = n + 1
+			let v{k} += [l . lnb . k] +
+				\map(copy(a:u{k}[n]), 'l . utd . v:val') +
+						\[l . lne . k] + [lns]
+		endfor
+		let f{k} = tempname()
+		call writefile(v{k}[:-2], f{k})
+	endfor
+
+	" call diff and get output as a list
+	let opt = "-a --binary "
+	if exists("g:DiffOptions") | let opt .= g:DiffOptions . " " | endif
+	if t:DChar.igc | let opt .= "-i " | endif
+	if t:DChar.igs | let opt .= "-b " | endif
+	let dfo = split(system("diff " . opt . f1 . " " . f2), '\n')
+	call delete(f1) | call delete(f2)
+
+	" trace diff output and generate a list of diff's commands per line
+	let dlc = {}
+
+	let hml = 0		" one hunk takes multiple lines or not
+	let [bkd, lnd] = [nr2char(0x1e), nr2char(0x1f)]
+	call map(dfo, '((v:val =~ "^\\d\\+") ? bkd . lnd : lnd) . v:val')
+	for db in split(join(dfo, ''), bkd)
+		let dl = split(db, lnd)
+		let dc = dl[0]
+		let z1 = filter(copy(dl), 'v:val[0] == "<"')
+		let z2 = filter(copy(dl), 'v:val[0] == ">"')
+
+		" get an operation and line numbers from diff's command line
+		let [s1, e1, cd, s2, e2] = split(substitute(dc,
+			\'^\(\d\+\)\%(,\(\d\+\)\)\=\(.\)
+				\\(\d\+\)\%(,\(\d\+\)\)\=$',
+					\'\1 \2 \3 \4 \5', ''), ' ', 1)
+		if empty(e1) | let e1 = s1 | endif
+		if empty(e2) | let e2 = s2 | endif
+		let [s1, e1, s2, e2] = [eval(s1), eval(e1), eval(s2), eval(e2)]
+		let dx = [cd, [s1, e1], [s2, e2]]
+
+		" check if one hunk takes signle line or not
+		let ll = map(filter(z1 + z2, 'v:val !~ "^. " . lns'),
+			\'substitute(v:val, "^. \\(\\d\\+\\).*$", "\\1", "")')
+
+		" if single line, just copy
+		if min(ll) == max(ll)
+			let dlc[ll[0]] = get(dlc, ll[0], []) + [dx]
+			continue
+		endif
+
+		" if multiple lines, separate by lines
+		let hml += 1
+		let lh = []
+		for lx in sort(map(ll, 'printf("%8d", v:val)'))
+			let lx = eval(lx)
+			if index(lh, lx) == -1
+				for k in [1, 2]
+					let h{k} = len(filter(copy(z{k}),
+						\'v:val =~ "^. " . lx . "\\D"'))
+					let e{k} = s{k} + h{k} - 1
+				endfor
+				if h1 > 0 && h2 > 0
+					let dx = ['c', [s1, e1], [s2, e2]]
+					let [s1, s2] += [h1 + 1, h2 + 1]
+				elseif h1 > 0 && h2 == 0
+					let dx = ['d', [s1, e1], [s2, s2]]
+					let s1 += h1 + 1
+				elseif h1 == 0 && h2 > 0
+					let dx = ['a', [s1, s1], [s2, e2]]
+					let s2 += h2 + 1
+				endif
+				let dlc[lx] = get(dlc, lx, []) + [dx]
+				let lh += [lx]
+			endif
+		endfor
+	endfor
+
+	" when a hunk takes multiple lines in this diff output,
+	" find and merge continuous 'a+d' and 'd+a' to one 'c'
+	if hml > 0
+		for [ln, ds] in items(dlc)
+			let cc = join(map(copy(ds), 'v:val[0]'), '')
+			if stridx(cc, 'ad') == -1 && stridx(cc, 'da') == -1
+				continue
+			endif
+			let dn = len(ds)
+			for n in range(dn - 1)
+				let [cdi, x1i, x2i] = ds[n]
+				let [cdj, x1j, x2j] = ds[n + 1]
+				let [d_a, a_d] = [[cdi, cdj] == ['d', 'a'],
+						\[cdi, cdj] == ['a', 'd']]
+				if d_a || a_d
+					if x1i[1] >= x1j[0] &&
+							\x1i[0] <= x1j[1] ||
+						\x2i[1] >= x2j[0] &&
+							\x2i[0] <= x2j[1]
+						let ds[n] = d_a ?
+							\['c', x1i, x2j] :
+							\['c', x1j, x2i]
+						unlet ds[n + 1]
+					endif
+				endif
+			endfor
+			if dn != len(ds) | let dlc[ln] = ds | endif
+		endfor
+	endif
+
+	" generate a list of commands with byte index per line
+	let cbx = {}
+
+	for [ln, ds] in items(dlc)
+		let ln -= 1
+		let [c1, c2] = [[], []]
+
+		let dn = len(ds)
+		for n in range(dn)
+			let [cd, x1, x2] = ds[n]
+			let [s1, e1] = x1
+			let [s2, e2] = x2
+
+			" adjust the unit number and diff's command
+			" (remove a count of line begin and end symbols)
+			if n == 0
+				let [bs1, bs2] = [s1 - 1, s2 - 1]
+			endif
+			let [s1, s2] -= (n == 0) ?
+					\[bs1, bs2] : [bs1 + 1, bs2 + 1]
+			let [e1, e2] -= (n == dn - 1) ?
+					\[bs1 + 2, bs2 + 2] : [bs1 + 1, bs2 + 1]
+			if cd == 'c'
+				let [w1, w2] = [s1 > e1, s2 > e2]
+				if [w1, w2] == [1, 1]
+					continue
+				elseif [w1, w2] == [1, 0]
+					let cd = 'a'
+					let s1 = e1
+				elseif [w1, w2] == [0, 1]
+					let cd = 'd'
+					let s2 = e2
+				endif
+			endif
+			let [r1, r2] = (cd == 'a') ? ['d', 'a'] :
+					\(cd == 'd') ? ['a', 'd'] : ['c', 'c']
+
+			" caluculate byte index from unit number
+			for k in [1, 2]
+				let [s{k}, e{k}] -= [1, 1]
+				if r{k} == 'd'
+					let s{k} = (s{k} < 0) ? 0 : len(join(
+						\a:u{k}[ln][:s{k}], ''))
+					let e{k} = s{k} + 1
+				else
+					let e{k} = len(join(
+						\a:u{k}[ln][s{k} : e{k}], ''))
+					let s{k} = (s{k} == 0) ? 1 : len(join(
+						\a:u{k}[ln][:s{k} - 1], '')) + 1
+					let e{k} += s{k} - 1
+				endif
+			endfor
+
+			let [c1, c2] += [[[r1, [s1, e1]]], [[r2, [s2, e2]]]]
+		endfor
+
+		if !empty(c1) || !empty(c2)
+			let cbx[ln] = [c1, c2]
+		endif
+	endfor
+
+	return cbx
 endfunction
 
 function! s:ResetDiffChar(sl, el)
@@ -1029,7 +1268,7 @@ function! s:RefreshDiffCharWin()
 	" find diffchar windows and set their winnr to t:DChar.win again
 	let t:DChar.win = {}
 	for win in range(1, winnr('$'))
-		let id = getwinvar(win, "DCharID")
+		let id = getwinvar(win, "DCharID", 0)
 		if id | let t:DChar.win[id] = win | endif
 	endfor
 endfunction
@@ -1052,12 +1291,9 @@ function! s:TraceDiffChar(u1, u2)
 	let fp = repeat([-1], M + N + 3)
 	let etree = []		" [next edit, previous p, previous k]
 
-	" set maximum p according to t:DChar.mxr
-	let maxP = exists("t:DChar.mxr") ? N * t:DChar.mxr / 100.0 : N
-
-	let ses = ''
-	let p = 0
-	while 1
+	let p = -1
+	while fp[D] != M
+		let p += 1
 		let etree += [repeat([['', 0, 0]], p * 2 + D + 1)]
 		for k in range(-p, D - 1, 1) + range(D + p, D + 1, -1) + [D]
 			let [x, etree[p][k]] = (fp[k - 1] < fp[k + 1]) ?
@@ -1072,18 +1308,10 @@ function! s:TraceDiffChar(u1, u2)
 			endwhile
 			let fp[k] = x
 		endfor
-		if fp[D] == M | break | endif
-		" if p exceeds maxP, split the diff tracing recursively
-		if p > maxP
-			let [u1, u2] = (l1 >= l2) ?
-				\[u1[x :], u2[y :]] : [u2[y :], u1[x :]]
-			let ses = s:TraceDiffChar(u1, u2)
-			break
-		endif
-		let p += 1
 	endwhile
 
 	" create a shortest edit script (SES) from last p and k
+	let ses = ''
 	while p != 0 || k != 0
 		let [e, p, k] = etree[p][k]
 		let ses = e . ses
@@ -1109,7 +1337,7 @@ function! s:ToggleDiffTextHL(on)
 			" disable HL at the first ON among all tabpages
 			let s:originalHL = &highlight
 			let &highlight = join(filter(split(s:originalHL, ','),
-					\'v:val !~ "^\\CT"'), ',') . ",Tn"
+				\'v:val[0] !~ "\\C[CT]"'), ',') . ",Cn,Tn"
 		endif
 	else
 		call s:RestoreDiffTextArea()
@@ -1130,29 +1358,15 @@ function! s:OverwriteDiffTextArea()
 	for k in [1, 2]
 		exec t:DChar.win[k] . "wincmd w"
 		let t:DChar.dtm[k] = []
-		for l in t:DChar.vdl[k]
-			if index([dc, dt], diff_hlID(l, 1)) != -1
-				" normal case
-				let c2 = col([l, '$'])
-				while c2 > 0 && diff_hlID(l, c2) != dt
-					let c2 -= 1
-				endwhile
-				if c2 == 0 | continue | endif
-				let c1 = 1
-				while c1 < c2 && diff_hlID(l, c1) != dt
-					let c1 += 1
-				endwhile
-			else
-				" DiffCharExpr() exceptional case
-				let h = t:DChar.hlc[k][l]
-				let c1 = h[0][0] == 'd' ?
-						\h[0][1][1] : h[0][1][0]
-				let c2 = h[-1][0] == 'd' ?
-						\h[-1][1][0] : h[-1][1][1]
-				if c1 > c2 | continue | endif
-			endif
+		for l in map(keys(t:DChar.hlc[k]), 'eval(v:val)')
+			let h = t:DChar.hlc[k][l]
+			let c1 = h[0][0] == 'd' ? h[0][1][1] : h[0][1][0]
+			let c2 = h[-1][0] == 'd' ? h[-1][1][0] : h[-1][1][1]
+			if c1 > c2 | continue | endif
+			let t:DChar.dtm[k] += [matchaddpos("DiffChange",
+								\[[l]], -1)]
 			let t:DChar.dtm[k] += [matchaddpos("DiffText",
-					\[[l, c1, c2 - c1 + 1]], -1)]
+						\[[l, c1, c2 - c1 + 1]], -1)]
 		endfor
 	endfor
 	exec cwin . "wincmd w"
