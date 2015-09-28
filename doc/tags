@@ -1785,6 +1785,11 @@ template-support-templ-visual	templatesupport.txt	/*template-support-templ-visua
 template-support-templates	templatesupport.txt	/*template-support-templates*
 template-support-visual	templatesupport.txt	/*template-support-visual*
 templatesupport.txt	templatesupport.txt	/*templatesupport.txt*
+togglenumber	togglenumber.txt	/*togglenumber*
+togglenumber-intro	togglenumber.txt	/*togglenumber-intro*
+togglenumber-license	togglenumber.txt	/*togglenumber-license*
+togglenumber-usage	togglenumber.txt	/*togglenumber-usage*
+togglenumber.txt	togglenumber.txt	/*togglenumber.txt*
 toolbox	toolbox.txt	/*toolbox*
 toolbox-cmake	toolboxcmake.txt	/*toolbox-cmake*
 toolbox-cmake-api	toolboxcmake.txt	/*toolbox-cmake-api*
