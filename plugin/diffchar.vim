@@ -44,11 +44,15 @@ nnoremap <silent> <Plug>JumpDiffCharNextEnd
 if !hasmapto('<Plug>ToggleDiffCharAllLines', 'nv')
 if empty(maparg('<F7>', 'nv'))
 	map <silent> <F7> <Plug>ToggleDiffCharAllLines
+else
+	map <silent> \da <Plug>ToggleDiffCharAllLines
 endif
 endif
 if !hasmapto('<Plug>ToggleDiffCharCurrentLine', 'nv')
 if empty(maparg('<F8>', 'nv'))
 	map <silent> <F8> <Plug>ToggleDiffCharCurrentLine
+else
+	map <silent> \dc <Plug>ToggleDiffCharCurrentLine
 endif
 endif
 if !hasmapto('<Plug>JumpDiffCharPrevStart', 'n')
