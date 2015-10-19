@@ -8,9 +8,9 @@
 " |     || || |   | |   |  |__ |  _  ||  _  || |  | |
 " |____| |_||_|   |_|   |_____||_| |_||_| |_||_|  |_|
 "
-" Last Change: 2016/06/12
+" Last Change:  06/13/16 01:56:52
 " Version:     6.2
-" Author:      Rick Howe <rdcxy754@ybb.ne.jp>
+" Author:  ShadowStar, <orphen.leiliu@gmail.com>
 
 if exists('g:loaded_diffchar')
 	finish
@@ -37,10 +37,10 @@ nnoremap <silent> <Plug>JumpDiffCharPrevEnd
 nnoremap <silent> <Plug>JumpDiffCharNextEnd
 				\ :call diffchar#JumpDiffChar(1, 0)<CR>
 if !hasmapto('<Plug>ToggleDiffCharAllLines', 'nv')
-	map <silent> <F7> <Plug>ToggleDiffCharAllLines
+	map <silent> \da <Plug>ToggleDiffCharAllLines
 endif
 if !hasmapto('<Plug>ToggleDiffCharCurrentLine', 'nv')
-	map <silent> <F8> <Plug>ToggleDiffCharCurrentLine
+	map <silent> \dc <Plug>ToggleDiffCharCurrentLine
 endif
 if !hasmapto('<Plug>JumpDiffCharPrevStart', 'n')
 	nmap <silent> [b <Plug>JumpDiffCharPrevStart
