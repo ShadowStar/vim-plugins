@@ -8,7 +8,7 @@
 " |     || || |   | |   |  |__ |  _  ||  _  || |  | |
 " |____| |_||_|   |_|   |_____||_| |_||_| |_||_|  |_|
 "
-" Last Change: 2016/03/09
+" Last Change:  03/09/16 17:34:02
 " Version:     6.1
 " Author:      Rick Howe <rdcxy754@ybb.ne.jp>
 
@@ -37,10 +37,10 @@ nnoremap <silent> <Plug>JumpDiffCharPrevEnd
 nnoremap <silent> <Plug>JumpDiffCharNextEnd
 				\ :call diffchar#JumpDiffChar(1, 0)<CR>
 if !hasmapto('<Plug>ToggleDiffCharAllLines', 'nv')
-	map <silent> <F7> <Plug>ToggleDiffCharAllLines
+	map <silent> \da <Plug>ToggleDiffCharAllLines
 endif
 if !hasmapto('<Plug>ToggleDiffCharCurrentLine', 'nv')
-	map <silent> <F8> <Plug>ToggleDiffCharCurrentLine
+	map <silent> \dc <Plug>ToggleDiffCharCurrentLine
 endif
 if !hasmapto('<Plug>JumpDiffCharPrevStart', 'n')
 	nmap <silent> [b <Plug>JumpDiffCharPrevStart
