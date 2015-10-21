@@ -25,6 +25,9 @@ set ruler               " Show the cursor position all the time
 
 set viminfo='20,\"500   " Keep a .viminfo file.
 
+set t_ZH=[3m
+set t_ZR=[23m
+
 " Don't use Ex mode, use Q for formatting
 map Q gq
 
