@@ -281,3 +281,5 @@ hi def link cDelimiter Delimiter
 hi def link cBraces Delimiter
 hi def link cBoolean Boolean
 
+hi cPreCondit term=underline cterm=italic,bold,reverse ctermfg=5 guifg=Purple
+
