@@ -14,17 +14,18 @@ let g:loaded_togglenumber = 1
 
 " toggle between no number, absolute number and relative number
 function! ToggleNumber()
-    if &relativenumber
-        set norelativenumber
-    elseif &number
+    if !&number && !&relativenumber
+        set number
+    elseif !&relativenumber
         set relativenumber
     else
-        set number
+        set nonumber
+        set norelativenumber
     endif
 endfunc
 
 " absolute number by default
-autocmd BufEnter * :set nonumber
+autocmd BufEnter * :set number
 
 " command for triggering
 command! -nargs=0 ToggleNumber call ToggleNumber()
