@@ -402,6 +402,7 @@ let Tlist_Auto_Highlight_Tag = 1
 let Tlist_Exit_OnlyWindow = 1
 let Tlist_Highlight_Tag_On_BufEnter = 1
 let Tlist_GainFocus_On_ToggleOpen = 1
+let Tlist_Inc_Winwidth = 0
 "let Tlist_Close_On_Select = 1
 let tlist_make_settings = 'make;m:makros;t:targets'
 let tlist_qmake_settings = 'qmake;t:SystemVariables'
