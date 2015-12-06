@@ -1214,6 +1214,8 @@ g:GITLOG_check_file_deferences	gitlog.txt	/*g:GITLOG_check_file_deferences*
 g:GITLOG_directory_default	gitlog.txt	/*g:GITLOG_directory_default*
 g:GITLOG_ignore_directories	gitlog.txt	/*g:GITLOG_ignore_directories*
 g:GITLOG_ignore_suffixes	gitlog.txt	/*g:GITLOG_ignore_suffixes*
+g:GITLOG_open_sub_on_search	gitlog.txt	/*g:GITLOG_open_sub_on_search*
+g:GITLOG_show_branch_window	gitlog.txt	/*g:GITLOG_show_branch_window*
 g:GITLOG_show_hidden_files	gitlog.txt	/*g:GITLOG_show_hidden_files*
 g:GITLOG_show_only_changes	gitlog.txt	/*g:GITLOG_show_only_changes*
 g:GITLOG_support_sub_git	gitlog.txt	/*g:GITLOG_support_sub_git*
