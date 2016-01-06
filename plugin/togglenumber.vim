@@ -24,9 +24,6 @@ function! ToggleNumber()
     endif
 endfunc
 
-" absolute number by default
-autocmd BufEnter * :set nonumber
-
 " command for triggering
 command! -nargs=0 ToggleNumber call ToggleNumber()
 
