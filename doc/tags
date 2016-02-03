@@ -1069,6 +1069,12 @@ dbext-tutorial-select	dbext.txt	/*dbext-tutorial-select*
 dbext-tutorial-variables	dbext.txt	/*dbext-tutorial-variables*
 dbext.txt	dbext.txt	/*dbext.txt*
 dbext.vim	dbext.txt	/*dbext.vim*
+diffchar	diffchar.txt	/*diffchar*
+diffchar-commands	diffchar.txt	/*diffchar-commands*
+diffchar-history	diffchar.txt	/*diffchar-history*
+diffchar-keymaps	diffchar.txt	/*diffchar-keymaps*
+diffchar-options	diffchar.txt	/*diffchar-options*
+diffchar.txt	diffchar.txt	/*diffchar.txt*
 diffgofile	diffgofile.txt	/*diffgofile*
 diffgofile-configuration	diffgofile.txt	/*diffgofile-configuration*
 diffgofile-contents	diffgofile.txt	/*diffgofile-contents*
