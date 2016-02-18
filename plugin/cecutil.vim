@@ -2,7 +2,7 @@
 "               save/restore mark position
 "               save/restore selected user maps
 "  Author:	Charles E. Campbell
-"  Version:	18i	NOT RELEASED
+"  Version:	18i	ASTRO-ONLY
 "  Date:	Oct 21, 2013
 "
 "  Saving Restoring Destroying Marks: {{{1
@@ -34,7 +34,7 @@
 if &cp || exists("g:loaded_cecutil")
  finish
 endif
-let g:loaded_cecutil = "v18h"
+let g:loaded_cecutil = "v18i"
 let s:keepcpo        = &cpo
 set cpo&vim
 "DechoRemOn
@@ -45,11 +45,13 @@ set cpo&vim
 
 " ---------------------------------------------------------------------
 "  Map Interface: {{{2
-if !hasmapto('<Plug>SaveWinPosn')
- map <unique> <Leader>swp <Plug>SaveWinPosn
-endif
-if !hasmapto('<Plug>RestoreWinPosn')
- map <unique> <Leader>rwp <Plug>RestoreWinPosn
+if !exists('g:no_plugin_maps') && !exists('g:no_cecutil_maps')
+ if !hasmapto('<Plug>SaveWinPosn')
+  map <unique> <Leader>swp <Plug>SaveWinPosn
+ endif
+ if !hasmapto('<Plug>RestoreWinPosn')
+  map <unique> <Leader>rwp <Plug>RestoreWinPosn
+ endif
 endif
 nmap <silent> <Plug>SaveWinPosn		:call SaveWinPosn()<CR>
 nmap <silent> <Plug>RestoreWinPosn	:call RestoreWinPosn()<CR>
