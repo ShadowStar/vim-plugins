@@ -8,14 +8,14 @@
 " |     || || |   | |   |  |__ |  _  ||  _  || |  | |
 " |____| |_||_|   |_|   |_____||_| |_||_| |_||_|  |_|
 "
-" Last Change:  02/03/16 18:57:55
-" Version:     6.0
+" Last Change: 2016/03/09
+" Version:     6.1
 " Author:      Rick Howe <rdcxy754@ybb.ne.jp>
 
 if exists('g:loaded_diffchar')
 	finish
 endif
-let g:loaded_diffchar = 6.0
+let g:loaded_diffchar = 6.1
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -37,10 +37,10 @@ nnoremap <silent> <Plug>JumpDiffCharPrevEnd
 nnoremap <silent> <Plug>JumpDiffCharNextEnd
 				\ :call diffchar#JumpDiffChar(1, 0)<CR>
 if !hasmapto('<Plug>ToggleDiffCharAllLines', 'nv')
-	map <silent> \da <Plug>ToggleDiffCharAllLines
+	map <silent> <F7> <Plug>ToggleDiffCharAllLines
 endif
 if !hasmapto('<Plug>ToggleDiffCharCurrentLine', 'nv')
-	map <silent> \dc <Plug>ToggleDiffCharCurrentLine
+	map <silent> <F8> <Plug>ToggleDiffCharCurrentLine
 endif
 if !hasmapto('<Plug>JumpDiffCharPrevStart', 'n')
 	nmap <silent> [b <Plug>JumpDiffCharPrevStart
@@ -74,11 +74,9 @@ let g:DiffColors = 0		" always 1 color
 endif
 
 " Set a difference unit updating while editing
-if exists('##TextChanged') && exists('##TextChangedI')
 if !exists('g:DiffUpdate')
 let g:DiffUpdate = 1		" enable
 " let g:DiffUpdate = 0		" disable
-endif
 endif
 
 " Set a time length (ms) to apply this plugin's internal algorithm first
