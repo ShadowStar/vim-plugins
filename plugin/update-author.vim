@@ -5,11 +5,11 @@
 "   Description:  
 "
 "   VIM Version:  7.0+
-"        Author: ShadowStar, <orphen.leiliu@gmail.com>
-"  Organization: Gmail
+"        Author:  ShadowStar, <orphen.leiliu@gmail.com>
+"  Organization:  Gmail
 "       Version:  1.0
 "       Created:  04/08/16 14:36:13
-"   Last Change:  04/08/16 17:26:28
+"   Last Change:  04/08/16 17:31:29
 "      Revision:  ---
 "       License:  Copyright (c) year 2016, Lei Liu
 "===============================================================================
@@ -23,13 +23,13 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 if !exists('g:update_author_stamp_leader')
-    let s:author_stamp_leader = ['Author: ']
+    let s:author_stamp_leader = ['Author:']
 else
     let s:author_stamp_leader = g:update_author_stamp_leader
 endif
 
 if !exists('g:update_company_stamp_leader')
-    let s:company_stamp_leader = ['Organization: ', 'Company: ']
+    let s:company_stamp_leader = ['Organization:', 'Company:']
 else
     let s:company_stamp_leader = g:update_company_stamp_leader
 endif
@@ -84,7 +84,7 @@ fun Update_author_update()
         let line_num = search(auth, '', s:end_line)
         if line_num > 0
             let line = getline(line_num)
-            let line = substitute(line, auth . '\zs.*', author, '')
+            let line = substitute(line, auth . '\zs.*', '  '.author, '')
             call setline(line_num, line)
         endif
     endfor
@@ -94,7 +94,7 @@ fun Update_author_update()
             let line_num = search(company, '', s:end_line)
             if line_num > 0
                 let line = getline(line_num)
-                let line = substitute(line, company . '\zs.*', com, '')
+                let line = substitute(line, company . '\zs.*', '  '.com, '')
                 call setline(line_num, line)
             endif
         endfor
@@ -111,3 +111,4 @@ com! -nargs=0 UpdateAuthorToggle call Update_author_toggle()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
+
