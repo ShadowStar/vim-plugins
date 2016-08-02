@@ -339,12 +339,12 @@ let g:bufExplorerShowRelativePath=1
 let g:bufExplorerSplitVertSize=30
 let g:bufExplorerSplitHorzSize=10
 
-inoremap [] []<left>
-inoremap {} {}<left>
-inoremap () ()<left>
-inoremap <> <><left>
-inoremap "" ""<left>
-inoremap '' ''<left>
+"inoremap [] []<left>
+"inoremap {} {}<left>
+"inoremap () ()<left>
+"inoremap <> <><left>
+"inoremap "" ""<left>
+"inoremap '' ''<left>
 "inoremap , ,<Space>
 
 noremap <F2> :Tlist<CR>
