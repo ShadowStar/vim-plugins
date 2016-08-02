@@ -34,6 +34,27 @@ if exists('g:viewdoc_man_cmd')
 endif
 "set tags=tags;/
 
+function! <sid>Str2Hex(type)
+  let l:type = a:type
+  let l:hex = matchstr(getline('.'), '\(0x\|\\x\)')
+  if l:hex == ""
+    if l:type == '0x'
+      silent execute "s/\\x\\x/\\='0x'.toupper(submatch(0)).', '/g"
+    else
+      silent execute "s/\\x\\x/\\='\\x'.toupper(submatch(0))/g"
+    endif
+  else
+    if matchstr(getline('.'), '0x\x\x,') != ""
+      silent execute "s/0x\\(\\x\\x\\)[,]\\s*/\\1/g"
+    elseif matchstr(getline('.'), '\\[xX]\x\x') != ""
+      silent execute "s/\\\\[xX]\\(\\x\\x\\)/\\1/g"
+    endif
+  endif
+endfunction
+
+map <leader>x :call <sid>Str2Hex('x')<CR>
+map <leader>0x :call <sid>Str2Hex('0x')<CR>
+
 "
 "-------------------------------------------------------------------------------
 " additional mapping : complete a classical C comment: '/*' => '/* | */'
