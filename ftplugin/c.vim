@@ -55,6 +55,17 @@ endfunction
 map <leader>x :call <sid>Str2Hex('x')<CR>
 map <leader>0x :call <sid>Str2Hex('0x')<CR>
 
+function! <sid>Comp_Case()
+  let out = ":\r"
+  if matchstr(getline('.'), '\<case\>') != ""
+    return out . "\r" . "break;\<up>\<tab>"
+  else
+    return out
+  endif
+endfunction
+
+inoremap <expr> :<CR>  <sid>Comp_Case()
+
 "
 "-------------------------------------------------------------------------------
 " additional mapping : complete a classical C comment: '/*' => '/* | */'
