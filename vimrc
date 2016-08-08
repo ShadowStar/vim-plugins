@@ -371,6 +371,8 @@ noremap <C-j> <C-W>j
 noremap <C-k> <C-W>k
 noremap <C-l> <C-W>l
 noremap <leader>u :GundoToggle<CR>
+noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
+noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
 
 let g:EchoFuncKeyPrev = '<C-k>'
 let g:EchoFuncKeyNext = '<C-j>'
