@@ -5,12 +5,14 @@
 "   - ingo/options.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2015 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.016	15-Jul-2016	Add ingo#compat#sha256(), with a fallback to an
+"				external sha256sum command.
 "   1.024.015	23-Apr-2015	Add ingo#compat#shiftwidth(), taken from :h
 "				shiftwidth().
 "   1.022.014	25-Sep-2014	FIX: Non-list argument to glob() for old Vim
@@ -42,11 +44,11 @@
 "   1.004.001	04-Apr-2013	file creation
 
 if exists('*shiftwidth')
-    function ingo#compat#shiftwidth()
+    function! ingo#compat#shiftwidth()
 	return shiftwidth()
     endfunction
 else
-    function ingo#compat#shiftwidth()
+    function! ingo#compat#shiftwidth()
 	return &shiftwidth
     endfunction
 endif
@@ -331,6 +333,21 @@ else
 	else
 	    return setpos(a:expr, a:list)
 	endif
+    endfunction
+endif
+
+if exists('*sha256')
+    function! ingo#compat#sha256( string )
+	return sha256(a:string)
+    endfunction
+elseif executable('sha256sum')
+    let s:printStringCommandTemplate = (ingo#os#IsWinOrDos() ? 'echo.%s' : 'printf %%s %s')
+    function! ingo#compat#sha256( string )
+	return get(split(system(printf(s:printStringCommandTemplate . "|sha256sum", ingo#compat#shellescape(a:string)))), 0, '')
+    endfunction
+else
+    function! ingo#compat#sha256( string )
+	throw 'ingo#compat#sha256: Not implemented here'
     endfunction
 endif
 

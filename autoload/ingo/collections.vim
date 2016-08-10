@@ -4,12 +4,14 @@
 "   - ingo/dict.vim autoload script
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2011-2015 Ingo Karkat
+" Copyright: (C) 2011-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.014	24-Jul-2016	Add ingo#collections#Reduce().
+"   1.025.013	01-May-2015	Add ingo#collections#Partition().
 "   1.023.012	22-Oct-2014	Add ingo#collections#mapsort().
 "   1.014.011	15-Oct-2013	Use the extracted ingo#list#AddOrExtend().
 "   1.011.010	12-Jul-2013	Make ingo#collections#ToDict() handle empty list
@@ -308,6 +310,81 @@ function! ingo#collections#Flatten( list )
 	unlet l:item
     endfor
     return l:result
+endfunction
+
+function! ingo#collections#Partition( list, Predicate )
+"******************************************************************************
+"* PURPOSE:
+"   Separate a List / Dictionary into two, depending on whether a:Predicate is
+"   true for each member of the collection.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list      List or Dictionary.
+"   a:Predicate Either a Funcref or an expression to be eval()ed.
+"* RETURN VALUES:
+"   List of [in, out], which are disjunct sub-Lists / sub-Dictionaries
+"   containing the items where a:Predicate is true / is false.
+"******************************************************************************
+    if type(a:list) == type([])
+	let [l:in, l:out] = [[], []]
+	for l:item in a:list
+	    if ingo#actions#EvaluateWithValOrFunc(a:Predicate, l:item)
+		call add(l:in, l:item)
+	    else
+		call add(l:out, l:item)
+	    endif
+	endfor
+    elseif type(a:list) == type({})
+	let [l:in, l:out] = [{}, {}]
+	for l:item in items(a:list)
+	    if ingo#actions#EvaluateWithValOrFunc(a:Predicate, l:item)
+		let l:in[l:item[0]] = l:item[1]
+	    else
+		let l:out[l:item[0]] = l:item[1]
+	    endif
+	endfor
+    else
+	throw 'ASSERT: Invalid type for list'
+    endif
+
+    return [l:in, l:out]
+endfunction
+
+function! ingo#collections#Reduce( list, Callback, initialValue )
+"******************************************************************************
+"* PURPOSE:
+"   Reduce a List / Dictionary into a single value by repeatedly applying
+"   a:Callback to the accumulator (as v:val[0]) and a List element / [key,
+"   value] Dictionary element (as v:val[1]). Also known as "fold left".
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list          List or Dictionary.
+"   a:Callback      Either a Funcref or an expression to be eval()ed.
+"   a:initialValue  Initial value for the accumulator.
+"* RETURN VALUES:
+"   Accumulated value.
+"******************************************************************************
+    let l:accumulator = a:initialValue
+
+    if type(a:list) == type([])
+	for l:item in a:list
+	    let l:accumulator = ingo#actions#EvaluateWithValOrFunc(a:Callback, l:accumulator, l:item)
+	endfor
+    elseif type(a:list) == type({})
+	for l:item in items(a:list)
+	    let l:accumulator = ingo#actions#EvaluateWithValOrFunc(a:Callback, l:accumulator, l:item)
+	endfor
+    else
+	throw 'ASSERT: Invalid type for list'
+    endif
+
+    return l:accumulator
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

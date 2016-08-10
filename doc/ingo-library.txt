@@ -83,6 +83,56 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.025	09-Aug-2016
+- Add ingo#str#Contains().
+- Add ingo#fs#path#split#Contains().
+- ingo#subst#pairs#Substitute(): Canonicalize path separators in
+  {replacement}, too. This is important to match further pairs, too, as the
+  pattern is always in canonical form, so the replacement has to be, too.
+- ingo#subst#pairs#Substitute() and ingo#subst#pairs#Split(): Only
+  canonicalize path separators in {replacement} on demand, via additional
+  a:isCanonicalizeReplacement argument. Some clients may not need iterative
+  replacement, and treat the wildcard as a convenient regexp-shorthand, not
+  overly filesystem-related.
+- ENH: Allow passing to ingo#subst#pairs#Substitute() [wildcard, replacement]
+  Lists instead of {wildcard}={replacement} Strings, too.
+- Add ingo#collections#Partition().
+- Add ingo#text#frompattern#GetAroundHere().
+- Add ingo#cmdline#showmode#TemporaryNoShowMode() variant of
+  ingo#cmdline#showmode#OneLineTemporaryNoShowMode().
+- ENH: Enable customization of ingo#window#special#IsSpecialWindow() via
+  g:IngoLibrary_SpecialWindowPredicates.
+- Add ingo#query#Question().
+- ENH: Make ingo#window#special#SaveSpecialWindowSize() return sum of special
+  windows' widths and sum of special windows' heights.
+- Add ingo/swap.vim module.
+- Add ingo#collections#unique#Insert() and ingo#collections#unique#Add().
+- BUG: Unescaped backslash resulted in unclosed [...] regexp collection
+  causing ingo#escape#file#fnameunescape() to fail to escape on Unix.
+- Add ingo#text#GetCharBefore() variant of ingo#text#GetChar().
+- Add optional a:characterOffset to ingo#record#PositionAndLocation().
+- Add ingo#regexp#MakeStartWordSearch() ingo#regexp#MakeEndWordSearch()
+  variants of ingo#regexp#MakeWholeWordSearch().
+- Add ingo#pos#IsInsideVisualSelection().
+- Add ingo#escape#command#mapunescape().
+- ENH: Add second optional flag a:isKeepDirectories to
+  ingo#cmdargs#glob#Expand() / ingo#cmdargs#glob#ExpandSingle().
+- Add ingo#range#borders#StartAndEndRange().
+- Add ingo#msg#VerboseMsg().
+- Add ingo#compat#sha256(), with a fallback to an external sha256sum command.
+- Add ingo#collections#Reduce().
+- Add ingo/actions/iterations.vim module.
+- Add ingo/actions/special.vim module.
+- Add ingo#collections#differences#ContainsLoosely() and
+  ingo#collections#differences#ContainsStrictly().
+- Add ingo#buffer#ExistOtherLoadedBuffers().
+- FIX: Temporarily reset 'switchbuf' in ingo#buffer#visible#Execute() and
+  ingo#buffer#temp#Execute(), to avoid that "usetab" switched to another tab
+  page.
+- ingo#msg#HighlightMsg(): Make a:hlgroup optional, default to 'None' (so the
+  function is useful to return to normal highlighting).
+- Add ingo#msg#HighlightN(), an :echon variant.
+
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
   ingo#lines#Replace().
@@ -509,7 +559,7 @@ First published version as separate shared library.
 Started development of shared autoload functionality.
 
 ==============================================================================
-Copyright: (C) 2009-2015 Ingo Karkat
+Copyright: (C) 2009-2016 Ingo Karkat
 Contains URL encoding / decoding algorithms written by Tim Pope.
 The VIM LICENSE applies to this plugin; see |copyright|.
 

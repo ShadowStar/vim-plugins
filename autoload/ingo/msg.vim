@@ -2,12 +2,17 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.008	01-Aug-2016	ingo#msg#HighlightMsg(): Make a:hlgroup
+"				optional, default to 'None' (so the function is
+"				useful to return to normal highlighting).
+"				Add ingo#msg#HighlightN(), an :echon variant.
+"   1.025.007	15-Jul-2016	Add ingo#msg#VerboseMsg().
 "   1.019.006	05-May-2014	Add optional a:isBeep argument to
 "				ingo#msg#ErrorMsg().
 "   1.009.005	21-Jun-2013	:echomsg sets v:statusmsg itself when there's no
@@ -22,9 +27,14 @@
 "   1.003.002	13-Mar-2013	Add ingo#msg#ShellError().
 "   1.000.001	22-Jan-2013	file creation
 
-function! ingo#msg#HighlightMsg( text, hlgroup )
-    execute 'echohl' a:hlgroup
+function! ingo#msg#HighlightMsg( text, ... )
+    execute 'echohl' (a:0 ? a:1 : 'None')
     echomsg a:text
+    echohl None
+endfunction
+function! ingo#msg#HighlightN( text, ... )
+    execute 'echohl' (a:0 ? a:1 : 'None')
+    echon a:text
     echohl None
 endfunction
 
@@ -48,6 +58,25 @@ function! ingo#msg#StatusMsg( text, ... )
 	call ingo#msg#HighlightMsg(a:text, a:1)
     else
 	echohl None
+	echomsg a:text
+    endif
+endfunction
+
+function! ingo#msg#VerboseMsg( text, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Echo a message if 'verbose' is greater or equal 1 (or the optional
+"   a:verboselevel).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  The message to be echoed in verbose mode.
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
+    if &verbose >= (a:0 ? a:1 : 1)
 	echomsg a:text
     endif
 endfunction
