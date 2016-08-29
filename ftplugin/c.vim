@@ -15,6 +15,24 @@ if exists("b:did_C_ftplugin")
   finish
 endif
 let b:did_C_ftplugin = 1
+
+let g:SuperTabNoCompleteAfter = ['^', '\s', ',', ';', ':', '(', ')', '[', ']', '{', '}']
+
+setlocal tabstop=8
+setlocal shiftwidth=8
+setlocal softtabstop=8
+setlocal textwidth=80
+setlocal noexpandtab
+setlocal cindent
+setlocal smartindent
+setlocal formatoptions=tcqlron
+setlocal cinoptions=:0,l1,t0,g0,(0
+setlocal keywordprg=man\ -S\ 2:3
+
+if exists('g:viewdoc_man_cmd')
+	let g:viewdoc_man_cmd=&keywordprg
+endif
+
 "
 "-------------------------------------------------------------------------------
 " additional mapping : complete a classical C comment: '/*' => '/* | */'
