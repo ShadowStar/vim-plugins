@@ -1009,8 +1009,10 @@ function! s:CreateAdditionalMaps ()
 	" templates
 	"-------------------------------------------------------------------------------
 	"
-	nnoremap    <buffer>  <silent>  <C-j>       i<C-R>=Vim_JumpForward()<CR>
-	inoremap    <buffer>  <silent>  <C-j>  <C-G>u<C-R>=Vim_JumpForward()<CR>
+	if exists(g:Vim_Ctrl_j) && g:Vim_Ctrl_j == 'on'
+		nnoremap    <buffer>  <silent>  <C-j>       i<C-R>=Vim_JumpForward()<CR>
+		inoremap    <buffer>  <silent>  <C-j>  <C-G>u<C-R>=Vim_JumpForward()<CR>
+	endif
 	"
 	" ----------------------------------------------------------------------------
 	"

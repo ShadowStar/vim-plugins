@@ -1084,8 +1084,10 @@ function! s:CreateAdditionalMaps ()
 	"-------------------------------------------------------------------------------
 	" templates
 	"-------------------------------------------------------------------------------
-	nnoremap  <buffer>  <silent>  <C-j>       i<C-R>=BASH_JumpForward()<CR>
-	inoremap  <buffer>  <silent>  <C-j>  <C-g>u<C-R>=BASH_JumpForward()<CR>
+	if exists(g:BASH_Ctrl_j) && g:BASH_Ctrl_j == 'on'
+		nnoremap  <buffer>  <silent>  <C-j>       i<C-R>=BASH_JumpForward()<CR>
+		inoremap  <buffer>  <silent>  <C-j>  <C-g>u<C-R>=BASH_JumpForward()<CR>
+	endif
 
 	call mmtemplates#core#CreateMaps ( 'g:BASH_Templates', g:BASH_MapLeader, 'do_special_maps', 'do_del_opt_map' )
 
