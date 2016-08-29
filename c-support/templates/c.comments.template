@@ -13,10 +13,12 @@
  *  <CURSOR>
  *-----------------------------------------------------------------------------*/
 == Comments.function == map:cfu, shortcut:f  ==
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  |?FUNCTION_NAME|
  *  Description:  <CURSOR>
+ *      Returns:
+ *      Notices:
  * =====================================================================================
  */
 == Comments.method == map:cme, shortcut:m  ==
@@ -52,6 +54,7 @@
  *
  *        Version:  1.0
  *        Created:  |DATE| |TIME|
+ *    Last Change:
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -71,6 +74,7 @@
  *
  *        Version:  1.0
  *        Created:  |DATE| |TIME|
+ *    Last Change:
  *       Revision:  none
  *       Compiler:  gcc
  *
