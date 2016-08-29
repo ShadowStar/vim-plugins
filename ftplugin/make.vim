@@ -14,6 +14,14 @@ if exists("b:did_Make_ftplugin")
   finish
 endif
 let b:did_Make_ftplugin = 1
+
+if exists("loaded_matchit")
+  let s:sol = '^\s*'  " start of line
+  let b:match_words =
+    \ s:sol.'if\(n\)\=\(eq\|def\)\>:' . s:sol.'else\>:' . s:sol.'endif\>,' .
+    \ s:sol.'define\>:' . s:sol.'endef\>'
+endif
+
 "
 " ---------- Maps for the Make tool -----------------------------
 "
