@@ -295,7 +295,7 @@ set ruler                       " show the cursor position all the time
 set showcmd                     " display incomplete commands
 set smartindent                 " smart autoindenting when starting a new line
 set visualbell                  " visual bell instead of beeping
-set wildignore=*.bak,*.o,*.e,*~ " wildmenu: ignore these extensions
+set wildignore=*.bak,*.o,*.ko,*.e,*~ " wildmenu: ignore these extensions
 set wildignore+=*.tar,*.tgz,*.gz,*.bz2,*.lzma,*.zip,*.rar
 set wildignore+=*.pdf,*.ppt,*.pptx,*.doc,*.docx,*.xls,*.xlsx
 set wildignore+=*.rmvb,*.avi,*.mpg,*.mpeg,*.mp4,*.mkv,*.swf
@@ -381,8 +381,8 @@ let g:EchoFuncKeyNext = '<C-j>'
 let g:BASH_FormatDate            = '%D'
 let g:BASH_FormatTime            = '%H:%M'
 let g:BASH_FormatYear            = 'year %Y'
-let g:C_Ctrl_j = 'off'
 let g:C_Dictionary_File = $HOME.'/.vim/c-support/wordlists/std-keywords.list'
+let g:C_Ctrl_j = 'off'
 let g:BASH_Ctrl_j = 'off'
 let g:Awk_Ctrl_j = 'off'
 let g:Vim_Ctrl_j = 'off'
@@ -426,8 +426,8 @@ let g:AutoPairsMapCR = 0
 set imdisable
 set iminsert=0
 
-let g:update_time_time_format = ' %D %H:%M:%S'
-let g:update_time_end_line = 30
+let g:update_last_time_format = '%x %X'
+let g:update_last_end_line = 30
 
 runtime simple_highlighting.vimrc
 "if filereadable(".vimrc")
