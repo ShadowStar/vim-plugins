@@ -7,8 +7,8 @@
 "                 Maps & Menus - Template Engine
 " 
 "   VIM Version:  7.0+
-"        Author:  Wolfgang Mehner, wolfgang-mehner@web.de
-"  Organization:  
+"        Author:  ShadowStar, <orphen.leiliu@gmail.com>
+"  Organization:  Gmail
 "       Version:  see variable g:Templates_Version below
 "       Created:  30.08.2011
 "      Revision:  30.09.2015
@@ -271,7 +271,7 @@ let s:StandardMacros = {
 			\ 'TIME_PRETTY'    : '%X',
 			\ 'YEAR'           : '%Y',
 			\ 'YEAR_PRETTY'    : '%Y',
-			\ 'TIME_LOCALE'    : '',
+			\ 'TIME_LOCALE'    : 'en_US.UTF-8',
 			\ }
 "
 "----------------------------------------------------------------------
