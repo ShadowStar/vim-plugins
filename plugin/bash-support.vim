@@ -1951,10 +1951,10 @@ if has( 'autocmd' )
 	" insert file header
 	"-------------------------------------------------------------------------------
 	if s:BASH_InsertFileHeader == 'yes'
-		autocmd BufNewFile  *.sh  call mmtemplates#core#InsertTemplate(g:BASH_Templates, 'Comments.file header')
+		autocmd BufNewFile  *.sh  call mmtemplates#core#InsertTemplate(g:BASH_Templates, 'Comments.file header') | set modified
 		if exists( 'g:BASH_AlsoBash' )
 			for item in g:BASH_AlsoBash
-				exe "autocmd BufNewFile ".item." call mmtemplates#core#InsertTemplate(g:BASH_Templates, 'Comments.file header')"
+				exe "autocmd BufNewFile ".item." call mmtemplates#core#InsertTemplate(g:BASH_Templates, 'Comments.file header') | set modified"
 			endfor
 		endif
 	endif

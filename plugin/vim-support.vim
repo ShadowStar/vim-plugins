@@ -1139,7 +1139,7 @@ if has( 'autocmd' )
   autocmd BufNewFile *.vim
 	\ if s:Vim_InsertFileHeader == 'yes' |
 		\ call mmtemplates#core#InsertTemplate(g:Vim_Templates, 'Comments.file description') |
-	\ endif
+	\ endif | set modified
 endif
 " }}}1
 "
