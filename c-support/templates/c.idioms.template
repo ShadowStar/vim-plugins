@@ -47,9 +47,11 @@ void __init_daemon(void)
 }
 
 == Idioms.main == map:im, shortcut:m  ==
-#include	<stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-/* 
+/*
  * ===  FUNCTION  ======================================================================
  *         Name:  main
  *  Description:  
