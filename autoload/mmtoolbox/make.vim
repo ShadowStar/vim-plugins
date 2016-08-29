@@ -13,8 +13,8 @@
 "  Organization:  
 "       Version:  see variable g:Make_Version below
 "       Created:  06.05.2013
-"      Revision:  10.11.2013
-"       License:  Copyright (c) 2013, Fritz Mehner
+"      Revision:  23.07.2015
+"       License:  Copyright (c) 2013-2015, Wolfgang Mehner
 "                 This program is free software; you can redistribute it and/or
 "                 modify it under the terms of the GNU General Public License as
 "                 published by the Free Software Foundation, version 2 of the
@@ -43,7 +43,7 @@ endif
 if &cp || ( exists('g:Make_Version') && ! exists('g:Make_DevelopmentOverwrite') )
 	finish
 endif
-let g:Make_Version= '1.0.1'     " version number of this script; do not change
+let g:Make_Version= '1.1'     " version number of this script; do not change
 "
 "-------------------------------------------------------------------------------
 " Auxiliary functions   {{{1
@@ -83,6 +83,34 @@ function! s:GetGlobalSetting ( varname )
 		exe 'let s:'.a:varname.' = g:'.a:varname
 	endif
 endfunction    " ----------  end of function s:GetGlobalSetting  ----------
+"
+"-------------------------------------------------------------------------------
+" s:ImportantMsg : Print an important message.   {{{2
+"
+" Parameters:
+"   line1 - a line (string)
+"   line2 - a line (string)
+"   ...   - ...
+" Returns:
+"   -
+"-------------------------------------------------------------------------------
+function! s:ImportantMsg ( ... )
+	echohl Search
+	echo join ( a:000, "\n" )
+	echohl None
+endfunction    " ----------  end of function s:ImportantMsg  ----------
+"
+"-------------------------------------------------------------------------------
+" s:SID : Return the <SID>.   {{{2
+"
+" Parameters:
+"   -
+" Returns:
+"   SID - the SID of the script (string)
+"-------------------------------------------------------------------------------
+function! s:SID ()
+	return matchstr ( expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$' )
+endfunction    " ----------  end of function s:SID ----------
 " }}}2
 "-------------------------------------------------------------------------------
 "
@@ -132,18 +160,38 @@ if ! executable ( s:Make_Executable )
 	let s:Enabled = 0
 endif
 "
+" Make target complete {{{2
+"
+function! s:MakeTargetComplete ( ArgLead, CmdLine, CursorPos )
+	"
+	" files
+	let filelist = split ( glob ( a:ArgLead.'*' ), "\n" )
+	"
+	for i in range ( 0, len(filelist)-1 )
+		if isdirectory ( filelist[i] )
+			let filelist[i] .= '/'
+		endif
+	endfor
+	"
+	" the makefile
+	let make_file = s:Makefile != '' ? s:Makefile : 'Makefile'
+	"
+	return filter( copy( s:GetMakeTargets( make_file ) ), 'v:val =~ "\\V\\<'.escape(a:ArgLead,'\').'\\w\\*"' ) + filelist
+endfunction    " ----------  end of function s:MakeTargetComplete  ----------
+"
 " custom commands {{{2
 "
 if s:Enabled == 1
+	command!       -nargs=* -complete=customlist,<SID>MakeTargetComplete  Make  :call <SID>Run(<q-args>)
+	"
 	command! -bang -nargs=* -complete=file MakeCmdlineArgs   :call mmtoolbox#make#Property('<bang>'=='!'?'echo':'set','cmdline-args',<q-args>)
 	command! -bang -nargs=? -complete=file MakeFile          :call mmtoolbox#make#Property('<bang>'=='!'?'echo':'set','makefile',<q-args>)
-	command!       -nargs=* -complete=file Make              :call mmtoolbox#make#Run(<q-args>)
-	command!       -nargs=0                MakeHelp          :call mmtoolbox#make#Help()
-	command! -bang -nargs=0                MakeSettings      :call mmtoolbox#make#Settings('<bang>'=='!')
+	command!       -nargs=0                MakeHelp          :call <SID>Help()
+	command! -bang -nargs=?                MakeSettings      :call <SID>Settings(('<bang>'=='!')+str2nr(<q-args>))
 else
 	"
-	" Disabled : Print why the script is disabled.   {{{3
-	function! mmtoolbox#make#Disabled ()
+	" s:Disabled : Print why the script is disabled.   {{{3
+	function! s:Disabled ()
 		let txt = "Make tool not working:\n"
 		if ! executable ( s:Make_Executable )
 			let txt .= "make not executable (".s:Make_Executable.")\n"
@@ -152,16 +200,14 @@ else
 			let txt .= "unknown reason\n"
 			let txt .= "see :help toolbox-make"
 		endif
-		echohl Search
-		echo txt
-		echohl None
+		call s:ImportantMsg ( txt )
 		return
-	endfunction    " ----------  end of function mmtoolbox#make#Disabled  ----------
+	endfunction    " ----------  end of function s:Disabled  ----------
 	" }}}3
 	"
-	command! -bang -nargs=* Make          :call mmtoolbox#make#Disabled()
-	command!       -nargs=0 MakeHelp      :call mmtoolbox#make#Help()
-	command! -bang -nargs=0 MakeSettings  :call mmtoolbox#make#Settings('<bang>'=='!')
+	command! -bang -nargs=* Make          :call <SID>Disabled()
+	command!       -nargs=0 MakeHelp      :call <SID>Help()
+	command! -bang -nargs=? MakeSettings  :call <SID>Settings(('<bang>'=='!')+str2nr(<q-args>))
 	"
 endif
 "
@@ -236,10 +282,10 @@ function! mmtoolbox#make#Property ( mode, key, ... )
 	"
 	" perform the action
 	if a:mode == 'echo'
-		exe 'echo '.var
+		echo {var}
 		return
 	elseif a:mode == 'get'
-		exe 'return '.var
+		return {var}
 	elseif a:key == 'cmdline-args'
 		let s:CmdLineArgs = val
 	elseif a:key == 'makefile'
@@ -255,33 +301,32 @@ function! mmtoolbox#make#Property ( mode, key, ... )
 endfunction    " ----------  end of function mmtoolbox#make#Property  ----------
 "
 "-------------------------------------------------------------------------------
-" Help : Plugin help.   {{{1
+" s:Help : Plugin help.   {{{1
 "-------------------------------------------------------------------------------
-function! mmtoolbox#make#Help ()
+function! s:Help ()
 	try
 		help toolbox-make
 	catch
 		exe 'helptags '.s:plugin_dir.'/doc'
 		help toolbox-make
 	endtry
-endfunction    " ----------  end of function mmtoolbox#make#Help  ----------
+endfunction    " ----------  end of function s:Help  ----------
 "
 "-------------------------------------------------------------------------------
-" Settings : Plugin settings.   {{{1
+" s:Settings : Plugin settings.   {{{1
 "-------------------------------------------------------------------------------
-function! mmtoolbox#make#Settings ( verbose )
+function! s:Settings ( verbose )
 	"
 	if     s:MSWIN | let sys_name = 'Windows'
 	elseif s:UNIX  | let sys_name = 'UNIX'
 	else           | let sys_name = 'unknown' | endif
 	"
-	let make_status = executable( s:Make_Executable ) ? '<yes>' : '<no>'
+	let make_status = executable( s:Make_Executable ) ? '' : ' (not executable)'
 	let make_file   = s:Makefile != '' ? s:Makefile : '(default) local Makefile'
 	"
 	let	txt = " Make-Support settings\n\n"
 				\ .'     plug-in installation :  toolbox on '.sys_name."\n"
-				\ .'          make executable :  '.s:Make_Executable."\n"
-				\ .'                > enabled :  '.make_status."\n"
+				\ .'          make executable :  '.s:Make_Executable.make_status."\n"
 				\ .'            using toolbox :  version '.g:Toolbox_Version." by Wolfgang Mehner\n"
 	if a:verbose
 		let	txt .= "\n"
@@ -292,8 +337,13 @@ function! mmtoolbox#make#Settings ( verbose )
 				\  "________________________________________________________________________________\n"
 				\ ." Make-Tool, Version ".g:Make_Version." / Wolfgang Mehner / wolfgang-mehner@web.de\n\n"
 	"
-	echo txt
-endfunction    " ----------  end of function mmtoolbox#make#Settings  ----------
+	if a:verbose == 2
+		split Make_Settings.txt
+		put = txt
+	else
+		echo txt
+	endif
+endfunction    " ----------  end of function s:Settings  ----------
 "
 "-------------------------------------------------------------------------------
 " Modul setup (abort early?).   {{{1
@@ -303,10 +353,9 @@ if s:Enabled == 0
 endif
 "
 "-------------------------------------------------------------------------------
-"
-" Run : Run make.   {{{1
+" s:Run : Run make.   {{{1
 "-------------------------------------------------------------------------------
-function! mmtoolbox#make#Run ( args )
+function! s:Run ( args )
 	"
 	silent exe 'update'   | " write source file if necessary
 	cclose
@@ -330,7 +379,71 @@ function! mmtoolbox#make#Run ( args )
 	"
 	botright cwindow
 	"
-endfunction    " ----------  end of function mmtoolbox#make#Run  ----------
+endfunction    " ----------  end of function s:Run  ----------
+"
+"-------------------------------------------------------------------------------
+" s:GetMakeTargets : Get the targets of a Makefile   {{{1
+"
+" Return a sorted list of targets. Duplicates are removed. If the file could
+" not be opened, the function fails quietly and returns an empty list.
+"
+" Parameters:
+"   file - the Makefile to process (string)
+" Returns:
+"   target_list - the list of targets (list of strings)
+"-------------------------------------------------------------------------------
+function! s:GetMakeTargets ( file )
+	"
+	if ! filereadable ( a:file )
+		return []
+	endif
+	"
+	let target_collect = []
+	let target_list    = []
+	let last_target    = ''
+	"
+	for line in readfile( a:file )
+		let target = matchstr ( line, '^\zs[^:# \t]\+\ze\s*:[^=]*$' )
+		if target != ''
+			call insert ( target_collect, target )
+		endif
+	endfor
+	"
+	call sort ( target_collect )
+	"
+	for target in target_collect
+		if target != last_target && target != '.PHONY'
+			call insert ( target_list, target )
+		endif
+		let last_target = target
+	endfor
+	"
+	return target_list
+endfunction    " ----------  end of function s:GetMakeTargets  ----------
+"
+"-------------------------------------------------------------------------------
+" mmtoolbox#make#Interface : Get the interface.   {{{1
+"
+" Parameters:
+"   -
+" Returns:
+"   interface - the interface (dict: name -> func.-ref)
+"-------------------------------------------------------------------------------
+function! mmtoolbox#make#Interface ()
+	"
+	let namelist = [
+				\ 'GetMakeTargets',
+				\ ]
+	"
+	let interface = {}
+	let sid = s:SID()
+	"
+	for name in namelist
+		let interface[name] = function ( '<SNR>'.sid.'_'.name )
+	endfor
+	"
+	return interface
+endfunction    " ----------  end of function mmtoolbox#make#Interface  ----------
 " }}}1
 "-------------------------------------------------------------------------------
 "

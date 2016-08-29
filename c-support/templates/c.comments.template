@@ -9,34 +9,30 @@
 == Comments.end-of-line-comment == append, nomenu ==
 /* <CURSOR> */
 == Comments.frame == map:cfr, shortcut:f  ==
-/*
- * =============================================================================
+/*-----------------------------------------------------------------------------
  *  <CURSOR>
- * =============================================================================
- */
+ *-----------------------------------------------------------------------------*/
 == Comments.function == map:cfu, shortcut:f  ==
-/*
- * ===  FUNCTION  ==============================================================
+/* 
+ * ===  FUNCTION  ======================================================================
  *         Name:  |?FUNCTION_NAME|
  *  Description:  <CURSOR>
- *      Returns:  
- *      Notices:  
- * =============================================================================
+ * =====================================================================================
  */
 == Comments.method == map:cme, shortcut:m  ==
 /*
- * =============================================================================
+ *--------------------------------------------------------------------------------------
  *       Class:  |?CLASSNAME|
  *      Method:  |?CLASSNAME| :: |?METHODNAME|
  * Description:  <CURSOR>
- * =============================================================================
+ *--------------------------------------------------------------------------------------
  */
 == Comments.class == map:ccl, shortcut:c  ==
 /*
- * =============================================================================
+ * =====================================================================================
  *        Class:  |?CLASSNAME|
  *  Description:  <CURSOR>
- * =============================================================================
+ * =====================================================================================
  */
 == ENDTEMPLATE ==
 
@@ -48,7 +44,7 @@
 
 == Comments.file description impl == map:cfdi, shortcut:c, start, noindent ==
 /*
- * =============================================================================
+ * =====================================================================================
  *
  *       Filename:  |FILENAME|
  *
@@ -56,19 +52,18 @@
  *
  *        Version:  1.0
  *        Created:  |DATE| |TIME|
- *    Last Change:  |DATE| |TIME|
  *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  |AUTHOR| (|AUTHORREF|), |EMAIL|
  *   Organization:  |ORGANIZATION|
  *
- * =============================================================================
+ * =====================================================================================
  */
 
 == Comments.file description header == map:cfdh, shortcut:h, start, noindent ==
 /*
- * =============================================================================
+ * =====================================================================================
  *
  *       Filename:  |FILENAME|
  *
@@ -76,19 +71,14 @@
  *
  *        Version:  1.0
  *        Created:  |DATE| |TIME|
- *    Last Change:  |DATE| |TIME|
  *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  |AUTHOR| (|AUTHORREF|), |EMAIL|
  *   Organization:  |ORGANIZATION|
  *
- * =============================================================================
+ * =====================================================================================
  */
-#ifndef __|BASENAME:U|_INC__
-#define __|BASENAME:U|_INC__
-
-#endif	/* __|BASENAME:U|_INC__ */
 == ENDTEMPLATE ==
 
 == LIST: comments_c_sections == hash ==
@@ -144,6 +134,78 @@
 == Comments.H file sections  == expandmenu, append, map:chs, shortcut:s ==
 |PickList( 'H file sections', 'comments_h_sections' )|
 /* #####   |PICK|######################################## */<CURSOR>
+== ENDTEMPLATE ==
+
+MenuShortcut( 'Comments.all sections', 'a' )
+
+== Comments.all sections.implementation, C == below, map:ccc, sc:c ==
+|InsertLine('Comments.C file sections', 'pick', 'HEADER FILE INCLUDES'       )|
+<CURSOR>
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL MACROS'               )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL TYPE DEFINITIONS'     )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL DATA TYPES'           )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL VARIABLES'            )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL PROTOTYPES'           )|
+
+|InsertLine('Comments.C file sections', 'pick', 'EXP.  FUNCTION DEFINITIONS' )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL FUNCTION DEFINITIONS' )|
+
+== Comments.all sections.implementation, CPP == below, map:ccp, sc:p ==
+|InsertLine('Comments.C file sections', 'pick', 'HEADER FILE INCLUDES'        )|
+<CURSOR>
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL MACROS'                )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL TYPE DEFINITIONS'      )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL DATA TYPES'            )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL CLASS DEFINITIONS'     )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL VARIABLES'             )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL PROTOTYPES'            )|
+
+|InsertLine('Comments.C file sections', 'pick', 'EXP.  FUNCTION DEFINITIONS'  )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL FUNCTION DEFINITIONS'  )|
+
+|InsertLine('Comments.C file sections', 'pick', 'EXP.  CLASS IMPLEMENTATIONS' )|
+
+|InsertLine('Comments.C file sections', 'pick', 'LOCAL CLASS IMPLEMENTATIONS' )|
+
+== Comments.all sections.header, C == below, map:chc, sc:c ==
+|InsertLine('Comments.H file sections', 'pick', 'HEADER FILE INCLUDES'           )|
+<CURSOR>
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED MACROS'                )|
+
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED TYPE DEFINITIONS'      )|
+
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED DATA TYPES'            )|
+
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED VARIABLES'             )|
+
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED FUNCTION DECLARATIONS' )|
+
+== Comments.all sections.header, CPP == below, map:chp, sc:p ==
+|InsertLine('Comments.H file sections', 'pick', 'HEADER FILE INCLUDES'           )|
+<CURSOR>
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED MACROS'                )|
+
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED TYPE DEFINITIONS'      )|
+
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED DATA TYPES'            )|
+
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED CLASS DEFINITIONS'     )|
+
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED VARIABLES'             )|
+
+|InsertLine('Comments.H file sections', 'pick', 'EXPORTED FUNCTION DECLARATIONS' )|
+
 == ENDTEMPLATE ==
 
 § -------------------------------------------------------------

@@ -1,13 +1,14 @@
-*toolboxmake.txt*                  Make Tool                       Dec 28 2013
+*toolboxmake.txt*                  Make Tool                      July 23 2015
 
 Make Tool                                                       *toolbox-make*
 
-                            Plug-in version 1.0.1
+                             Plug-in version 1.1
                         for Vim version 7.0 and above
                  Wolfgang Mehner <wolfgang-mehner at web.de>
 
 The Make tool offers minimal make functionality, such as running make with the
-makefile located in a different directory.
+makefile located in a different directory. The make command is run by using
+the :Make command, which has command-line completion for make targets.
 
 ==============================================================================
 0.  TABLE OF CONTENTS                                  *toolbox-make-contents*
@@ -42,6 +43,9 @@ it possible to use the tool for larger projects, which are organized in
 multiple directories. The specified file is used until another is chosen or
 the default behavior is restored by calling :MakeFile without arguments.
 
+Whether or not the makefile is set by :MakeFile, the :Make command has
+command-line completion for the targets.
+
   Command                       Short Description
  ----------------------------------------------------------------------------
   |:Make| [<args>]                run make with the given arguments
@@ -71,6 +75,7 @@ Runs make with the given arguments.  If no arguments are given, uses the ones
 specified with |:MakeCmdlineArgs|, which can be an empty argument list as well.
 
 Uses the local makefile, unless a makefile has been chosen using |:MakeFile|.
+The command has command-line completion for the targets of that makefile.
 
 If the tool is not working properly, prints the reason.
 
@@ -168,6 +173,26 @@ A.  CHANGE LOG                                       *toolbox-make-change-log*
 ==============================================================================
 
 ------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.1
+------------------------------------------------------------------------------
+
+- Add: Command-line completion for Make targets.
+- Minor changes.
+
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.0.3
+------------------------------------------------------------------------------
+
+- Internal changes, less global functions.
+- Minor changes.
+
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.0.2
+------------------------------------------------------------------------------
+
+- Minor changes.
+
+------------------------------------------------------------------------------
   RELEASE NOTES FOR VERSION 1.0.1
 ------------------------------------------------------------------------------
 
@@ -181,4 +206,4 @@ A.  CHANGE LOG                                       *toolbox-make-change-log*
 - Initial upload.
 
 ==============================================================================
-vim:tw=78:noet:ts=2:ft=help:norl:expandtab:
+vim:tw=78:expandtab:ts=2:ft=help:norl:

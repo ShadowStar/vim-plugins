@@ -2,70 +2,19 @@
 "
 " Vim filetype plugin file
 "
-"   Language :  C / C++
-"     Plugin :  c.vim
-" Maintainer :  Fritz Mehner <mehner@fh-swf.de>
+"   Language :  C
+"     Plugin :  c.vim 
+" Maintainer :  Wolfgang Mehner <wolfgang-mehner@web.de>
+"               (formerly Fritz Mehner <mehner.fritz@web.de>)
 "
 " ------------------------------------------------------------------------------
 "
 " Only do this when not done yet for this buffer
-"
+" 
 if exists("b:did_C_ftplugin")
   finish
 endif
 let b:did_C_ftplugin = 1
-
-"set colorcolumn=81
-setlocal keywordprg=man\ -S\ 2:3
-setlocal wildignore+=*.ko,*.mod.c,*.order,modules.builtin
-setlocal tabstop=8
-setlocal shiftwidth=8
-setlocal softtabstop=8
-setlocal textwidth=80
-setlocal noexpandtab
-setlocal cindent
-setlocal smartindent
-setlocal formatoptions=tcqlron
-setlocal cinoptions=:0,l1,t0,g0,(0
-let g:SuperTabNoCompleteAfter = ['^', '\s', ',', ';', ':', '(', ')', '[', ']', '{', '}']
-
-if exists('g:viewdoc_man_cmd')
-	let g:viewdoc_man_cmd=&keywordprg
-endif
-"set tags=tags;/
-
-function! <sid>Str2Hex(type)
-  let l:type = a:type
-  let l:hex = matchstr(getline('.'), '\(0x\|\\x\)')
-  if l:hex == ""
-    if l:type == '0x'
-      silent execute "s/\\x\\x/\\='0x'.toupper(submatch(0)).', '/g"
-    else
-      silent execute "s/\\x\\x/\\='\\x'.toupper(submatch(0))/g"
-    endif
-  else
-    if matchstr(getline('.'), '0x\x\x,') != ""
-      silent execute "s/0x\\(\\x\\x\\)[,]\\s*/\\1/g"
-    elseif matchstr(getline('.'), '\\[xX]\x\x') != ""
-      silent execute "s/\\\\[xX]\\(\\x\\x\\)/\\1/g"
-    endif
-  endif
-endfunction
-
-map <leader>x :call <sid>Str2Hex('x')<CR>
-map <leader>0x :call <sid>Str2Hex('0x')<CR>
-
-function! <sid>Comp_Case()
-  let out = ":\r"
-  if matchstr(getline('.'), '\<case\>') != ""
-    return out . "\r" . "break;\<up>\<tab>"
-  else
-    return out
-  endif
-endfunction
-
-inoremap <expr> :<CR>  <sid>Comp_Case()
-
 "
 "-------------------------------------------------------------------------------
 " additional mapping : complete a classical C comment: '/*' => '/* | */'
@@ -74,7 +23,7 @@ inoremap  <buffer>  /*       /*<Space><Space>*/<Left><Left><Left>
 vnoremap  <buffer>  /*      s/*<Space><Space>*/<Left><Left><Left><Esc>p
 "
 "-------------------------------------------------------------------------------
-" additional mapping : complete a classical C multi-line comment:
+" additional mapping : complete a classical C multi-line comment: 
 "                      '/*<CR>' =>  /*
 "                                    * |
 "                                    */

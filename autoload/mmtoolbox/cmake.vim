@@ -13,8 +13,8 @@
 "  Organization:  
 "       Version:  see variable g:CMake_Version below
 "       Created:  28.12.2011
-"      Revision:  ---
-"       License:  Copyright (c) 2012, Wolfgang Mehner
+"      Revision:  23.07.2015
+"       License:  Copyright (c) 2012-2016, Wolfgang Mehner
 "                 This program is free software; you can redistribute it and/or
 "                 modify it under the terms of the GNU General Public License as
 "                 published by the Free Software Foundation, version 2 of the
@@ -43,7 +43,7 @@ endif
 if &cp || ( exists('g:CMake_Version') && ! exists('g:CMake_DevelopmentOverwrite') )
 	finish
 endif
-let g:CMake_Version= '0.9.1'     " version number of this script; do not change
+let g:CMake_Version= '0.9.2'     " version number of this script; do not change
 "
 "-------------------------------------------------------------------------------
 " Auxiliary functions   {{{1
@@ -168,6 +168,22 @@ function! s:Question ( prompt, ... )
 	"
 	return ret
 endfunction    " ----------  end of function s:Question  ----------
+"
+"-------------------------------------------------------------------------------
+" s:WarningMsg : Print a warning/error message.   {{{2
+"
+" Parameters:
+"   line1 - a line (string)
+"   line2 - a line (string)
+"   ...   - ...
+" Returns:
+"   -
+"-------------------------------------------------------------------------------
+function! s:WarningMsg ( ... )
+	echohl WarningMsg
+	echo join ( a:000, "\n" )
+	echohl None
+endfunction    " ----------  end of function s:WarningMsg  ----------
 " }}}2
 "-------------------------------------------------------------------------------
 "
@@ -179,8 +195,6 @@ endfunction    " ----------  end of function s:Question  ----------
 "
 let s:MSWIN = has("win16") || has("win32")   || has("win64")     || has("win95")
 let s:UNIX	= has("unix")  || has("macunix") || has("win32unix")
-"
-let s:SettingsEscChar = ' |"\'
 "
 if s:MSWIN
 	"
@@ -201,33 +215,60 @@ else
 endif
 "
 " settings   {{{2
-"
+
+let s:makelib = mmtoolbox#make#Interface ()
+
 let s:ProjectDir    = '.'
 let s:BuildLocation = '.'
-"
+
 if s:MSWIN
-	let s:CMake_Executable = 'C:\Program Files\CMake\bin\cmake.exe'
+	let s:CMake_BinPath = ''
 else
-	let s:CMake_Executable = 'cmake'
+	let s:CMake_BinPath = ''
+endif
+
+call s:GetGlobalSetting ( 'CMake_BinPath' )
+
+if s:MSWIN
+	let s:CMake_BinPath = substitute ( s:CMake_BinPath, '[^\\/]$', '&\\', '' )
+
+	let s:CMake_Executable = s:CMake_BinPath.'cmake.exe'
+	let s:CMake_GuiExec    = s:CMake_BinPath.'cmake-gui.exe'
+else
+	let s:CMake_BinPath = substitute ( s:CMake_BinPath, '[^\\/]$', '&/', '' )
+
+	let s:CMake_Executable = s:CMake_BinPath.'cmake'
+	let s:CMake_CCMakeExec = s:CMake_BinPath.'ccmake'
+	let s:CMake_GuiExec    = s:CMake_BinPath.'cmake-gui'
 endif
 let s:CMake_MakeTool   = 'make'
-"
+
+let s:Xterm_Executable = 'xterm'
+
 call s:GetGlobalSetting ( 'CMake_Executable' )
 call s:GetGlobalSetting ( 'CMake_MakeTool' )
-call s:ApplyDefaultSetting ( 'CMake_JumpToError', 'cmake' )
-"
+call s:GetGlobalSetting ( 'CMake_GuiExec' )
+call s:GetGlobalSetting ( 'CMake_CCMakeExec' )
+call s:GetGlobalSetting ( 'Xterm_Executable' )
+call s:ApplyDefaultSetting ( 'CMake_JumpToError',       'cmake' )
+call s:ApplyDefaultSetting ( 'CMake_FilterFastTargets', 'no' )
+call s:ApplyDefaultSetting ( 'Xterm_Options', '-fa courier -fs 12 -geometry 80x24' )
+
 let s:Enabled = 1
-"
+
 " check executables   {{{2
-"
+
 if ! executable ( s:CMake_Executable ) || ! executable ( s:CMake_MakeTool )
 	let s:Enabled = 0
 endif
-"
+
+let s:EnabledCCMake   = s:UNIX && executable ( s:CMake_CCMakeExec )
+let s:EnabledCMakeGui = executable ( s:CMake_GuiExec )
+
 " error formats {{{2
 "
 " error format for CMake
-let s:ErrorFormat_CMake = escape(
+let s:ErrorFormat_CMake =
 			\  '%-DDIR : %f,%-XENDDIR : %f,'
 			\ .'%-G,'
 			\ .'%+G-- %.%#,'
@@ -242,13 +283,11 @@ let s:ErrorFormat_CMake = escape(
 			\ .'%C%>    %f:%l (if),'
 			\ .'%C%>,'
 			\ .'%Z  %m,'
-			\ , s:SettingsEscChar )
 "
 " error format for make, additional errors
-let s:ErrorFormat_MakeAdditions = escape(
+let s:ErrorFormat_MakeAdditions =
 			\  '%-GIn file included from %f:%l:%.%#,'
 			\ .'%-G%\s%\+from %f:%l:%.%#,'
-			\ , s:SettingsEscChar )
 "
 " policy list {{{2
 "
@@ -281,23 +320,63 @@ let s:Policies_List = [
 			\ [ 'CMP????', 'There might be more policies not mentioned here, since this list is not maintained automatically.', '?.?.?' ],
 			\ ]
 "
-" custom commands {{{2
+" Make target complete {{{2
 "
+function! s:MakeTargetComplete ( ArgLead, CmdLine, CursorPos )
+	"
+	" targets
+	let target_list = filter( copy( s:makelib.GetMakeTargets( s:BuildLocation.'/Makefile' ) ), 'v:val =~ "\\V\\<'.escape(a:ArgLead,'\').'\\w\\*"' )
+	"
+	" filter fast targets?
+	if g:CMake_FilterFastTargets == 'yes'
+		let target_list = filter( target_list, 'v:val !~ "/fast$"' )
+	endif
+	"
+	" files
+	let filelist = split ( glob ( a:ArgLead.'*' ), "\n" )
+	"
+	for i in range ( 0, len(filelist)-1 )
+		if isdirectory ( filelist[i] )
+			let filelist[i] .= '/'
+		endif
+	endfor
+	"
+	return target_list + filelist
+endfunction    " ----------  end of function s:MakeTargetComplete  ----------
+
+" CMake cache complete {{{2
+
+function! s:CacheOptions (...)
+	return "-L\n-LA\n-LH\n-LAH"
+endfunction    " ----------  end of function s:CacheOptions  ----------
+
+" custom commands {{{2
+
 if s:Enabled == 1
+	command! -bang -nargs=* -complete=customlist,<SID>MakeTargetComplete  CMake       :call <SID>Run(<q-args>,'<bang>'=='!')
+	command! -bang -nargs=? -complete=custom,<SID>CacheOptions            CMakeCache  :call <SID>ShowCache(<q-args>)
+
 	command! -bang -nargs=? -complete=file CMakeProjectDir    :call mmtoolbox#cmake#Property('<bang>'=='!'?'echo':'set','project-dir',<q-args>)
 	command! -bang -nargs=? -complete=file CMakeBuildLocation :call mmtoolbox#cmake#Property('<bang>'=='!'?'echo':'set','build-dir',<q-args>)
-	command! -bang -nargs=* -complete=file CMake              :call mmtoolbox#cmake#Run(<q-args>,'<bang>'=='!')
-	command!       -nargs=? -complete=file CMakeHelpCommand   :call mmtoolbox#cmake#Help('command',<q-args>)
-	command!       -nargs=? -complete=file CMakeHelpModule    :call mmtoolbox#cmake#Help('module',<q-args>)
-	command!       -nargs=? -complete=file CMakeHelpPolicy    :call mmtoolbox#cmake#Help('policy',<q-args>)
-	command!       -nargs=? -complete=file CMakeHelpProperty  :call mmtoolbox#cmake#Help('property',<q-args>)
-	command!       -nargs=? -complete=file CMakeHelpVariable  :call mmtoolbox#cmake#Help('variable',<q-args>)
-	command!       -nargs=0                CMakeHelp          :call mmtoolbox#cmake#HelpPlugin()
-	command! -bang -nargs=0                CMakeSettings      :call mmtoolbox#cmake#Settings('<bang>'=='!')
+	command!       -nargs=? -complete=file CMakeHelpCommand   :call <SID>Help('command',<q-args>)
+	command!       -nargs=? -complete=file CMakeHelpModule    :call <SID>Help('module',<q-args>)
+	command!       -nargs=? -complete=file CMakeHelpPolicy    :call <SID>Help('policy',<q-args>)
+	command!       -nargs=? -complete=file CMakeHelpProperty  :call <SID>Help('property',<q-args>)
+	command!       -nargs=? -complete=file CMakeHelpVariable  :call <SID>Help('variable',<q-args>)
+	command!       -nargs=0                CMakeHelp          :call <SID>HelpPlugin()
+	command! -bang -nargs=?                CMakeSettings      :call <SID>Settings(('<bang>'=='!')+str2nr(<q-args>))
+	command!       -nargs=0                CMakeRuntime       :call <SID>RuntimeInfo()
+
+	if s:EnabledCCMake
+		command!       -nargs=* -complete=file CMakeCurses      :call <SID>StartCCMake(<q-args>)
+	endif
+	if s:EnabledCMakeGui
+		command!       -nargs=* -complete=file CMakeGui         :call <SID>StartGui(<q-args>)
+	endif
 else
-	"
-	" Disabled : Print why the script is disabled.   {{{3
-	function! mmtoolbox#cmake#Disabled ()
+
+	" s:Disabled : Print why the script is disabled.   {{{3
+	function! s:Disabled ()
 		let txt = "CMake tool not working:\n"
 		if ! executable ( s:CMake_Executable )
 			let txt .= "CMake not executable (".s:CMake_Executable.")\n"
@@ -311,17 +390,18 @@ else
 		endif
 		call s:ImportantMsg ( txt )
 		return
-	endfunction    " ----------  end of function mmtoolbox#cmake#Disabled  ----------
+	endfunction    " ----------  end of function s:Disabled  ----------
 	" }}}3
-	"
-	command! -bang -nargs=* CMake          :call mmtoolbox#cmake#Disabled()
-	command!       -nargs=0 CMakeHelp      :call mmtoolbox#cmake#HelpPlugin()
-	command! -bang -nargs=0 CMakeSettings  :call mmtoolbox#cmake#Settings('<bang>'=='!')
-	"
+
+	command! -bang -nargs=* CMake          :call <SID>Disabled()
+	command!       -nargs=0 CMakeHelp      :call <SID>HelpPlugin()
+	command! -bang -nargs=? CMakeSettings  :call <SID>Settings(('<bang>'=='!')+str2nr(<q-args>))
+	command! -bang -nargs=? CMakeRuntime   :call <SID>Settings(('<bang>'=='!')+str2nr(<q-args>))
+
 endif
-"
+
 " }}}2
-"
+
 "-------------------------------------------------------------------------------
 " GetInfo : Initialize the script.   {{{1
 "-------------------------------------------------------------------------------
@@ -343,28 +423,38 @@ endfunction    " ----------  end of function mmtoolbox#cmake#AddMaps  ----------
 " AddMenu : Add menus.   {{{1
 "-------------------------------------------------------------------------------
 function! mmtoolbox#cmake#AddMenu ( root, esc_mapl )
-	"
+
 	exe 'amenu '.a:root.'.run\ CMake<Tab>:CMake!   :CMake! '
 	exe 'amenu '.a:root.'.&run\ make<Tab>:CMake    :CMake '
-	"
+
+	exe 'amenu '.a:root.'.&list\ variables<Tab>:CMakeCache    :CMakeCache '
+
+	if s:EnabledCCMake
+		exe 'amenu '.a:root.'.run\ &ccmake<Tab>:CMakeCurses    :CMakeCurses '
+	endif
+	if s:EnabledCMakeGui
+		exe 'amenu '.a:root.'.run\ cmake-&gui<Tab>:CMakeGui    :CMakeGui '
+	endif
+
 	exe 'amenu '.a:root.'.-Sep01- <Nop>'
-	"
+
 	exe 'amenu '.a:root.'.project\ &directory<Tab>:CMakeProjectDir     :CMakeProjectDir '
 	exe 'amenu '.a:root.'.build\ &location<Tab>:CMakeBuildLocation     :CMakeBuildLocation '
-	"
+
 	exe 'amenu '.a:root.'.-Sep02- <Nop>'
-	"
+
 	exe 'amenu '.a:root.'.help\ &commands<Tab>:CMakeHelpCommand    :CMakeHelpCommand<CR>'
 	exe 'amenu '.a:root.'.help\ &modules<Tab>:CMakeHelpModule      :CMakeHelpModule<CR>'
 	exe 'amenu '.a:root.'.help\ &policies<Tab>:CMakeHelpPolicy     :CMakeHelpPolicy<CR>'
 	exe 'amenu '.a:root.'.help\ &property<Tab>:CMakeHelpProperty   :CMakeHelpProperty<CR>'
 	exe 'amenu '.a:root.'.help\ &variables<Tab>:CMakeHelpVariable  :CMakeHelpVariable<CR>'
-	"
+
 	exe 'amenu '.a:root.'.-SEP03- <Nop>'
-	"
-	exe 'amenu '.a:root.'.&help<Tab>:CMakeHelp          :CMakeHelp<CR>'
-	exe 'amenu '.a:root.'.&settings<Tab>:CMakeSettings  :CMakeSettings<CR>'
-	"
+
+	exe 'amenu '.a:root.'.runtime\ &info<Tab>:CMakeRuntime  :CMakeRuntime<CR>'
+	exe 'amenu '.a:root.'.&settings<Tab>:CMakeSettings      :CMakeSettings<CR>'
+	exe 'amenu '.a:root.'.&help<Tab>:CMakeHelp              :CMakeHelp<CR>'
+
 endfunction    " ----------  end of function mmtoolbox#cmake#AddMenu  ----------
 "
 "-------------------------------------------------------------------------------
@@ -398,10 +488,10 @@ function! mmtoolbox#cmake#Property ( mode, key, ... )
 	"
 	" perform the action
 	if a:mode == 'echo'
-		exe 'echo '.var
+		echo {var}
 		return
 	elseif a:mode == 'get'
-		exe 'return '.var
+		return {var}
 	elseif a:key == 'project-dir'
 		" expand replaces the escape sequences from the cmdline
 		if val =~ '\S'
@@ -424,39 +514,49 @@ function! mmtoolbox#cmake#Property ( mode, key, ... )
 endfunction    " ----------  end of function mmtoolbox#cmake#Property  ----------
 "
 "-------------------------------------------------------------------------------
-" HelpPlugin : Plugin help.   {{{1
+" s:HelpPlugin : Plugin help.   {{{1
 "-------------------------------------------------------------------------------
-function! mmtoolbox#cmake#HelpPlugin ()
+function! s:HelpPlugin ()
 	try
 		help toolbox-cmake
 	catch
 		exe 'helptags '.s:plugin_dir.'/doc'
 		help toolbox-cmake
 	endtry
-endfunction    " ----------  end of function mmtoolbox#cmake#HelpPlugin  ----------
+endfunction    " ----------  end of function s:HelpPlugin  ----------
 "
 "-------------------------------------------------------------------------------
-" Settings : Plugin settings.   {{{1
+" s:Settings : Plugin settings.   {{{1
 "-------------------------------------------------------------------------------
-function! mmtoolbox#cmake#Settings ( verbose )
-	"
+function! s:Settings ( verbose )
+
 	if     s:MSWIN | let sys_name = 'Windows'
 	elseif s:UNIX  | let sys_name = 'UNIX'
 	else           | let sys_name = 'unknown' | endif
-	"
-	let cmake_status = executable( s:CMake_Executable ) ? '<yes>' : '<no>'
-	let make_status  = executable( s:CMake_MakeTool   ) ? '<yes>' : '<no>'
-	"
+
+	let cmake_status = executable( s:CMake_Executable ) ? '' : ' (not executable)'
+	let make_status  = executable( s:CMake_MakeTool   ) ? '' : ' (not executable)'
+
+	if s:UNIX
+		let ccmake_status = executable( s:CMake_CCMakeExec ) ? '' : ' (not executable)'
+	endif
+	let gui_status    = executable( s:CMake_GuiExec    ) ? '' : ' (not executable)'
+
 	let	txt = " CMake-Support settings\n\n"
 				\ .'     plug-in installation :  toolbox on '.sys_name."\n"
-				\ .'         cmake executable :  '.s:CMake_Executable."\n"
-				\ .'                > enabled :  '.cmake_status."\n"
-				\ .'                make tool :  '.s:CMake_MakeTool."\n"
-				\ .'                > enabled :  '.make_status."\n"
+				\ .'         cmake executable :  '.s:CMake_Executable.cmake_status."\n"
+				\ .'                make tool :  '.s:CMake_MakeTool.make_status."\n"
+	if s:UNIX
+		let txt .=
+					\  '        ccmake executable :  '.s:CMake_CCMakeExec.ccmake_status."\n"
+	endif
+	let txt .=
+				\  '     cmake-gui executable :  '.s:CMake_GuiExec.gui_status."\n"
 				\ .'            using toolbox :  version '.g:Toolbox_Version." by Wolfgang Mehner\n"
 	if a:verbose
 		let	txt .= "\n"
 					\ .'            jump to error :  '.g:CMake_JumpToError."\n"
+					\ .'      filter fast targets :  '.g:CMake_FilterFastTargets."\n"
 					\ ."\n"
 					\ .'        project directory :  '.s:ProjectDir."\n"
 					\ .'           build location :  '.s:BuildLocation."\n"
@@ -464,10 +564,31 @@ function! mmtoolbox#cmake#Settings ( verbose )
 	let txt .=
 				\  "________________________________________________________________________________\n"
 				\ ." CMake-Tool, Version ".g:CMake_Version." / Wolfgang Mehner / wolfgang-mehner@web.de\n\n"
-	"
+
+	if a:verbose == 2
+		split CMake_Settings.txt
+		put = txt
+	else
+		echo txt
+	endif
+endfunction    " ----------  end of function s:Settings  ----------
+
+"-------------------------------------------------------------------------------
+" s:RuntimeInfo : Display everything that's important during work.   {{{1
+"-------------------------------------------------------------------------------
+function! s:RuntimeInfo ()
+	let jump_cmake = g:CMake_JumpToError == 'cmake' || g:CMake_JumpToError == 'both' ? 'x' : ' '
+	let jump_make  = g:CMake_JumpToError == 'make'  || g:CMake_JumpToError == 'both' ? 'x' : ' '
+
+	let	txt = " CMake-Support runtime information\n\n"
+				\ .'            jump to error :  cmake ('.jump_cmake.') , make ('.jump_make.")\n"
+				\ .'      filter fast targets :  '.g:CMake_FilterFastTargets."\n"
+				\ ."\n"
+				\ .'        project directory :  '.s:ProjectDir."\n"
+				\ .'           build location :  '.s:BuildLocation."\n"
 	echo txt
-endfunction    " ----------  end of function mmtoolbox#cmake#Settings  ----------
-"
+endfunction    " ----------  end of function s:RuntimeInfo  ----------
+
 "-------------------------------------------------------------------------------
 " Modul setup (abort early?).   {{{1
 "-------------------------------------------------------------------------------
@@ -476,9 +597,9 @@ if s:Enabled == 0
 endif
 "
 "-------------------------------------------------------------------------------
-" Run : Run CMake or make.   {{{1
+" s:Run : Run CMake or make.   {{{1
 "-------------------------------------------------------------------------------
-function! mmtoolbox#cmake#Run ( args, cmake_only )
+function! s:Run ( args, cmake_only )
 	"
 	let g:CMakeDebugStr = 'cmake#run: '   " debug
 	"
@@ -495,7 +616,7 @@ function! mmtoolbox#cmake#Run ( args, cmake_only )
 		let errorf_saved = &g:errorformat
 		"
 		" run CMake and process the errors
-		exe	'setglobal errorformat='.s:ErrorFormat_CMake
+		let &g:errorformat = s:ErrorFormat_CMake
 		"
 		if a:args == '' | let args = shellescape ( s:ProjectDir )
 		else            | let args = a:args
@@ -512,13 +633,16 @@ function! mmtoolbox#cmake#Run ( args, cmake_only )
 		endif
 		"
 		" restore the old settings
-		exe 'setglobal errorformat='.escape( errorf_saved, s:SettingsEscChar )
+		let &g:errorformat = errorf_saved
 		"
 		let g:CMakeDebugStr .= 'success: '.( v:shell_error == 0 ).', '   " debug
 		"
 		" errors occurred?
-		if v:shell_error == 0 | echo 'CMake : CMake finished successfully.'
-		else                  | botright cwindow
+		if v:shell_error != 0
+			botright cwindow
+		else
+			redraw                                    " redraw after cclose, before echoing
+			call s:ImportantMsg ( 'CMake : CMake finished successfully.' )
 		endif
 		"
 	else
@@ -541,7 +665,7 @@ function! mmtoolbox#cmake#Run ( args, cmake_only )
 			let errorf_saved = &g:errorformat
 			"
 			" process the errors
-			exe	'setglobal errorformat='.s:ErrorFormat_CMake
+			let &g:errorformat = s:ErrorFormat_CMake
 			"
 			let errors = 'DIR : '.s:ProjectDir."\n"
 						\ .errors
@@ -554,7 +678,7 @@ function! mmtoolbox#cmake#Run ( args, cmake_only )
 			endif
 			"
 			" restore the old settings
-			exe 'setglobal errorformat='.escape( errorf_saved, s:SettingsEscChar )
+			let &g:errorformat = errorf_saved
 			"
 		else
 			" no error or error was produced by make, gcc, ...
@@ -565,9 +689,9 @@ function! mmtoolbox#cmake#Run ( args, cmake_only )
 			let errorf_saved = &g:errorformat
 			"
 			" process the errors
-			exe	'setglobal errorformat='
-						\ .s:ErrorFormat_MakeAdditions
-						\ .escape( errorf_saved, s:SettingsEscChar )
+			let &g:errorformat =
+						\  s:ErrorFormat_MakeAdditions
+						\ .errorf_saved
 			"
 			if g:CMake_JumpToError == 'make' || g:CMake_JumpToError == 'both'
 				silent exe 'cexpr errors'
@@ -576,15 +700,32 @@ function! mmtoolbox#cmake#Run ( args, cmake_only )
 			endif
 			"
 			" restore the old settings
-			exe 'setglobal errorformat='.escape( errorf_saved, s:SettingsEscChar )
+			let &g:errorformat = errorf_saved
 			"
 		endif
 		"
 		let g:CMakeDebugStr .= 'success: '.( v:shell_error == 0 ).', '   " debug
 		"
 		" errors occurred?
-		if v:shell_error == 0 | echo 'CMake : make finished successfully.'
-		else                  | botright cwindow
+		if v:shell_error != 0
+			botright cwindow
+		else
+			redraw                                    " redraw after cclose, before echoing
+			"
+			let warnings = 0
+			"
+			for entry in getqflist ()
+				if entry.valid
+					let warnings = 1
+					break
+				endif
+			endfor
+			"
+			if warnings
+				call s:ImportantMsg ( 'CMake : make finished successfully, but warnings present' )
+			else
+				call s:ImportantMsg ( 'CMake : make finished successfully.' )
+			endif
 		endif
 		"
 	endif
@@ -593,7 +734,7 @@ function! mmtoolbox#cmake#Run ( args, cmake_only )
 	"
 	let g:CMakeDebugStr .= 'done'   " debug
 	"
-endfunction    " ----------  end of function mmtoolbox#cmake#Run  ----------
+endfunction    " ----------  end of function s:Run  ----------
 "
 "-------------------------------------------------------------------------------
 " s:TextFromSystem : Get text from a system command.   {{{1
@@ -622,50 +763,74 @@ function! s:PolicyListText ()
 	"
 	return [ 1, text ]
 endfunction    " ----------  end of function s:PolicyListText  ----------
-"
+
 "-------------------------------------------------------------------------------
-" s:OpenManBuffer : Print help for commands.   {{{1
+" s:OpenBuffer : Open a scratch buffer.   {{{1
 "-------------------------------------------------------------------------------
-function! s:OpenManBuffer ( text_cmd, buf_name, jump_reaction )
-	"
+function! s:OpenBuffer ( buf_name )
+
 	" a buffer like this already existing?
 	if bufnr ( a:buf_name ) != -1
 		" yes -> go to the window containing the buffer
 		exe bufwinnr( a:buf_name ).'wincmd w'
-		return
-	endif
-	"
-	" no -> open a buffer and insert the text
-	exe 'let [ success, text ] = '.a:text_cmd
-	"
-	if success == 0
 		return 0
 	endif
-	"
+
+	" no -> open a new window
 	aboveleft new
-	silent exe 'put! = text'
-	:1
-	"
-	" settings of the new buffer
-	silent exe 'file '.escape( a:buf_name, ' ' )
+
+	" buffer exists elsewhere?
+	if bufnr ( a:buf_name ) != -1
+		" yes -> settings of the new buffer
+		silent exe 'edit #'.bufnr( a:buf_name )
+		return 0
+	else
+		" no -> settings of the new buffer
+		silent exe 'file '.escape( a:buf_name, ' ' )
+		setlocal noswapfile
+		setlocal bufhidden=wipe
+		setlocal tabstop=8
+	endif
+
+	return 1
+endfunction    " ----------  end of function s:OpenBuffer  ----------
+
+"-------------------------------------------------------------------------------
+" s:UpdateBuffer : Update a scratch buffer.   {{{1
+"-------------------------------------------------------------------------------
+function! s:UpdateBuffer ( text )
+
+	" delete the previous contents
+	setlocal modifiable
+	setlocal noro
+	silent exe '1,$delete _'
+
+	" pause syntax highlighting (for speed)
+	if &syntax != ''
+		setlocal syntax=OFF
+	endif
+
+	" insert the text
+	silent exe 'put = a:text'
+
+	" delete the first line (empty)
+	normal! gg"_dd
+
+	" restart syntax highlighting
+	if &syntax != ''
+		setlocal syntax=ON
+	endif
+
+	" read-only again
 	setlocal ro
 	setlocal nomodified
 	setlocal nomodifiable
-	setlocal bufhidden=wipe
-"	setlocal filetype=man
-	"
-	silent exe 'nmap <silent> <buffer> <C-]>         '.a:jump_reaction
-	silent exe 'nmap <silent> <buffer> <Enter>       '.a:jump_reaction
-	silent exe 'nmap <silent> <buffer> <2-Leftmouse> '.a:jump_reaction
-	silent exe 'nmap <silent> <buffer> q             :close<CR>'
-  "
-	return 1
-endfunction    " ----------  end of function s:OpenManBuffer  ----------
-"
+endfunction    " ----------  end of function s:UpdateBuffer  ----------
+
 "-------------------------------------------------------------------------------
-" Help : Print help for commands, modules and variables.   {{{1
+" s:Help : Print help for commands, modules and variables.   {{{1
 "-------------------------------------------------------------------------------
-function! mmtoolbox#cmake#Help ( type, topic )
+function! s:Help ( type, topic )
 	"
 	" help for which type of object?
 	if a:type == 'command'
@@ -682,59 +847,75 @@ function! mmtoolbox#cmake#Help ( type, topic )
 		call s:ErrorMsg ( 'CMake : Unknown type for help: '.type )
 		return
 	endif
-	"
+
 	let esc_exe = shellescape( s:CMake_Executable )
-	let esc_exe = substitute( esc_exe, "'", "''", "g" )
-	"
+
 	" overview or concrete topic?
 	if a:topic == '' && a:type == 'policy'
 		"
 		" get the policy list (requires special treatment)
-		let cmd  = 's:PolicyListText ()'
+		let [ success, text ] = s:PolicyListText ()
 		"
 		let topic    = a:type
 		let category = 'list'
 		"
-		let jump = ':call mmtoolbox#cmake#HelpJump("'.a:type.'")<CR>'
+		let jump = ':call <SID>HelpJump("'.a:type.'")<CR>'
 	elseif a:topic == ''
 		"
 		" get the list of topics
-		let cmd  = "s:TextFromSystem ( '".esc_exe." ".switch."-list ".a:topic."' )"
+		let [ success, text ] = s:TextFromSystem ( esc_exe." ".switch."-list ".a:topic )
 		"
 		let topic    = a:type
 		let category = 'list'
 		"
-		let jump = ':call mmtoolbox#cmake#HelpJump("'.a:type.'")<CR>'
+		let jump = ':call <SID>HelpJump("'.a:type.'")<CR>'
 	else
-		"
+
 		" get help for a topic
-		let cmd = "s:TextFromSystem ( '".esc_exe." ".switch." ".escape( a:topic, '<>[] ' )."' )"
-		"
+		let arg_name = a:topic
+
 		if s:MSWIN
-			" :TODO:18.02.2014 15:09:WM: which characters can we use under Windows?
-			let topic = substitute( a:topic, '[<>[\]]', '-', 'g' )
-		else
-			let topic = a:topic
+			let arg_name = substitute( a:topic, '[<>]', '', 'g' )
 		endif
+
+		let [ success, text ] = s:TextFromSystem ( esc_exe." ".switch." ".escape( arg_name, '<>[] ' ) )
+
+		let topic    = a:topic
 		let category = a:type
-		"
-		let jump = ':call mmtoolbox#cmake#Help("'.a:type.'","")<CR>'
+
+		let jump = ':call <SID>Help("'.a:type.'","")<CR>'
 	endif
-	"
+
 	" get the help
-	" :TODO:18.02.2014 15:09:WM: can we use brackets under Windows?
-	let buf  = 'CMake help - '.topic.' ('.category.')'
-	"
-	if ! s:OpenManBuffer ( cmd, buf, jump )
-		echo 'CMake : No help for "'.topic.'".'
+	if success == 0
+		call s:WarningMsg ( 'CMake : No help for "'.topic.'".' )
+		return
 	endif
-  "
-endfunction    " ----------  end of function mmtoolbox#cmake#Help  ----------
+
+	if s:MSWIN
+		let topic_display = substitute( topic, '[<>]', '-', 'g' )
+		let buf = 'CMake help - '.topic_display.' ('.category.')'
+	else
+		let buf = 'CMake help - '.topic.' ('.category.')'
+	endif
+
+	if s:OpenBuffer ( buf )
+		silent exe 'nmap <silent> <buffer> <C-]>         '.jump
+		silent exe 'nmap <silent> <buffer> <Enter>       '.jump
+		silent exe 'nmap <silent> <buffer> <2-Leftmouse> '.jump
+		silent exe 'nmap <silent> <buffer> q             :close<CR>'
+	else
+		return
+	endif
+
+	call s:UpdateBuffer ( text )
+
+endfunction    " ----------  end of function s:Help  ----------
 "
 "-------------------------------------------------------------------------------
-" HelpJump : Jump to help for commands, modules and variables.   {{{1
+" s:HelpJump : Jump to help for commands, modules and variables.   {{{1
 "-------------------------------------------------------------------------------
-function! mmtoolbox#cmake#HelpJump ( type )
+function! s:HelpJump ( type )
 	"
 	" get help for the word in the line
 	"
@@ -743,7 +924,7 @@ function! mmtoolbox#cmake#HelpJump ( type )
 	" but never end with a space
 	"
 	let line = getline('.')
-	let line = matchstr( line, '^[[:alnum:]_<>[\] ]*[[:alnum:]_<>[\]]\ze\s*$' )
+	let line = matchstr( line, '^[[:alnum:]_<>[\] -]*[[:alnum:]_<>[\]-]\ze\s*$' )
 	"
 	" for type "policy": maybe the line above matches (can use simpler regex)
 	if empty( line ) && a:type == 'policy' && line('.')-1 > 0
@@ -752,15 +933,105 @@ function! mmtoolbox#cmake#HelpJump ( type )
 	endif
 	"
 	if empty( line )
-		echo 'CMake : No '.a:type.' under the cursor.'
+		call s:WarningMsg ( 'CMake : No '.a:type.' under the cursor.' )
 		return
 	endif
 	"
-	call mmtoolbox#cmake#Help ( a:type, line )
+	call s:Help ( a:type, line )
   "
-endfunction    " ----------  end of function mmtoolbox#cmake#HelpJump  ----------
+endfunction    " ----------  end of function s:HelpJump  ----------
+
+"-------------------------------------------------------------------------------
+" s:ShowCache : Show the cache.   {{{1
+"-------------------------------------------------------------------------------
+function! s:ShowCache ( args )
+
+	" correct flags?
+	if a:args =~ '^\s*$'
+		let args = '-L'
+	elseif 1
+		let args = a:args
+	else
+		call s:ErrorMsg ( 'CMake : Unknown option for cache: '.a:args )
+		return
+	endif
+
+	" get the cache
+	exe	'lchdir '.fnameescape( s:BuildLocation )
+
+	let [ success, text ] = s:TextFromSystem ( shellescape( s:CMake_Executable ).' -N '.args )
+
+	lchdir -
+
+	if success == 0
+		call s:WarningMsg ( 'CMake : Could not obtain the cache.' )
+		return
+	endif
+
+	if s:OpenBuffer ( 'CMake - cache' )
+		silent exe 'nmap <silent> <buffer> q             :close<CR>'
+	endif
+
+	call s:UpdateBuffer ( text )
+endfunction    " ----------  end of function s:ShowCache  ----------
+
+"-------------------------------------------------------------------------------
+" s:StartCCMake : Start 'ccmake' in using xterm in the background.   {{{1
+"-------------------------------------------------------------------------------
+function! s:StartCCMake ( args )
+
+	if ! s:EnabledCCMake || ! executable ( s:Xterm_Executable )
+		return
+	endif
+
+	let title = 'CCMake'
+
+	if a:args == '' && isdirectory ( s:BuildLocation )
+		let title .= ' : '.fnamemodify( s:BuildLocation, ':p' )
+		let param = shellescape ( s:BuildLocation )
+	elseif a:args == '' && isdirectory ( s:ProjectDir )
+		let title .= ' : '.fnamemodify( s:ProjectDir, ':p' )
+		let param = shellescape ( s:ProjectDir )
+	else
+		let title .= ' : "'.a:args.'"'
+		let param = escape ( a:args, '%#' )
+	endif
+
+	silent exe '!'.s:Xterm_Executable.' '.g:Xterm_Options
+				\ .' -title '.shellescape( title )
+				\ .' -e '.shellescape( s:CMake_CCMakeExec.' '.param ).' &'
+
+endfunction    " ----------  end of function s:StartCCMake  ----------
+
+"-------------------------------------------------------------------------------
+" s:StartGui : Start 'cmake-gui' in the background.   {{{1
+"-------------------------------------------------------------------------------
+function! s:StartGui ( args )
+
+	if ! s:EnabledCMakeGui
+		return
+	endif
+
+	if s:MSWIN
+		let param = ''   " cmake-gui under Windows does not seem to support cmd.-line args
+	elseif a:args == '' && isdirectory ( s:BuildLocation )
+		let param = shellescape ( s:BuildLocation )
+	elseif a:args == '' && isdirectory ( s:ProjectDir )
+		let param = shellescape ( s:ProjectDir )
+	else
+		let param = escape ( a:args, '%#' )
+	endif
+
+	if s:MSWIN
+		silent exe '!start '.shellescape( s:CMake_GuiExec ).' '.param
+	else
+		silent exe '!'.shellescape( s:CMake_GuiExec ).' '.param.' &'
+	endif
+
+endfunction    " ----------  end of function s:StartGui  ----------
+
 " }}}1
 "-------------------------------------------------------------------------------
-"
+
 " =====================================================================================
 "  vim: foldmethod=marker

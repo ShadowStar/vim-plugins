@@ -10,14 +10,15 @@
 "   GVIM Version:  7.0+
 "
 "  Configuration:  There are some personal details which should be configured
-"                   (see the files README.csupport and csupport.txt).
+"                   (see the files README.md and csupport.txt).
 "
-"         Author:  Dr.-Ing. Fritz Mehner, FH Südwestfalen, 58644 Iserlohn, Germany
-"          Email:  mehner.fritz@fh-swf.de
+"         Author:  Wolfgang Mehner <wolfgang-mehner@web.de>
+"                  (formerly Fritz Mehner <mehner.fritz@web.de>)
 "
 "        Version:  see variable  g:C_Version  below
 "        Created:  04.11.2000
-"        License:  Copyright (c) 2000-2013, Fritz Mehner
+"        License:  Copyright (c) 2000-2014, Fritz Mehner
+"                  Copyright (c) 2015-2016, Wolfgang Mehner
 "                  This program is free software; you can redistribute it and/or
 "                  modify it under the terms of the GNU General Public License as
 "                  published by the Free Software Foundation, version 2 of the
@@ -40,39 +41,71 @@ endif
 if exists("g:C_Version") || &cp
  finish
 endif
-let g:C_Version= "6.1.1"								" version number of this script; do not change
+let g:C_Version= "6.2"								" version number of this script; do not change
+
+"-------------------------------------------------------------------------------
+" Auxiliary functions.   {{{1
+"-------------------------------------------------------------------------------
+
+"-------------------------------------------------------------------------------
+" s:ApplyDefaultSetting : Write default setting to a global variable.   {{{2
 "
+" Parameters:
+"   varname - name of the variable (string)
+"   value   - default value (string)
+" Returns:
+"   -
+"
+" If g:<varname> does not exists, assign:
+"   g:<varname> = value
+"-------------------------------------------------------------------------------
+
+function! s:ApplyDefaultSetting ( varname, value )
+	if ! exists ( 'g:'.a:varname )
+		let { 'g:'.a:varname } = a:value
+	endif
+endfunction    " ----------  end of function s:ApplyDefaultSetting  ----------
+
+"-------------------------------------------------------------------------------
+" s:GetGlobalSetting : Get a setting from a global variable.   {{{2
+"
+" Parameters:
+"   varname - name of the variable (string)
+"   glbname - name of the global variable (string, optional)
+" Returns:
+"   -
+"
+" If 'glbname' is given, it is used as the name of the global variable.
+" Otherwise the global variable will also be named 'varname'.
+"
+" If g:<glbname> exists, assign:
+"   s:<varname> = g:<glbname>
+"-------------------------------------------------------------------------------
+
+function! s:GetGlobalSetting ( varname, ... )
+	let lname = a:varname
+	let gname = a:0 >= 1 ? a:1 : lname
+	if exists ( 'g:'.gname )
+		let { 's:'.lname } = { 'g:'.gname }
+	endif
+endfunction    " ----------  end of function s:GetGlobalSetting  ----------
+
 "===  FUNCTION  ================================================================
-"          NAME:  C_CheckGlobal
+"          NAME:  C_CheckGlobal   {{{1
 "   DESCRIPTION:  Assign a value to a local variable if a corresponding global
 "                 variable exists.
 "    PARAMETERS:  name - variable to set
 "===============================================================================
+" :TODO:17.03.2016 10:39:WM: remove this function eventually
 function! s:C_CheckGlobal ( name )
 	if exists('g:'.a:name)
 		exe 'let s:'.a:name.' = g:'.a:name
 	endif
 endfunction    " ----------  end of function s:C_CheckGlobal ----------
-"
-"===  FUNCTION  ================================================================
-"          NAME:  C_SetGlobalVariable     {{{1
-"   DESCRIPTION:  Define a global variable and assign a default value if not
-"                 already defined.
-"    PARAMETERS:  name - global variable
-"                 default - default value
-"===============================================================================
-function! s:C_SetGlobalVariable ( name, default )
-	if !exists('g:'.a:name)
-		exe 'let g:'.a:name." = '".a:default."'"
-	else
-		" check for an empty initialization
-		exe 'let	val	= g:'.a:name
-		if empty(val)
-			exe 'let g:'.a:name." = '".a:default."'"
-		endif
-	endif
-endfunction   " ---------- end of function  s:C_SetGlobalVariable  ----------
-"
+
+" }}}1
+"-------------------------------------------------------------------------------
+
 "#################################################################################
 "
 "  Global variables (with default values) which can be overridden.
@@ -89,6 +122,7 @@ let s:plugin_dir						= ''
 "
 let s:C_GlobalTemplateFile	= ''
 let s:C_LocalTemplateFile		= ''
+let s:C_CustomTemplateFile  = ''                " the custom templates
 let s:C_FilenameEscChar 		= ''
 
 let s:C_ToolboxDir					= []
@@ -105,6 +139,7 @@ if	s:MSWIN
 		" USER INSTALLATION ASSUMED
 		let g:C_Installation				= 'local'
 		let s:C_LocalTemplateFile		= s:plugin_dir.'/c-support/templates/Templates'
+		let s:C_CustomTemplateFile  = $HOME.'/vimfiles/templates/c.templates'
 		let s:C_ToolboxDir				 += [ s:plugin_dir.'/autoload/mmtoolbox/' ]
 	else
 		"
@@ -112,6 +147,7 @@ if	s:MSWIN
 		let g:C_Installation				= 'system'
 		let s:C_GlobalTemplateFile  = s:plugin_dir.'/c-support/templates/Templates'
 		let s:C_LocalTemplateFile		= $HOME.'/vimfiles/c-support/templates/Templates'
+		let s:C_CustomTemplateFile  = $HOME.'/vimfiles/templates/c.templates'
 		let s:C_ToolboxDir				 += [
 					\	s:plugin_dir.'/autoload/mmtoolbox/',
 					\	$HOME.'/vimfiles/autoload/mmtoolbox/' ]
@@ -128,12 +164,14 @@ else
 		" USER INSTALLATION ASSUMED
 		let g:C_Installation				= 'local'
 		let s:C_LocalTemplateFile		= s:plugin_dir.'/c-support/templates/Templates'
+		let s:C_CustomTemplateFile  = $HOME.'/.vim/templates/c.templates'
 		let s:C_ToolboxDir				 += [ s:plugin_dir.'/autoload/mmtoolbox/' ]
 	else
 		" SYSTEM WIDE INSTALLATION
 		let g:C_Installation				= 'system'
 		let s:C_GlobalTemplateFile  = s:plugin_dir.'/c-support/templates/Templates'
 		let s:C_LocalTemplateFile		= $HOME.'/.vim/c-support/templates/Templates'
+		let s:C_CustomTemplateFile  = $HOME.'/.vim/templates/c.templates'
 		let s:C_ToolboxDir				 += [
 					\	s:plugin_dir.'/autoload/mmtoolbox/',
 					\	$HOME.'/.vim/autoload/mmtoolbox/' ]
@@ -143,6 +181,7 @@ else
 	"
 endif
 "
+let s:C_AdditionalTemplates   = mmtemplates#config#GetFt ( 'c' )
 let s:C_CodeSnippets  				= s:plugin_dir.'/c-support/codesnippets/'
 let s:C_IndentErrorLog				= $HOME.'/.indent.errorlog'
 "
@@ -159,29 +198,29 @@ endif
 "  Modul global variables (with default values) which can be overridden. {{{1
 "
 if	s:MSWIN
-	call s:C_SetGlobalVariable ( 'C_CCompiler',     'gcc.exe' )
-	call s:C_SetGlobalVariable ( 'C_CplusCompiler', 'g++.exe' )
+	call s:ApplyDefaultSetting ( 'C_CCompiler',     'gcc.exe' )
+	call s:ApplyDefaultSetting ( 'C_CplusCompiler', 'g++.exe' )
 	let s:C_ExeExtension        = '.exe'     " file extension for executables (leading point required)
 	let s:C_ObjExtension        = '.obj'     " file extension for objects (leading point required)
 	let s:C_Man                 = 'man.exe'  " the manual program
 else
-	call s:C_SetGlobalVariable ( 'C_CCompiler',     'gcc' )
-	call s:C_SetGlobalVariable ( 'C_CplusCompiler', 'g++' )
+	call s:ApplyDefaultSetting ( 'C_CCompiler',     'gcc' )
+	call s:ApplyDefaultSetting ( 'C_CplusCompiler', 'g++' )
 	let s:C_ExeExtension        = ''         " file extension for executables (leading point required)
 	let s:C_ObjExtension        = '.o'       " file extension for objects (leading point required)
 	let s:C_Man                 = 'man'      " the manual program
 endif
 "
-call s:C_SetGlobalVariable ( 'C_CFlags', '-Wall -g -O0 -c')
-call s:C_SetGlobalVariable ( 'C_LFlags', '-Wall -g -O0'   )
-call s:C_SetGlobalVariable ( 'C_Libs',   '-lm'            )
+call s:ApplyDefaultSetting ( 'C_CFlags', '-Wall -g -O0 -c')
+call s:ApplyDefaultSetting ( 'C_LFlags', '-Wall -g -O0'   )
+call s:ApplyDefaultSetting ( 'C_Libs',   '-lm'            )
 "
-call s:C_SetGlobalVariable ( 'C_CplusCFlags', '-Wall -g -O0 -c')
-call s:C_SetGlobalVariable ( 'C_CplusLFlags', '-Wall -g -O0'   )
-call s:C_SetGlobalVariable ( 'C_CplusLibs',   '-lm'            )
-call s:C_SetGlobalVariable ( 'C_Debugger',    'gdb'            )
+call s:ApplyDefaultSetting ( 'C_CplusCFlags', '-Wall -g -O0 -c')
+call s:ApplyDefaultSetting ( 'C_CplusLFlags', '-Wall -g -O0'   )
+call s:ApplyDefaultSetting ( 'C_CplusLibs',   '-lm'            )
+call s:ApplyDefaultSetting ( 'C_Debugger',    'gdb'            )
 "
-call s:C_SetGlobalVariable ( 'C_MapLeader', '' )       " default: do not overwrite 'maplocalleader'
+call s:ApplyDefaultSetting ( 'C_MapLeader', '' )       " default: do not overwrite 'maplocalleader'
 "
 let s:C_CExtension     				= 'c'                    " C file extension; everything else is C++
 let s:C_CodeCheckExeName      = 'check'
@@ -196,14 +235,12 @@ let s:C_Printheader           = "%<%f%h%m%<  %=%{strftime('%x %X')}     Page %N"
 let s:C_RootMenu  	   				= '&C\/C\+\+.'           " the name of the root menu of this plugin
 let s:C_TypeOfH               = 'cpp'
 let s:C_Wrapper               = s:plugin_dir.'/c-support/scripts/wrapper.sh'
-let s:C_XtermDefaults         = '-fa courier -fs 12 -geometry 80x24'
 let s:C_GuiSnippetBrowser     = 'gui'										" gui / commandline
-let s:C_GuiTemplateBrowser    = 'gui'										" gui / explorer / commandline
 let s:C_UseToolbox            = 'yes'
-call s:C_SetGlobalVariable ( 'C_UseTool_cmake',   'no' )
-call s:C_SetGlobalVariable ( 'C_UseTool_doxygen', 'no' )
-call s:C_SetGlobalVariable ( 'C_UseTool_make',    'yes' )
-"
+call s:ApplyDefaultSetting ( 'C_UseTool_cmake',   'no' )
+call s:ApplyDefaultSetting ( 'C_UseTool_doxygen', 'no' )
+call s:ApplyDefaultSetting ( 'C_UseTool_make',    'yes' )
+
 let s:C_Ctrl_j								= 'on'
 "
 let s:C_SourceCodeExtensions  = 'c cc cp cxx cpp CPP c++ C i ii'
@@ -222,10 +259,10 @@ call s:C_CheckGlobal('C_CodeCheckOptions     ')
 call s:C_CheckGlobal('C_CodeSnippets         ')
 call s:C_CheckGlobal('C_CreateMenusDelayed   ')
 call s:C_CheckGlobal('C_Ctrl_j               ')
+call s:C_CheckGlobal('C_CustomTemplateFile   ')
 call s:C_CheckGlobal('C_ExeExtension         ')
 call s:C_CheckGlobal('C_GlobalTemplateFile   ')
 call s:C_CheckGlobal('C_GuiSnippetBrowser    ')
-call s:C_CheckGlobal('C_GuiTemplateBrowser   ')
 call s:C_CheckGlobal('C_IndentErrorLog       ')
 call s:C_CheckGlobal('C_InsertFileHeader     ')
 call s:C_CheckGlobal('C_LineEndCommColDefault')
@@ -241,7 +278,23 @@ call s:C_CheckGlobal('C_RootMenu             ')
 call s:C_CheckGlobal('C_SourceCodeExtensions ')
 call s:C_CheckGlobal('C_TypeOfH              ')
 call s:C_CheckGlobal('C_UseToolbox           ')
-call s:C_CheckGlobal('C_XtermDefaults        ')
+
+" xterm
+
+let s:Xterm_Executable = 'xterm'
+let s:C_XtermDefaults  = '-fa courier -fs 12 -geometry 80x24'
+
+" check 'g:C_XtermDefaults' for backwards compatibility
+if ! exists ( 'g:Xterm_Options' )
+	call s:GetGlobalSetting ( 'C_XtermDefaults' )
+	" set default geometry if not specified
+	if match( s:C_XtermDefaults, "-geometry\\s\\+\\d\\+x\\d\\+" ) < 0
+		let s:C_XtermDefaults = s:C_XtermDefaults." -geometry 80x24"
+	endif
+endif
+
+call s:GetGlobalSetting ( 'Xterm_Executable' )
+call s:ApplyDefaultSetting ( 'Xterm_Options', s:C_XtermDefaults )
 
 "----- some variables for internal use only -----------------------------------
 "
@@ -250,13 +303,7 @@ if executable( 'stdbuf' )
 	" stdbuf : the output stream will be unbuffered
 	let s:stdbuf	= 'stdbuf -o0 '
 endif
-"
-" set default geometry if not specified
-"
-if match( s:C_XtermDefaults, "-geometry\\s\\+\\d\\+x\\d\\+" ) < 0
-	let s:C_XtermDefaults	= s:C_XtermDefaults." -geometry 80x24"
-endif
-"
+
 " escape the printheader
 "
 let s:C_Printheader  = escape( s:C_Printheader, ' %' )
@@ -280,9 +327,7 @@ let s:C_IndentIsExecutable		= executable( "indent" )
 let s:C_Com1          			= '/*'     " C-style : comment start
 let s:C_Com2          			= '*/'     " C-style : comment end
 "
-let s:C_TJT									= '[ 0-9a-zA-Z_]*'
-let s:C_TemplateJumpTarget1 = '<+'.s:C_TJT.'+>\|{+'.s:C_TJT.'+}'
-let s:C_TemplateJumpTarget2 = '<-'.s:C_TJT.'->\|{-'.s:C_TJT.'-}'
+let s:C_TemplateJumpTarget  = '<+\i\++>\|{+\i\++}\|<-\i\+->\|{-\i\+-}'
 
 let s:C_ForTypes     = [
     \ 'char'                  ,
@@ -305,7 +350,6 @@ let s:C_ForTypes     = [
     \ 'unsigned short int'    ,
     \ ]
 
-let s:MsgInsNotAvail	= "insertion not available for a fold" 
 let s:MenuRun         = s:C_RootMenu.'&Run'
 let s:Output					= [ 'VIM->buffer->xterm', 'BUFFER->xterm->vim', 'XTERM->vim->buffer' ]
 
@@ -320,6 +364,8 @@ let s:CppcheckSeverity	= [ "all", "error", "warning", "style", "performance", "p
 "    PARAMETERS:  -
 "       RETURNS:  
 "===============================================================================
+" :TODO:17.03.2016 10:39:WM: remove this function, is it unused but for one usage,
+" which should also be reworked
 function! C_MenuTitle ()
 		echohl WarningMsg | echo "This is a menu header." | echohl None
 endfunction    " ----------  end of function C_MenuTitle  ----------
@@ -344,16 +390,24 @@ function! s:C_InitMenus ()
 	exe 'amenu '.s:C_RootMenu.'C\/C\+\+ <Nop>'
 	exe 'amenu '.s:C_RootMenu.'-Sep00-  <Nop>'
 	"
+	let [ MenuDoxygen, err_dox ] = mmtemplates#core#Resource ( g:C_Templates, 'get', 'property', 'Doxygen::BriefAM::Menu' )
+	if err_dox == '' && MenuDoxygen != ''
+		let MenuDoxygen	= mmtemplates#core#EscapeMenu( MenuDoxygen, 'menu' )
+	endif
+	"
 	"-------------------------------------------------------------------------------
 	" menu headers
 	"-------------------------------------------------------------------------------
 	"
 	call mmtemplates#core#CreateMenus ( 'g:C_Templates', s:C_RootMenu, 'sub_menu', '&Comments', 'priority', 500 )
+	if err_dox == '' && MenuDoxygen != ''
+		call mmtemplates#core#CreateMenus ( 'g:C_Templates', s:C_RootMenu, 'sub_menu', MenuDoxygen, 'priority', 500 )
+	endif
 	" the other, automatically created menus go here; their priority is the standard priority 500
 	call mmtemplates#core#CreateMenus ( 'g:C_Templates', s:C_RootMenu, 'sub_menu', 'S&nippets', 'priority', 600 )
 	call mmtemplates#core#CreateMenus ( 'g:C_Templates', s:C_RootMenu, 'sub_menu', '&Run'     , 'priority', 700 )
 	if s:C_UseToolbox == 'yes' && mmtoolbox#tools#Property ( s:C_Toolbox, 'empty-menu' ) == 0
-		call mmtemplates#core#CreateMenus ( 'g:C_Templates', s:C_RootMenu, 'sub_menu', '&Tool Box', 'priority', 800 )
+		call mmtemplates#core#CreateMenus ( 'g:C_Templates', s:C_RootMenu, 'sub_menu', '&Tool\ Box', 'priority', 800 )
 	endif
 	call mmtemplates#core#CreateMenus ( 'g:C_Templates', s:C_RootMenu, 'sub_menu', '&Help'    , 'priority', 900 )
 	"
@@ -430,17 +484,8 @@ function! s:C_InitMenus ()
 
 	exe ahead.'-SEP2-									     :'
 	"
-	exe ahead.'edit\ &local\ templates<Tab>'.esc_mapl.'ntl       :call mmtemplates#core#EditTemplateFiles(g:C_Templates,-1)<CR>'
-	exe ihead.'edit\ &local\ templates<Tab>'.esc_mapl.'ntl  <C-C>:call mmtemplates#core#EditTemplateFiles(g:C_Templates,-1)<CR>'
-	if g:C_Installation == 'system'
-		exe ahead.'edit\ &global\ templates<Tab>'.esc_mapl.'ntg       :call mmtemplates#core#EditTemplateFiles(g:C_Templates,0)<CR>'
-		exe ihead.'edit\ &global\ templates<Tab>'.esc_mapl.'ntg  <C-C>:call mmtemplates#core#EditTemplateFiles(g:C_Templates,0)<CR>'
-	endif
-	"
-	exe ahead.'reread\ &templates<Tab>'.esc_mapl.'ntr       :call mmtemplates#core#ReadTemplates(g:C_Templates,"reload","all")<CR>'
-	exe ihead.'reread\ &templates<Tab>'.esc_mapl.'ntr  <C-C>:call mmtemplates#core#ReadTemplates(g:C_Templates,"reload","all")<CR>'
-	"
-	call mmtemplates#core#CreateMenus ( 'g:C_Templates', s:C_RootMenu, 'do_styles', 'specials_menu', 'Snippets'	)
+	" templates: edit and reload templates, styles
+	call mmtemplates#core#CreateMenus ( 'g:C_Templates', s:C_RootMenu, 'do_specials', 'specials_menu', 'Snippets' )
 	"
 	"===============================================================================================
 	"----- Menu : Run ---------------------------------------------------------   {{{2
@@ -470,7 +515,7 @@ function! s:C_InitMenus ()
 		exe ihead.'s&plint<Tab>'.esc_mapl.'rp                           <C-C>:call C_SplintCheck()<CR>:call C_HlMessage()<CR>'
 		exe ahead.'cmd\.\ line\ arg\.\ for\ spl&int<Tab>'.esc_mapl.'rpa      :call C_SplintArguments()<CR>'
 		exe ihead.'cmd\.\ line\ arg\.\ for\ spl&int<Tab>'.esc_mapl.'rpa <C-C>:call C_SplintArguments()<CR>'
-		exe ahead.'-SEP2-                                          :'
+		exe ahead.'-SEP-SPLINT-                                              :'
 	endif
 	"
 	if s:C_CppcheckIsExecutable==1
@@ -485,6 +530,7 @@ function! s:C_InitMenus ()
 		for level in s:CppcheckSeverity
 			exe ahead.'cppcheck\ severity<Tab>'.esc_mapl.'rccs.&'.level.'   :call C_GetCppcheckSeverity("'.level.'")<CR>'
 		endfor
+		exe ahead.'-SEP-CPPCHECK-   :'
 	endif
 	"
 	if s:C_CodeCheckIsExecutable==1
@@ -492,7 +538,7 @@ function! s:C_InitMenus ()
 		exe ihead.'CodeChec&k<Tab>'.esc_mapl.'rk                           <C-C>:call C_CodeCheck()<CR>:call C_HlMessage()<CR>'
 		exe ahead.'cmd\.\ line\ arg\.\ for\ Cod&eCheck<Tab>'.esc_mapl.'rka      :call C_CodeCheckArguments()<CR>'
 		exe ihead.'cmd\.\ line\ arg\.\ for\ Cod&eCheck<Tab>'.esc_mapl.'rka <C-C>:call C_CodeCheckArguments()<CR>'
-		exe ahead.'-SEP3-                                             :'
+		exe ahead.'-SEP-CODECHECK-                                              :'
 	endif
 	"
 	exe ahead.'in&dent<Tab>'.esc_mapl.'ri                                  :call C_Indent()<CR>'
@@ -508,8 +554,8 @@ function! s:C_InitMenus ()
 	endif
 	exe ihead.'-SEP4-                                            :'
 
-	exe ahead.'&settings<Tab>'.esc_mapl.'rs                                :call C_Settings()<CR>'
-	exe ihead.'&settings<Tab>'.esc_mapl.'rs                           <C-C>:call C_Settings()<CR>'
+	exe ahead.'&settings<Tab>'.esc_mapl.'rs                                :call C_Settings(0)<CR>'
+	exe ihead.'&settings<Tab>'.esc_mapl.'rs                           <C-C>:call C_Settings(0)<CR>'
 	exe ihead.'-SEP5-                                            :'
 
 	if !s:MSWIN
@@ -563,14 +609,12 @@ function! s:C_InitMenus ()
 	"----- Menu : C-Doxygen ---------------------------------------------------   {{{2
 	"===============================================================================================
 	"
-	let [ MenuDoxygen, err ] = mmtemplates#core#Resource ( g:C_Templates, 'get', 'property', 'Doxygen::BriefAM::Menu' )
-	"
-	if err == '' && MenuDoxygen != ''
-		let	MenuDoxygen	= s:C_RootMenu.mmtemplates#core#EscapeMenu( MenuDoxygen, 'menu' )
+	if err_dox == '' && MenuDoxygen != ''
+		let	MenuDoxygen	= s:C_RootMenu.MenuDoxygen
 		"
-		let [ bam_map, err ] = mmtemplates#core#Resource ( g:C_Templates, 'get', 'property', 'Doxygen::BriefAM::Map' )
+		let [ bam_map, err_dox ] = mmtemplates#core#Resource ( g:C_Templates, 'get', 'property', 'Doxygen::BriefAM::Map' )
 		"
-		if err == '' && bam_map != ''
+		if err_dox == '' && bam_map != ''
 			let bam_map = esc_mapl.mmtemplates#core#EscapeMenu( bam_map, 'right' )
 		else
 			let bam_map = esc_mapl.'dba'
@@ -899,7 +943,7 @@ function! C_CommentToggle () range
 		let line			= getline(linenumber)
 		" ----------  C => C++  ----------
 		if match( line, LineEndCommentC ) >= 0
-			let	line	= substitute( line, '\/\*\s*\(.\{-}\)\*\/', '\/\/ \1', '' )
+			let line = substitute( line, '\/\*\s*\(.\{-}\)\s*\*\/', '\/\/ \1', '' )
 			call setline( linenumber, line )
 			continue
 		endif
@@ -1456,21 +1500,12 @@ endfunction    " ----------  end of function C_CheckForMain  ----------
 "------------------------------------------------------------------------------
 function! C_Link ()
 
-	call	C_Compile()
-	:redraw!
-	if s:LastShellReturnCode != 0
-		let	s:LastShellReturnCode	=  0
-		return
-	endif
-
 	let s:C_HlMessage = ""
 	let	Sou		= expand("%:p")						       		" name of the file (full path)
-	let	Obj		= expand("%:p:r").s:C_ObjExtension	" name of the object file
 	let	Exe		= expand("%:p:r").s:C_ExeExtension	" name of the executable
-	let ObjEsc= escape( Obj, s:C_FilenameEscChar )
+	let SouEsc= escape( Sou, s:C_FilenameEscChar )
 	let ExeEsc= escape( Exe, s:C_FilenameEscChar )
 	if s:MSWIN
-		let	ObjEsc	= '"'.ObjEsc.'"'
 		let	ExeEsc	= '"'.ExeEsc.'"'
 	endif
 
@@ -1479,58 +1514,45 @@ function! C_Link ()
 		return
 	endif
 
-	" no linkage if:
-	"   executable exists
-	"   object exists
-	"   source exists
-	"   executable newer then object
-	"   object newer then source
-
-	if    filereadable(Exe)                &&
-      \ filereadable(Obj)                &&
-      \ filereadable(Sou)                &&
-      \ (getftime(Exe) >= getftime(Obj)) &&
-      \ (getftime(Obj) >= getftime(Sou))
+	" no linkage if: executable exists and source exists and executable newer then source
+	if    filereadable(Exe)      &&
+				\ filereadable(Sou)    &&
+				\ (getftime(Exe)  >= getftime(Sou))
 		let s:C_HlMessage = " '".Exe."' is up to date "
 		return
 	endif
 
-	" linkage if:
-	"   object exists
-	"   source exists
-	"   object newer then source
 	let	linkerflags	= g:C_LFlags 
 
-	if filereadable(Obj) && (getftime(Obj) >= getftime(Sou))
-		call s:C_SaveGlobalOption('makeprg')
-		if expand("%:e") == s:C_CExtension
-			exe		"setlocal makeprg=".g:C_CCompiler
-			let	linkerflags	= g:C_LFlags
-		else
-			exe		"setlocal makeprg=".g:C_CplusCompiler
-			let	linkerflags	= g:C_CplusLFlags 
-		endif
-		let	s:LastShellReturnCode	= 0
-		let v:statusmsg = ''
-		if &filetype == "c" 
-			silent exe "make ".linkerflags." -o ".ExeEsc." ".ObjEsc." ".g:C_Libs
-		else
-			silent exe "make ".linkerflags." -o ".ExeEsc." ".ObjEsc." ".g:C_CplusLibs
-		endif
-		if v:shell_error != 0
-			let	s:LastShellReturnCode	= v:shell_error
-		endif
-		call s:C_RestoreGlobalOption('makeprg')
-		"
-		if empty(v:statusmsg)
-			let s:C_HlMessage = "'".Exe."' : linking successful"
+	call s:C_SaveGlobalOption('makeprg')
+	if expand("%:e") == s:C_CExtension
+		exe		"setlocal makeprg=".g:C_CCompiler
+		let	linkerflags	= g:C_LFlags
+	else
+		exe		"setlocal makeprg=".g:C_CplusCompiler
+		let	linkerflags	= g:C_CplusLFlags 
+	endif
+	let	s:LastShellReturnCode	= 0
+	let v:statusmsg = ''
+	if &filetype == "c" 
+		silent exe "make ".linkerflags." -o ".ExeEsc." ".SouEsc." ".g:C_Libs
+	else
+		silent exe "make ".linkerflags." -o ".ExeEsc." ".SouEsc." ".g:C_CplusLibs
+	endif
+	if v:shell_error != 0
+		let	s:LastShellReturnCode	= v:shell_error
+	endif
+	call s:C_RestoreGlobalOption('makeprg')
+	"
+	if empty(v:statusmsg)
+		let s:C_HlMessage = "'".Exe."' : linking successful"
 		" open error window if necessary
 		:redraw!
 		exe	":botright cwindow"
-		else
-			exe ":botright copen"
-		endif
+	else
+		exe ":botright copen"
 	endif
+	"		
 endfunction    " ----------  end of function C_Link ----------
 "
 "------------------------------------------------------------------------------
@@ -1540,14 +1562,13 @@ endfunction    " ----------  end of function C_Link ----------
 "
 let s:C_OutputBufferName   = "C-Output"
 let s:C_OutputBufferNumber = -1
-let s:C_RunMsg1						 ="' does not exist or is not executable or object/source older then executable"
+let s:C_RunMsg1						 ="' does not exist or is not executable or source older then executable"
 let s:C_RunMsg2						 ="' does not exist or is not executable"
 "
 function! C_Run ()
 "
 	let s:C_HlMessage = ""
 	let Sou  					= expand("%:p")												" name of the source file
-	let Obj  					= expand("%:p:r").s:C_ObjExtension		" name of the object file
 	let Exe  					= expand("%:p:r").s:C_ExeExtension		" name of the executable
 	let ExeEsc  			= escape( Exe, s:C_FilenameEscChar )	" name of the executable, escaped
 	let Quote					= ''
@@ -1576,7 +1597,7 @@ function! C_Run ()
 				call C_HlMessage()
 			endif
 			"
-			if	executable(Exe) && getftime(Exe) >= getftime(Obj) && getftime(Obj) >= getftime(Sou)
+			if	executable(Exe) && getftime(Exe) >=  getftime(Sou)
 				exe		"!".Quote.ExeEsc.Quote." ".l:arguments
 			else
 				echomsg "file '".Exe.s:C_RunMsg1
@@ -1621,7 +1642,7 @@ function! C_Run ()
 			if s:C_ExecutableToRun !~ "^\s*$"
 				call C_HlMessage( "executable : '".s:C_ExecutableToRun."'" )
 				let realexe	= s:C_ExecutableToRun
-			elseif executable(Exe) && getftime(Exe) >= getftime(Obj) && getftime(Obj) >= getftime(Sou)
+			elseif executable(Exe) && getftime(Exe) >= getftime(Sou)
 				let realexe	= ExeEsc
 			else
 				setlocal	nomodifiable
@@ -1652,7 +1673,7 @@ function! C_Run ()
 			if s:MSWIN
 				exe		'!'.Quote.s:C_ExecutableToRun.Quote.' '.l:arguments
 			else
-				silent exe '!xterm -title '.s:C_ExecutableToRun.' '.s:C_XtermDefaults.' -e '.s:C_Wrapper.' '.s:C_ExecutableToRun.' '.l:arguments.' &'
+				silent exe '!'.s:Xterm_Executable.' -title '.s:C_ExecutableToRun.' '.g:Xterm_Options.' -e '.s:C_Wrapper.' '.s:C_ExecutableToRun.' '.l:arguments.' &'
 				:redraw!
 				call C_HlMessage( "executable : '".s:C_ExecutableToRun."'" )
 			endif
@@ -1660,11 +1681,11 @@ function! C_Run ()
 
 			silent call C_Link()
 			"
-			if	executable(Exe) && getftime(Exe) >= getftime(Obj) && getftime(Obj) >= getftime(Sou)
+			if	executable(Exe) && getftime(Exe) >= getftime(Sou)
 				if s:MSWIN
 					exe		"!".Quote.ExeEsc.Quote." ".l:arguments
 				else
-					silent exe '!xterm -title '.ExeEsc.' '.s:C_XtermDefaults.' -e '.s:C_Wrapper.' '.ExeEsc.' '.l:arguments.' &'
+					silent exe '!'.s:Xterm_Executable.' -title '.ExeEsc.' '.g:Xterm_Options.' -e '.s:C_Wrapper.' '.ExeEsc.' '.l:arguments.' &'
 					:redraw!
 				endif
 			else
@@ -1717,7 +1738,7 @@ endfunction    " ----------  end of function C_Toggle_Gvim_Xterm ----------
 "------------------------------------------------------------------------------
 function! C_XtermSize ()
 	let regex	= '-geometry\s\+\d\+x\d\+'
-	let geom	= matchstr( s:C_XtermDefaults, regex )
+	let geom	= matchstr( g:Xterm_Options, regex )
 	let geom	= matchstr( geom, '\d\+x\d\+' )
 	let geom	= substitute( geom, 'x', ' ', "" )
 	let	answer= C_Input("   xterm size (COLUMNS LINES) : ", geom )
@@ -1725,7 +1746,7 @@ function! C_XtermSize ()
 		let	answer= C_Input(" + xterm size (COLUMNS LINES) : ", geom )
 	endwhile
 	let answer  = substitute( answer, '\s\+', "x", "" )						" replace inner whitespaces
-	let s:C_XtermDefaults	= substitute( s:C_XtermDefaults, regex, "-geometry ".answer , "" )
+	let g:Xterm_Options	= substitute( g:Xterm_Options, regex, "-geometry ".answer , "" )
 endfunction    " ----------  end of function C_XtermSize ----------
 "
 "------------------------------------------------------------------------------
@@ -1768,7 +1789,7 @@ function! C_Debugger ()
       exe '!gdb  "'.s:C_ExecutableToRun.l:arguments.'"'
     else
       if has("gui_running") || &term == "xterm"
-     	 	silent exe "!xterm ".s:C_XtermDefaults.' -e gdb ' . s:C_ExecutableToRun.l:arguments.' &'
+				silent exe "!".s:Xterm_Executable." ".g:Xterm_Options.' -e gdb ' . s:C_ExecutableToRun.l:arguments.' &'
       else
         silent exe '!clear; gdb ' . s:C_ExecutableToRun.l:arguments
       endif
@@ -2055,17 +2076,66 @@ endfunction    " ----------  end of function C_HlMessage ----------
 "------------------------------------------------------------------------------
 "  C_Settings : settings     {{{1
 "------------------------------------------------------------------------------
-function! C_Settings ()
-	let	txt =     " C/C++-Support settings\n\n"
-	let txt = txt.'                   author :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|AUTHOR|'      )."\"\n"
-	let txt = txt.'                authorref :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|AUTHORREF|'   )."\"\n"
-	let txt = txt.'                  company :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|COMPANY|'     )."\"\n"
-	let txt = txt.'         copyright holder :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|COPYRIGHT|'   )."\"\n"
-	let txt = txt.'                    email :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|EMAIL|'       )."\"\n"
-  let txt = txt.'                  licence :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|LICENSE|'     )."\"\n"
-	let txt = txt.'             organization :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|ORGANIZATION|')."\"\n"
-	let txt = txt.'                  project :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|PROJECT|'     )."\"\n"
-	let txt = txt.'         C / C++ compiler :  '.g:C_CCompiler.' / '.g:C_CplusCompiler."\n"
+function! C_Settings ( verbose )
+	"
+	if     s:MSWIN | let sys_name = 'Windows'
+	elseif s:UNIX  | let sys_name = 'UN*X'
+	else           | let sys_name = 'unknown' | endif
+	"
+	let	txt = " C/C++-Support settings\n\n"
+	" template settings: macros, style, ...
+	if exists ( 'g:C_Templates' )
+		let txt .= '                   author :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|AUTHOR|'       )."\"\n"
+		let txt .= '                authorref :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|AUTHORREF|'    )."\"\n"
+		let txt .= '                    email :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|EMAIL|'        )."\"\n"
+		let txt .= '             organization :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|ORGANIZATION|' )."\"\n"
+		let txt .= '         copyright holder :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|COPYRIGHT|'    )."\"\n"
+		let txt .= '                  license :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|LICENSE|'      )."\"\n"
+		let txt .= '                  project :  "'.mmtemplates#core#ExpandText( g:C_Templates, '|PROJECT|'     )."\"\n"
+		let txt .= '           template style :  "'.mmtemplates#core#Resource ( g:C_Templates, "style" )[0]."\"\n\n"
+	else
+		let txt .= "                templates :  -not loaded-\n\n"
+	endif
+	" plug-in installation
+	let txt .= '      plugin installation :  '.g:C_Installation.' on '.sys_name."\n"
+	" toolbox
+	if s:C_UseToolbox == 'yes'
+		let toollist = mmtoolbox#tools#GetList ( s:C_Toolbox )
+		if empty ( toollist )
+			let txt .= "            using toolbox :  -no tools-\n"
+		else
+			let sep  = "\n"."                             "
+			let txt .=      "            using toolbox :  "
+						\ .join ( toollist, sep )."\n"
+		endif
+	endif
+	let txt .= "\n"
+	" templates, snippets
+	if exists ( 'g:C_Templates' )
+		let [ templist, msg ] = mmtemplates#core#Resource ( g:C_Templates, 'template_list' )
+		let sep  = "\n"."                             "
+		let txt .=      "           template files :  "
+					\ .join ( templist, sep )."\n"
+	else
+		let txt .= "           template files :  -not loaded-\n"
+	endif
+	let txt .=
+				\  '       code snippets dir. :  '.s:C_CodeSnippets."\n"
+	" ----- dictionaries ------------------------
+	if !empty(g:C_Dictionary_File)
+		let ausgabe= &dictionary
+		let ausgabe= substitute( ausgabe, ",", ",\n                             ", "g" )
+		let txt = txt."       dictionary file(s) :  ".ausgabe."\n"
+	endif
+	" ----- map leader, menus, file headers -----
+	if a:verbose >= 1
+		let	txt .= "\n"
+					\ .'                mapleader :  "'.g:C_MapLeader."\"\n"
+					\ .'     load menus / delayed :  "'.s:C_LoadMenus.'" / "'.s:C_CreateMenusDelayed."\"\n"
+					\ .'       insert file header :  "'.s:C_InsertFileHeader."\"\n"
+	endif
+	let txt .= "\n"
+	" ----- extension, flags, executables -------
 	let txt = txt.'         C file extension :  "'.s:C_CExtension.'"  (everything else is C++)'."\n"
 	let txt = txt.'    extension for objects :  "'.s:C_ObjExtension."\"\n"
 	let txt = txt.'extension for executables :  "'.s:C_ExeExtension."\"\n"
@@ -2075,29 +2145,17 @@ function! C_Settings ()
 	let txt = txt.'     compiler flags (C++) :  "'.g:C_CplusCFlags."\"\n"
 	let txt = txt.'       linker flags (C++) :  "'.g:C_CplusLFlags."\"\n"
 	let txt = txt.'          libraries (C++) :  "'.g:C_CplusLibs."\"\n"
+	let txt = txt.'         C / C++ compiler :  "'.g:C_CCompiler.'" / "'.g:C_CplusCompiler."\"\n"
 	let txt = txt.'                 debugger :  "'.g:C_Debugger."\"\n"
-	let txt = txt.'   code snippet directory :  "'.s:C_CodeSnippets."\"\n"
-	" ----- template files  ------------------------
- 	let txt = txt.'           template style :  "'.mmtemplates#core#Resource ( g:C_Templates, "style" )[0]."\"\n"
-	let txt = txt.'      plugin installation :  "'.g:C_Installation."\"\n"
-	if g:C_Installation == 'system'
-		let txt = txt.'     global template file :  "'.s:C_GlobalTemplateFile."\"\n"
-		if filereadable( s:C_LocalTemplateFile )
-			let txt = txt.'      local template file :  "'.s:C_LocalTemplateFile."\"\n"
-		endif
-	else
-		let txt = txt.'      local template file :  "'.s:C_LocalTemplateFile."\"\n"
+	" ----- output ------------------------------
+	if a:verbose >= 1
+		let txt = txt."\n"
+		let txt = txt."            output method :  ".s:C_OutputGvim."\n"
 	endif
-	if	!s:MSWIN
-		let txt = txt.'           xterm defaults :  '.s:C_XtermDefaults."\n"
+	if !s:MSWIN && a:verbose >= 1
+		let txt = txt.'         xterm executable :  '.s:Xterm_Executable."\n"
+		let txt = txt.'            xterm options :  '.g:Xterm_Options."\n"
 	endif
-	" ----- dictionaries ------------------------
-	if !empty(g:C_Dictionary_File)
-		let ausgabe= &dictionary
-		let ausgabe= substitute( ausgabe, ",", ",\n                           + ", "g" )
-		let txt = txt."       dictionary file(s) :  ".ausgabe."\n"
-	endif
-	let txt = txt.'     current output dest. :  '.s:C_OutputGvim."\n"
 	" ----- splint ------------------------------
 	if s:C_SplintIsExecutable==1
 		if exists("b:C_SplintCmdLineArgs")
@@ -2105,10 +2163,12 @@ function! C_Settings ()
 		else
 			let ausgabe = ""
 		endif
+		let txt = txt."\n"
 		let txt = txt."        splint options(s) :  ".ausgabe."\n"
 	endif
 	" ----- cppcheck ------------------------------
 	if s:C_CppcheckIsExecutable==1
+		let txt = txt."\n"
 		let txt = txt."        cppcheck severity :  ".s:C_CppcheckSeverity."\n"
 	endif
 	" ----- code check --------------------------
@@ -2118,23 +2178,18 @@ function! C_Settings ()
 		else
 			let ausgabe = s:C_CodeCheckOptions
 		endif
+		let txt = txt."\n"
 		let txt = txt."CodeCheck (TM) options(s) :  ".ausgabe."\n"
 	endif
-	" ----- toolbox -----------------------------
-	if s:C_UseToolbox == 'yes'
-		let toollist = mmtoolbox#tools#GetList ( s:C_Toolbox )
-		if empty ( toollist )
-			let txt .= "                  toolbox :  -no tools-\n"
-		else
-			let sep  = "\n"."                             "
-			let txt .=      "                  toolbox :  "
-						\ .join ( toollist, sep )."\n"
-		endif
-	endif
-	let txt = txt."\n"
 	let	txt = txt."__________________________________________________________________________\n"
-	let	txt = txt." C/C++-Support, Version ".g:C_Version." / Dr.-Ing. Fritz Mehner / mehner.fritz@fh-swf.de\n\n"
-	echo txt
+	let	txt = txt." C/C++-Support, Version ".g:C_Version." / Wolfgang Mehner / wolfgang-mehner@web.de\n\n"
+	"
+	if a:verbose == 2
+		split CSupport_Settings.txt
+		put = txt
+	else
+		echo txt
+	endif
 endfunction    " ----------  end of function C_Settings ----------
 "
 "------------------------------------------------------------------------------
@@ -2223,8 +2278,10 @@ function! C_Help( type )
 		setlocal buftype=nofile
 		setlocal noswapfile
 		setlocal bufhidden=delete
-		setlocal filetype=sh		" allows repeated use of <S-F1>
 		setlocal syntax=OFF
+
+		 noremap  <buffer>  <silent>  <S-F1>        :call C_Help("m")<CR>
+		inoremap  <buffer>  <silent>  <S-F1>   <C-C>:call C_Help("m")<CR>
 	endif
 	setlocal	modifiable
 	"
@@ -2277,7 +2334,13 @@ function! C_Help( type )
 			endif
 		endif
 
+		" :WORKAROUND:05.04.2016 21:05:WM: setting the filetype changes the global tabstop,
+		" handle this manually
+		let ts_save = &g:tabstop
+
 		set filetype=man
+
+		let &g:tabstop = ts_save
 
 		" get the width of the newly opened window
 		" and set the width of man's output accordingly
@@ -2324,7 +2387,7 @@ function! C_CreateGuiMenus ()
 		aunmenu <silent> &Tools.Load\ C\ Support
 		amenu   <silent> 40.1000 &Tools.-SEP100- :
 		amenu   <silent> 40.1030 &Tools.Unload\ C\ Support <C-C>:call C_RemoveGuiMenus()<CR>
-		call s:C_RereadTemplates('no')
+		call s:C_RereadTemplates()
 		call s:C_InitMenus()
 		let  s:C_MenusVisible = 'yes'
 	endif
@@ -2335,7 +2398,7 @@ endfunction    " ----------  end of function C_CreateGuiMenus  ----------
 "------------------------------------------------------------------------------
 function! s:CheckAndRereadTemplates ()
 	if ! exists ( 'g:C_Templates' )
-		call s:C_RereadTemplates('no')        
+		call s:C_RereadTemplates()        
 	endif
 endfunction    " ----------  end of function s:CheckAndRereadTemplates  ----------
 "
@@ -2365,15 +2428,15 @@ endfunction    " ----------  end of function C_ResetMapLeader  ----------
 "===  FUNCTION  ================================================================
 "          NAME:  C_RereadTemplates     {{{1
 "   DESCRIPTION:  rebuild commands and the menu from the (changed) template file
-"    PARAMETERS:  displaymsg - yes / no
+"    PARAMETERS:  -
 "       RETURNS:  
 "===============================================================================
-function! s:C_RereadTemplates ( displaymsg )
+function! s:C_RereadTemplates ()
 	"
 	"-------------------------------------------------------------------------------
 	" SETUP TEMPLATE LIBRARY
 	"-------------------------------------------------------------------------------
-	let g:C_Templates = mmtemplates#core#NewLibrary ()
+	let g:C_Templates = mmtemplates#core#NewLibrary ( 'api_version', '1.0' )
 	"
 	" mapleader
 	if empty ( g:C_MapLeader )
@@ -2382,85 +2445,97 @@ function! s:C_RereadTemplates ( displaymsg )
 		call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::Mapleader', g:C_MapLeader )
 	endif
 	"
-	" map: choose style
-	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::ChooseStyle::Map', 'nts' )
+	" some metainfo
+	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::Wizard::PluginName',   'C' )
+	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::Wizard::FiletypeName', 'C' )
+	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::Wizard::FileCustomNoPersonal',   s:plugin_dir.'/c-support/rc/custom.templates' )
+	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::Wizard::FileCustomWithPersonal', s:plugin_dir.'/c-support/rc/custom_with_personal.templates' )
+	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::Wizard::FilePersonal',           s:plugin_dir.'/c-support/rc/personal.templates' )
+	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::Wizard::CustomFileVariable',     'g:C_CustomTemplateFile' )
+	"
+	" maps: special operations
+	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::RereadTemplates::Map', 'ntr' )
+	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::ChooseStyle::Map',     'nts' )
+	call mmtemplates#core#Resource ( g:C_Templates, 'set', 'property', 'Templates::SetupWizard::Map',     'ntw' )
 	"
 	" syntax: comments
 	call mmtemplates#core#ChangeSyntax ( g:C_Templates, 'comment', '§' )
-	let s:C_TemplateJumpTarget = mmtemplates#core#Resource ( g:C_Templates, "jumptag" )[0]
 	"
 	" property: Doxygen menu
 	call mmtemplates#core#Resource ( g:C_Templates, 'add', 'property', 'Doxygen::BriefAM::Menu', '' )
 	call mmtemplates#core#Resource ( g:C_Templates, 'add', 'property', 'Doxygen::BriefAM::Map', '' )
 	"
-	let	messsage = ''
-	"
+	"-------------------------------------------------------------------------------
+	" load template library
+	"-------------------------------------------------------------------------------
+
+	" global templates (global installation only)
 	if g:C_Installation == 'system'
-		"-------------------------------------------------------------------------------
-		" SYSTEM INSTALLATION
-		"-------------------------------------------------------------------------------
-		if filereadable( s:C_GlobalTemplateFile )
-			call mmtemplates#core#ReadTemplates ( g:C_Templates, 'load', s:C_GlobalTemplateFile )
-		else
-			echomsg "Global template file '".s:C_GlobalTemplateFile."' not readable."
-			return
-		endif
-		let	messsage	= "Templates read from '".s:C_GlobalTemplateFile."'"
-		"
-		"-------------------------------------------------------------------------------
-		" handle local template files
-		"-------------------------------------------------------------------------------
-		let templ_dir = fnamemodify( s:C_LocalTemplateFile, ":p:h" ).'/'
-		"
-		if finddir( templ_dir ) == ''
-			" try to create a local template directory
-			if exists("*mkdir")
-				try 
-					call mkdir( templ_dir, "p" )
-				catch /.*/
-				endtry
-			endif
-		endif
+		call mmtemplates#core#ReadTemplates ( g:C_Templates, 'load', s:C_GlobalTemplateFile,
+					\ 'name', 'global', 'map', 'ntg' )
+	endif
 
-		if isdirectory( templ_dir ) && !filereadable( s:C_LocalTemplateFile )
-			" write a default local template file
-			let template	= [	]
-			let sample_template_file	= s:plugin_dir.'/c-support/rc/sample_template_file'
-			if filereadable( sample_template_file )
-				for line in readfile( sample_template_file )
-					call add( template, line )
-				endfor
-				call writefile( template, s:C_LocalTemplateFile )
-			endif
-		endif
-		"
-		if filereadable( s:C_LocalTemplateFile )
-			call mmtemplates#core#ReadTemplates ( g:C_Templates, 'load', s:C_LocalTemplateFile )
-			let messsage	= messsage." and '".s:C_LocalTemplateFile."'"
-			if mmtemplates#core#ExpandText( g:C_Templates, '|AUTHOR|' ) == 'YOUR NAME'
-				echomsg "Please set your personal details in file '".s:C_LocalTemplateFile."'."
-			endif
-		endif
-		"
+	" local templates (optional for global installation)
+	if g:C_Installation == 'system'
+		call mmtemplates#core#ReadTemplates ( g:C_Templates, 'load', s:C_LocalTemplateFile,
+					\ 'name', 'local', 'map', 'ntl', 'optional', 'hidden' )
 	else
-		"-------------------------------------------------------------------------------
-		" LOCAL INSTALLATION
-		"-------------------------------------------------------------------------------
-		if filereadable( s:C_LocalTemplateFile )
-			call mmtemplates#core#ReadTemplates ( g:C_Templates, 'load', s:C_LocalTemplateFile )
-			let	messsage	= "Templates read from '".s:C_LocalTemplateFile."'"
-		else
-			echomsg "Local template file '".s:C_LocalTemplateFile."' not readable." 
-			return
-		endif
-		"
-	endif
-	if a:displaymsg == 'yes'
-		echomsg messsage.'.'
+		call mmtemplates#core#ReadTemplates ( g:C_Templates, 'load', s:C_LocalTemplateFile,
+					\ 'name', 'local', 'map', 'ntl' )
 	endif
 
+	" additional templates (optional)
+	if ! empty ( s:C_AdditionalTemplates )
+		call mmtemplates#core#AddCustomTemplateFiles ( g:C_Templates, s:C_AdditionalTemplates, "C's additional templates" )
+	endif
+
+	" personal templates (shared across template libraries) (optional, existence of file checked by template engine)
+	call mmtemplates#core#ReadTemplates ( g:C_Templates, 'personalization',
+				\ 'name', 'personal', 'map', 'ntp' )
+
+	" custom templates (optional, existence of file checked by template engine)
+	call mmtemplates#core#ReadTemplates ( g:C_Templates, 'load', s:C_CustomTemplateFile,
+				\ 'name', 'custom', 'map', 'ntc', 'optional' )
+
+	"-------------------------------------------------------------------------------
+	" further setup
+	"-------------------------------------------------------------------------------
+	"
+	" get the jump tags
+	let s:C_TemplateJumpTarget = mmtemplates#core#Resource ( g:C_Templates, "jumptag" )[0]
+	"
 endfunction    " ----------  end of function s:C_RereadTemplates  ----------
 
+"===  FUNCTION  ================================================================
+"          NAME:  s:CheckTemplatePersonalization     {{{1
+"   DESCRIPTION:  check whether the name, .. has been set
+"    PARAMETERS:  -
+"       RETURNS:
+"===============================================================================
+let s:DoneCheckTemplatePersonalization = 0
+"
+function! s:CheckTemplatePersonalization ()
+	"
+	" check whether the templates are personalized
+	if ! s:DoneCheckTemplatePersonalization
+				\ && mmtemplates#core#ExpandText ( g:C_Templates, '|AUTHOR|' ) == 'YOUR NAME'
+		let s:DoneCheckTemplatePersonalization = 1
+		"
+		let maplead = mmtemplates#core#Resource ( g:C_Templates, 'get', 'property', 'Templates::Mapleader' )[0]
+		"
+		redraw
+		echohl Search
+		echo 'The personal details (name, mail, ...) are not set in the template library.'
+		echo 'They are used to generate comments, ...'
+		echo 'To set them, start the setup wizard using:'
+		echo '- use the menu entry "C/C++ -> Snippets -> template setup wizard"'
+		echo '- use the map "'.maplead.'ntw" inside a C buffer'
+		echo "\n"
+		echohl None
+	endif
+	"
+endfunction    " ----------  end of function s:CheckTemplatePersonalization  ----------
+"
 "------------------------------------------------------------------------------
 "  C_ToolMenu     {{{1
 "------------------------------------------------------------------------------
@@ -2505,11 +2580,11 @@ function! C_OpenFold ( mode )
 endfunction    " ----------  end of function C_OpenFold  ----------
 
 "------------------------------------------------------------------------------
-"  C_HighlightJumpTargets
+"  C_HighlightJumpTargets   {{{1
 "------------------------------------------------------------------------------
 function! C_HighlightJumpTargets ()
 	if s:C_Ctrl_j == 'on'
-		exe 'match Search /'.s:C_TemplateJumpTarget1.'\|'.s:C_TemplateJumpTarget2.'/'
+		exe 'match Search /'.s:C_TemplateJumpTarget.'/'
 	endif
 endfunction    " ----------  end of function C_HighlightJumpTargets  ----------
 
@@ -2517,10 +2592,10 @@ endfunction    " ----------  end of function C_HighlightJumpTargets  ----------
 "  C_JumpCtrlJ     {{{1
 "------------------------------------------------------------------------------
 function! C_JumpCtrlJ ()
-  let match	= search( s:C_TemplateJumpTarget1.'\|'.s:C_TemplateJumpTarget2, 'c' )
+  let match	= search( s:C_TemplateJumpTarget, 'c' )
 	if match > 0
 		" remove the target
-		call setline( match, substitute( getline('.'), s:C_TemplateJumpTarget1.'\|'.s:C_TemplateJumpTarget2, '', '' ) )
+		call setline( match, substitute( getline('.'), s:C_TemplateJumpTarget, '', '' ) )
 	else
 		" try to jump behind parenthesis or strings in the current line 
 		if match( getline(".")[col(".") - 1], "[\]})\"'`]"  ) != 0
@@ -2708,19 +2783,6 @@ function! s:CreateAdditionalMaps ()
 	noremap    <buffer>  <silent>  <LocalLeader>ns         :call C_ProtoShow()<CR>
 	inoremap   <buffer>  <silent>  <LocalLeader>ns    <Esc>:call C_ProtoShow()<CR>
 	"
-	" ---------- snippet menu : templates ----------------------------------------
-	"
-	nnoremap    <buffer>  <silent> <LocalLeader>ntl       :call mmtemplates#core#EditTemplateFiles(g:C_Templates,-1)<CR>
-	inoremap    <buffer>  <silent> <LocalLeader>ntl  <C-C>:call mmtemplates#core#EditTemplateFiles(g:C_Templates,-1)<CR>
-	if g:C_Installation == 'system'
-		nnoremap  <buffer>  <silent> <LocalLeader>ntg       :call mmtemplates#core#EditTemplateFiles(g:C_Templates,0)<CR>
-		inoremap  <buffer>  <silent> <LocalLeader>ntg  <C-C>:call mmtemplates#core#EditTemplateFiles(g:C_Templates,0)<CR>
-	endif
-	nnoremap    <buffer>  <silent> <LocalLeader>ntr       :call mmtemplates#core#ReadTemplates(g:C_Templates,"reload","all")<CR>
-	inoremap    <buffer>  <silent> <LocalLeader>ntr  <C-C>:call mmtemplates#core#ReadTemplates(g:C_Templates,"reload","all")<CR>
-	nnoremap    <buffer>  <silent> <LocalLeader>nts       :call mmtemplates#core#ChooseStyle(g:C_Templates,"!pick")<CR>
-	inoremap    <buffer>  <silent> <LocalLeader>nts  <C-C>:call mmtemplates#core#ChooseStyle(g:C_Templates,"!pick")<CR>
-	"
 	" ---------- C++ menu ----------------------------------------------------
 	"
 	" ---------- run menu --------------------------------------------------------
@@ -2751,8 +2813,8 @@ function! s:CreateAdditionalMaps ()
 	noremap  <buffer>  <silent>  <LocalLeader>rh         :call C_Hardcopy()<CR>
 	inoremap <buffer>  <silent>  <LocalLeader>rh    <C-C>:call C_Hardcopy()<CR>
 	vnoremap <buffer>  <silent>  <LocalLeader>rh         :call C_Hardcopy()<CR>
-	noremap  <buffer>  <silent>  <LocalLeader>rs         :call C_Settings()<CR>
-	inoremap <buffer>  <silent>  <LocalLeader>rs    <C-C>:call C_Settings()<CR>
+	noremap  <buffer>  <silent>  <LocalLeader>rs         :call C_Settings(0)<CR>
+	inoremap <buffer>  <silent>  <LocalLeader>rs    <C-C>:call C_Settings(0)<CR>
 	"
 	if has("unix")
 		noremap  <buffer>  <silent>  <LocalLeader>rx       :call C_XtermSize()<CR>
@@ -2776,11 +2838,6 @@ function! s:CreateAdditionalMaps ()
 	noremap  <buffer>  <silent>  <LocalLeader>hm         :call C_Help("m")<CR>
 	inoremap <buffer>  <silent>  <LocalLeader>hm    <C-C>:call C_Help("m")<CR>
 	"
-	if !exists("g:C_Ctrl_j") || ( exists("g:C_Ctrl_j") && g:C_Ctrl_j != 'off' )
-		nnoremap  <buffer>  <silent>  <C-j>   i<C-R>=C_JumpCtrlJ()<CR>
-		inoremap  <buffer>  <silent>  <C-j>    <C-R>=C_JumpCtrlJ()<CR>
-	endif
-	"
 	" ---------- tool box --------------------------------------------------------
 	"
 	if s:C_UseToolbox == 'yes'
@@ -2797,6 +2854,18 @@ function! s:CreateAdditionalMaps ()
 			unlet g:maplocalleader
 		endif
 	endif
+	"
+	"-------------------------------------------------------------------------------
+	" templates
+	"-------------------------------------------------------------------------------
+	if s:C_Ctrl_j == 'on'
+		nnoremap  <buffer>  <silent>  <C-j>       i<C-R>=C_JumpCtrlJ()<CR>
+		inoremap  <buffer>  <silent>  <C-j>  <C-G>u<C-R>=C_JumpCtrlJ()<CR>
+	endif
+	"
+	" ----------------------------------------------------------------------------
+	"
+	call mmtemplates#core#CreateMaps ( 'g:C_Templates', g:C_MapLeader, 'do_special_maps', 'do_del_opt_map' )
 	"
 endfunction    " ----------  end of function s:CreateAdditionalMaps  ----------
 "
@@ -2855,12 +2924,12 @@ if has("autocmd")
 	autocmd FileType *
 				\	if ( &filetype == 'cpp' || &filetype == 'c') |
 				\		if ! exists( 'g:C_Templates' ) |
-				\			if s:C_LoadMenus == 'yes' | call C_CreateGuiMenus ()        |
-				\			else                      | call s:C_RereadTemplates ('no') |
+				\			if s:C_LoadMenus == 'yes' | call C_CreateGuiMenus ()    |
+				\			else                      | call s:C_RereadTemplates () |
 				\			endif |
 				\		endif |
 				\		call s:CreateAdditionalMaps() |
-				\		call mmtemplates#core#CreateMaps ( 'g:C_Templates', g:C_MapLeader ) |
+				\		call s:CheckTemplatePersonalization() |
 				\	endif
 
 		"-------------------------------------------------------------------------------
@@ -2890,9 +2959,6 @@ if has("autocmd")
 	"
 	exe 'autocmd BufRead *.'.join( s:C_SourceCodeExtensionsList, '\|*.' )
 				\     .' call C_HighlightJumpTargets()'
-	"
-" 	autocmd BufNewFile,BufRead * if &filetype =~ '^\(c\|cpp\)$' |
-" 							\     call s:CreateAdditionalMaps() | endif
 endif " has("autocmd")
 "
 "=====================================================================================

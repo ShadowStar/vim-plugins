@@ -8,9 +8,9 @@
 %%        Created:  10.11.2006
 %%       Revision:  none
 %%
-%%         Author:  Dr. Fritz Mehner (fgm), mehner.fritz@fh-swf.de
-%%   Organization:  FH Südwestfalen, Iserlohn, Germany
-%%      Copyright:  Copyright (c) 2006-2014, Dr. Fritz Mehner
+%%         Author:  Wolfgang Mehner, wolfgang-mehner@web.de
+%%                  (formerly Dr. Fritz Mehner (fgm), mehner.fritz@web.de)
+%%      Copyright:  Copyright (c) 2006-2016, Wolfgang Mehner
 %%
 %%          Notes:  
 %%                
@@ -31,7 +31,7 @@
 %
 \setlength\parindent{0pt}
 %
-\newcommand{\Pluginversion}{6.1.1}
+\newcommand{\Pluginversion}{6.2}
 \newcommand{\ReleaseDate}{\today}
 \newcommand{\Rep}{{\tiny{[n]}}}
 %
@@ -54,8 +54,8 @@
 %%----------------------------------------------------------------------
 %%  hyperref
 %%----------------------------------------------------------------------
-\usepackage[ps2pdf]{hyperref}
-\hypersetup{pdfauthor={Dr.-Ing. Fritz Mehner, FH Südwestfalen, Iserlohn, Germany}}
+\usepackage{hyperref}
+\hypersetup{pdfauthor={Wolfgang Mehner, Germany, wolfgang-mehner@web.de}}
 \hypersetup{pdfkeywords={Vim, C/C++}}
 \hypersetup{pdfsubject={Vim-plugin,  c-support.vim, hot keys}}
 \hypersetup{pdftitle={Vim-plugin,  c-support.vim, hot keys}}
@@ -66,20 +66,22 @@
 \begin{document}%
 %
 \begin{multicols}{3}
+\begin{center}
 %
 %%======================================================================
 %%  title       [[[1
 %%======================================================================
-\begin{center}
-\textbf{\textsc{\small{Vim-Plugin}}}\\
+\textbf{\textsc{\small{Vim-Plug-in}}}\\
 \textbf{\LARGE{c-support.vim}}\\
 \textbf{\textsc{\small{Version \Pluginversion}}}\\
+\vspace{1mm}%
 \textbf{\textsc{\Huge{Hot keys}}}\\ 
-Key mappings for Vim with and without GUI.\\
-{\tiny{http://vim.sourceforge.net/scripts/script.php?script\_id=213}}\\
+\vspace{1mm}%
+Key mappings for Vim and gVim.\\
+{\tiny  \texttt{http://www.vim.org}\hspace{1.5mm}---\hspace{1.5mm}\textbf{Wolfgang Mehner},  \texttt{wolfgang-mehner@web.de}}\\
 \vspace{1.0mm}
 {\normalsize (i)} insert mode, {\normalsize (n)} normal mode, {\normalsize (v)} visual mode\\
-\vspace{3.0mm}
+\vspace{1.0mm}
 %
 %%======================================================================
 %%  page 1, table, left   part        [[[1
@@ -133,7 +135,7 @@ Key mappings for Vim with and without GUI.\\
 %%======================================================================
 %
 %%~~~~~ TABULAR : begin ~~~~~~~~~~
-\begin{tabular}[]{|p{15mm}|p{55mm}|}
+\begin{tabular}[]{|p{11mm}|p{60mm}|}
 %%----------------------------------------------------------------------
 %%  menu statements
 %%----------------------------------------------------------------------
@@ -154,60 +156,9 @@ Key mappings for Vim with and without GUI.\\
 \hline \verb'\sb'  & \verb'{ }'                 \hfill (n,v,i)\\
 \hline
 %%----------------------------------------------------------------------
-%%  preprocessor menu
-%%----------------------------------------------------------------------
-\hline
-\multicolumn{2}{|r|}{\textsl{\textbf{P}reprocessor}}   \\
-\hline \verb'\pih'  & include Std. Lib. header     \hfill (n,i)\\
-\hline \verb'\pg'   & \verb$#include<...>$ (global)\hfill (n,i)\\
-\hline \verb'\pl'   & \verb$#include"..."$ (local) \hfill (n,i)\\
-\hline \verb'\pd'   & \verb'#define'               \hfill (n,i)\\
-\hline \verb'\pu'   & \verb'#undef'                \hfill (n,i)\\
-\hline \verb'\pif'  & \verb'#if #endif'            \hfill (n,v,i)\\
-\hline \verb'\pie'  & \verb'#if #else #endif'      \hfill (n,v,i)\\
-\hline \verb'\pid'  & \verb'#ifdef #else #endif'   \hfill (n,v,i)\\
-\hline \verb'\pin'  & \verb'#ifndef #else #endif'  \hfill (n,v,i)\\
-\hline \verb'\pind' & \verb'#ifndef #def #endif'   \hfill (n,v,i)\\
-\hline \verb'\pe'   & \verb'#error '               \hfill (n,i)\\
-\hline \verb'\pli'  & \verb'#line  '               \hfill (n,i)\\
-\hline \verb'\pp'   & \verb'#pragma'               \hfill (n,i)\\
-\hline \verb'\pw'   & \verb'#warning'              \hfill (n,i)\\
-\hline \verb'\pi0'  & \verb'#if 0 #endif'          \hfill (n,v,i)\\
-\hline \verb'\pr0'  & remove \verb'#if 0 #endif'   \hfill (n,i)\\
-\hline
-\end{tabular} \\
-%%~~~~~ TABULAR :  end  ~~~~~~~~~~
-%
-%%======================================================================
-%%  page 1, table, right  part        [[[1
-%%======================================================================
-%
-%%~~~~~ TABULAR : begin ~~~~~~~~~~
-\begin{tabular}[]{|p{11mm}|p{60mm}|}%
-%%----------------------------------------------------------------------
-%%  snippet menu
-%%----------------------------------------------------------------------
-\hline 
-\multicolumn{2}{|r|}{\textsl{S\textbf{n}ippet}} \\
-\hline     \verb'\nr'  & read code snippet         \hfill (n,i)\\
-\hline     \verb'\nv'  & view code snippet         \hfill (n,v,i)\\
-\hline     \verb'\nw'  & write code snippet        \hfill (n,v,i)\\
-\hline     \verb'\ne'  & edit code snippet         \hfill (n,i)\\
-\hline \Rep\verb'\nf'  & pick up function prototype\hfill (n,v,i)\\
-       \Rep\verb'\np'  &                           \hfill (n,v,i)\\
-\hline \Rep\verb'\nm'  & pick up method prototype  \hfill (n,v,i)\\
-\hline     \verb'\ni'  & insert prototype(s)       \hfill (n,i)\\
-\hline     \verb'\nc'  & clear  prototype(s)       \hfill (n,i)\\
-\hline     \verb'\ns'  & show   prototype(s)       \hfill (n,i)\\
-%
-\hline     \verb'\ntl' & edit local templates      \hfill (n,i)\\
-\hline     \verb'\ntr' & reread the templates      \hfill (n,i)\\
-\hline     \verb'\njt' & insert jump tag           \hfill (n,i)\\
-\hline
-%%----------------------------------------------------------------------
 %%  idioms menu
 %%----------------------------------------------------------------------
-\hline 
+\hline
 \multicolumn{2}{|r|}{\textsl{\textbf{I}dioms}}   \\
 \hline \verb'\if'  & function                           \hfill (n,v,i)\\
 \hline \verb'\isf' & static function                    \hfill (n,v,i)\\
@@ -228,6 +179,62 @@ Key mappings for Vim with and without GUI.\\
 \hline \verb'\ifpr'& fprintf                            \hfill (n,i)\\
 \hline \Rep\verb'\i0'  & \verb'for( x=0; x<n; x+=1 )'   \hfill (n,v,i)\\
 \hline \Rep\verb'\in'  & \verb'for( x=n-1; x>=0; x-=1 )'\hfill (n,v,i)\\
+\hline
+\end{tabular} \\
+%%~~~~~ TABULAR :  end  ~~~~~~~~~~
+%
+%%======================================================================
+%%  page 1, table, right  part        [[[1
+%%======================================================================
+%
+%%~~~~~ TABULAR : begin ~~~~~~~~~~
+\begin{tabular}[]{|p{11mm}|p{60mm}|}%
+%%----------------------------------------------------------------------
+%%  preprocessor menu
+%%----------------------------------------------------------------------
+\hline
+\multicolumn{2}{|r|}{\textsl{\textbf{P}reprocessor}}   \\
+\hline \verb'\pih'  & include Std. Lib. header     \hfill (n,i)\\
+\hline \verb'\piph' & include POSIX header         \hfill (n,i)\\
+\hline \verb'\pg'   & \verb$#include<...>$ (global)\hfill (n,i)\\
+\hline \verb'\pl'   & \verb$#include"..."$ (local) \hfill (n,i)\\
+\hline \verb'\pd'   & \verb'#define'               \hfill (n,i)\\
+\hline \verb'\pu'   & \verb'#undef'                \hfill (n,i)\\
+\hline \verb'\pif'  & \verb'#if #endif'            \hfill (n,v,i)\\
+\hline \verb'\pie'  & \verb'#if #else #endif'      \hfill (n,v,i)\\
+\hline \verb'\pid'  & \verb'#ifdef #else #endif'   \hfill (n,v,i)\\
+\hline \verb'\pin'  & \verb'#ifndef #else #endif'  \hfill (n,v,i)\\
+\hline \verb'\pind' & \verb'#ifndef #def #endif'   \hfill (n,v,i)\\
+\hline \verb'\pe'   & \verb'#error '               \hfill (n,i)\\
+\hline \verb'\pli'  & \verb'#line  '               \hfill (n,i)\\
+\hline \verb'\pp'   & \verb'#pragma'               \hfill (n,i)\\
+\hline \verb'\pw'   & \verb'#warning'              \hfill (n,i)\\
+\hline \verb'\pi0'  & \verb'#if 0 #endif'          \hfill (n,v,i)\\
+\hline \verb'\pr0'  & remove \verb'#if 0 #endif'   \hfill (n,i)\\
+\hline
+%%----------------------------------------------------------------------
+%%  snippet menu
+%%----------------------------------------------------------------------
+\hline 
+\multicolumn{2}{|r|}{\textsl{S\textbf{n}ippet}} \\
+\hline     \verb'\nr'  & read code snippet         \hfill (n,i)\\
+\hline     \verb'\nv'  & view code snippet         \hfill (n,v,i)\\
+\hline     \verb'\nw'  & write code snippet        \hfill (n,v,i)\\
+\hline     \verb'\ne'  & edit code snippet         \hfill (n,i)\\
+\hline \Rep\verb'\nf'  & pick up function prototype\hfill (n,v,i)\\
+       \Rep\verb'\np'  &                           \hfill (n,v,i)\\
+\hline \Rep\verb'\nm'  & pick up method prototype  \hfill (n,v,i)\\
+\hline     \verb'\ni'  & insert prototype(s)       \hfill (n,i)\\
+\hline     \verb'\nc'  & clear  prototype(s)       \hfill (n,i)\\
+\hline     \verb'\ns'  & show   prototype(s)       \hfill (n,i)\\
+%
+\hline     \verb'\ntl' & edit local templates      \hfill (n,i)\\
+\hline     \verb'\ntc' & edit custom templates     \hfill (n, i)\\
+\hline     \verb'\ntp' & edit personal templates   \hfill (n, i)\\
+\hline     \verb'\ntr' & reread the templates      \hfill (n,i)\\
+\hline     \verb'\ntw' & template setup wizard     \hfill (n, i)\\
+\hline     \verb'\nts' & choose template style     \hfill (n, i)\\
+\hline     \verb'\njt' & insert jump tag           \hfill (n,i)\\
 \hline
 \end{tabular}
 %

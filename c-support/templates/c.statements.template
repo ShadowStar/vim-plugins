@@ -1,6 +1,6 @@
 == Statements.do while == map:sd, shortcut:d  ==
 do {
-<SPLIT>} while ( <CURSOR> );	/* -----  end do-while  ----- */
+<SPLIT>} while ( <CURSOR> );				/* -----  end do-while  ----- */
 == Statements.for == map:sf, shortcut:o  ==
 for ( <CURSOR>; ; )
 §
@@ -42,20 +42,20 @@ while ( <CURSOR> ) {
 <SPLIT>}
 == Statements.switch == map:ss, shortcut:s  ==
 switch ( <CURSOR> ) {
-case <-LABEL->:
-	<SPLIT>break;
+	case <-LABEL->:	
+		<SPLIT>break;
 
-case <-LABEL->:
-	break;
+	case <-LABEL->:	
+		break;
 
-case <-LABEL->:
-	break;
+	case <-LABEL->:	
+		break;
 
-default:
-	break;
-}	/* -----  end switch  ----- */
+	default:	
+		break;
+}				/* -----  end switch  ----- */
 == Statements.case == map:sc, shortcut:c  ==
-case <CURSOR>:
+case <CURSOR>:	
 break;
 
 == Statements.block == map:sb, shortcut:b  ==

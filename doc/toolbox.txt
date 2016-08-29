@@ -1,11 +1,10 @@
-*toolbox.txt*                   MM Toolbox Support                 Jan 04 2014
+*toolbox.txt*                   MM Toolbox Support                 Oct 23 2014
 
 MM Toolbox Support                                                  *toolbox*
 
-                            Plug-in version 1.0.1
+                             Plug-in version 1.2
                         for Vim version 7.0 and above
                  Wolfgang Mehner <wolfgang-mehner at web.de>
-                  Fritz Mehner  <mehner.fritz at fh-swf.de>
 
      --- The Maps & Menus Toolbox Support ---
 
@@ -379,6 +378,21 @@ A.  CHANGE LOG                                    *toolbox-support-change-log*
 ==============================================================================
 
 ------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.2
+------------------------------------------------------------------------------
+
+- Added sub-menu "load additional tools" to load tools during a session.
+- Minor changes.
+
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.1
+------------------------------------------------------------------------------
+
+- Change: In case several version of autoload/mmtoolbox/tools.vim are
+  available on 'runtimepath', pick out the newest one to load.
+- Minor changes.
+
+------------------------------------------------------------------------------
   RELEASE NOTES FOR VERSION 1.0.1
 ------------------------------------------------------------------------------
 
@@ -399,4 +413,4 @@ A.  CHANGE LOG                                    *toolbox-support-change-log*
 - Initial upload.
 
 ==============================================================================
-vim:tw=78:noet:ts=2:ft=help:norl:expandtab:
+vim:tw=78:expandtab:ts=2:ft=help:norl:
