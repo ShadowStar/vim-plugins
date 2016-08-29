@@ -145,6 +145,7 @@ let s:Vim_LineEndCommColDefault = 49
 let s:VimStartComment						= '"'
 let s:Vim_Printheader   				= "%<%f%h%m%<  %=%{strftime('%x %X')}     Page %N"
 let s:Vim_TemplateJumpTarget 		= '<+\i\++>\|{+\i\++}\|<-\i\+->\|{-\i\+-}'
+let s:Vim_InsertFileHeader	= 'yes'
 "
 call s:GetGlobalSetting ( 'Vim_GuiSnippetBrowser' )
 call s:GetGlobalSetting ( 'Vim_LoadMenus' )
@@ -1135,7 +1136,10 @@ if has( 'autocmd' )
         \   call s:CreateAdditionalMaps() |
 				\		call s:CheckTemplatePersonalization() |
         \ endif
-
+  autocmd BufNewFile *.vim
+	\ if s:Vim_InsertFileHeader == 'yes' |
+		\ call mmtemplates#core#InsertTemplate(g:Vim_Templates, 'Comments.file description') |
+	\ endif
 endif
 " }}}1
 "
