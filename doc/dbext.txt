@@ -1,4 +1,4 @@
-*dbext.txt*	For Vim version 7.0.  Last change: 2016 Jan 03
+*dbext.txt*	For Vim version 7.0.  Last change: 2016 Sep 09
 
 
                 	  VIM REFERENCE MANUAL
@@ -7,7 +7,7 @@
                      Peter Bagyinszki
 
 	  	Database extension plugin (dbext.vim) manual
-	  	dbext.vim version 23.00
+	  	dbext.vim version 24.00
 
 For instructions on installing this file, type
 	:help add-local-help
@@ -17,7 +17,8 @@ Homepage: http://vim.sourceforge.net/script.php?script_id=356
 
 *dbext* *dbext.vim* *db_ext* *db_ext.vim* *database-extension* *pgsql* *mysql*
 *asa* *ase* *ingres* *interbase* *sqlite* *sqlsrv* *ora* *oracle*
-*db2* *DBI* *ODBC* *sqlanywhere* *firebird*
+*db2* *DBI* *ODBC* *sqlanywhere* *ultralite* *hana* *firebird*
+*CrateIO* *RDBMS*
 
 1.  Getting Started			      |dbext-getting-started|
 2.  Whats New   			      |dbext-new|
@@ -116,6 +117,34 @@ David Fishburn
 
 ==============================================================================
 2. What's New						*dbext-new*
+
+Version 24.00 (Sept 30, 2016)
+
+ New Features
+ ------------
+ - Added missing menu items for Execute All (sea), Execute Line (sel),
+   Execute Previous Visual Selection (sep) (pull #18) (Raphaël Bade)
+ - When using ?s as input parameters, these can now be remembered
+   and used when saving previous values when executing the query.
+ - Additional examples of connecting to Oracle using DBI/ODBC
+   without a TNSNAMES entry.
+ - Strip off ending cmd terminators for the DBI database types
+   as some databases (Oracle) complain about them (Bruce Hunsaker).
+ - For native Oracle connections, when retrieving database objects
+   (tables, procedures, columns, ...) ignore case (Dimitri Belov).
+
+ Bug Fixes
+ ---------
+ - For Java, CSharp, JSP, HTML and JavaScript files, remove line
+   continuation (backslash) characters before sending request to database.
+ - Better error handling for the DBI / ODBC databases (Michael Graham, 
+   Bruce Hunsaker, Dimitri Belov, Will Wyatt).
+ - The @ask[bg] parameter was not supported properly in later 
+   releases (Richard Tsai, Nan Jia).
+ - Vim error - Invalid range reported for the SQL history (Bruce Hunsaker).
+ - DBI / ODBC CommitOnDisconnect driver parameter is not supported by all
+   drivers, handle cleanly (Dimitri Belov).
+ - DBI / ODBC Disconnect reported a Vim error (Dimitri Belov).
 
 Version 23.00 (Dec 30, 2015)
 
@@ -1033,10 +1062,11 @@ Version 2.00 (Jul 11, 2004)
         Oracle
         Oracle Rdb on an Open VMS Node
         SQLite
-        Sybase Adaptive Server Anywhere
+        Sybase Adaptive Server Anywhere (SA / ASA)
         Sybase UltraLite
-        Sybase Adaptive Server Enterprise
+        Sybase Adaptive Server Enterprise (ASE)
         SAP HANA
+        CrateIO
  When using a Perl enabled Vim ( :echo has('perl') ):
         DBI
         ODBC
@@ -2486,7 +2516,7 @@ Version 2.00 (Jul 11, 2004)
           INTO p1, p2
           FROM customer
          WHERE name    = @name
-           AND address = ?
+           AND country = ?
            AND phone   = :phone_nbr
            AND email   = 'bob@something.com'
            AND c2      = 'property:name';
@@ -2503,13 +2533,24 @@ Version 2.00 (Jul 11, 2004)
     4.  When prompted for a value for @name, I would enter 'Homer' (including
         the single quotes).
     5.  When prompted for a value for ? it will indicate which ? this is, by
-        counting them and prompting you for a value for ? number 6.
+        counting them and prompting you for a value for ? number 1.  Enter
+        a value of 'Canada' (again, including quotes).
 
+ The resulting query which is sent to the database will be: >
+        SELECT varexists('@dave'), column2
+          FROM customer
+         WHERE name    = 'Homer'
+           AND country = 'Canada'
+           AND phone   = :phone_nbr
+           AND email   = 'bob@something.com'
+           AND c2      = 'property:name';
+<
  To modify what variables that are searched for consider the following
  example: >
         INSERT INTO sync_log ( user_id, table_name, line )
         VALUES( i_user, i_table_name, i_str );
-<This is an INSERT statement within a stored procedure.  The stored procedure
+<
+ This is an INSERT statement within a stored procedure.  The stored procedure
  takes 3 input parameters.  The author of the stored procedure places a i_
  ahead of all input variables.  You can modify the buffer variable for this
  file as follows: >
@@ -2643,8 +2684,10 @@ To specify the type of database you connect to most often, you can place the
     let g:dbext_default_profile_ORA = 'type=ORA:srvname=ffs42ga:user=john:passwd=whatever'
     " Oracle SQL Connect URL string (notice the : is escaped for the port option)
     let g:dbext_default_profile_ORA_URL = 'type=ORA:srvname=//localhost\:3333/instance_name:user=scott:passwd=tiger'
-    " Different form of Oracle server name
+    " These 2 examples connect without using an entry in TNSNAMES
     let g:dbext_default_profile_ORA_Extended = 'type=ORA:user=scott:passwd=tiger:srvname=(description=(address=(protocol=TCP)(host=localhost)(port=1521))(connect_data=(server=dedicated)(service_name=10gR2)))'
+    let g:dbext_default_profile_ORA_Extended_DBI = 'type=DBI:user=system:passwd=oracle:driver=Oracle:conn_parms=SID=orcl12c;HOST=localhost;PORT=1521'
+
 
     " PostgreSQL
     let g:dbext_default_profile_PG = 'type=PGSQL:user=postgres'
@@ -2661,6 +2704,9 @@ To specify the type of database you connect to most often, you can place the
 
     " SQLite
     let g:dbext_default_profile_POPFile = 'type=SQLITE:SQLITE_bin=C:\Programs\POPFile\sqlite.exe:dbname=C:\Programs\POPFile\popfile.db'
+    let g:dbext_default_profile_SQLite = 'type=SQLITE:SQLITE_bin=C:\download\OpenSrc\Databases\SQLite\sqlite3.exe:dbname=\vim\test\dbext\sqlite\test.db'
+    let g:dbext_default_profile_SQLite_DBI = 'type=DBI:driver=SQLite:conn_parms=dbname=\vim\test\dbext\sqlite\test.db'
+    let g:dbext_default_profile_SQLite_diff_cmdT = 'type=SQLITE:dbname=C:\vim\test\dbext\sqlite\test.db:cmd_terminator=~'
 
     " ULTRALITE
     let g:dbext_default_profile_UL_CustDB = 'type=ULTRALITE:user=dba:passwd=sql:dbname='.expand('$SQLANYSAMP11\ultralite\custdb\custdb.udb')

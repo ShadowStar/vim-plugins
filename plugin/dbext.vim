@@ -1,11 +1,11 @@
 " dbext.vim - Commn Database Utility
 " Copyright (C) 2002-16, Peter Bagyinszki, David Fishburn
 " ---------------------------------------------------------------
-" Version:       23.00
+" Version:       24.00
 " Maintainer:    David Fishburn <dfishburn dot vim at gmail dot com>
 " Authors:       Peter Bagyinszki <petike1 at dpg dot hu>
 "                David Fishburn <dfishburn dot vim at gmail dot com>
-" Last Modified: 2015 Dec 29
+" Last Modified: 2016 Sep 09
 " Based On:      sqlplus.vim (author: Jamis Buck)
 " Created:       2002-05-24
 " Homepage:      http://vim.sourceforge.net/script.php?script_id=356
@@ -40,7 +40,7 @@ if v:version < 702
     echomsg "dbext: Version 22.00 or higher requires Vim7.2 or higher.  Version 21.00 can stil be used with Vim 7.1 and lower."
     finish
 endif
-let g:loaded_dbext = 2300
+let g:loaded_dbext = 2400
 
 " Turn on support for line continuations when creating the script
 let s:cpo_save = &cpo
@@ -73,7 +73,7 @@ endif
 " Commands {{{
 command! -nargs=+ DBExecSQL         :call dbext#DB_execSql(<q-args>)
 command! -nargs=+ DBExecSQLTopX     :call dbext#DB_execSqlTopX(<q-args>)
-command! -nargs=0 DBConnect         :call dbext#DB_connect()
+command! -nargs=* DBConnect         :call dbext#DB_connect(<q-args>)
 command! -nargs=* DBDisconnect      :call dbext#DB_disconnect(<q-args>)
 command! -nargs=* DBDisconnectAll   :call dbext#DB_disconnectAll()
 command! -nargs=0 DBCommit          :call dbext#DB_commit()
@@ -369,6 +369,9 @@ if has("gui_running") && has("menu") && g:dbext_default_menu_mode != 0
 
     if g:dbext_map_or_cmd == 'map'
         exec 'vnoremenu <script> '.menuRoot.'.Execute\ SQL\ (Visual\ selection)<TAB>'.leader.'se :DBExecVisualSQL<CR>'
+        exec 'noremenu  <script> '.menuRoot.'.Execute\ SQL\ Previous\ Visual\ Range<TAB>'.leader.'sep  :'."'<,'>DBExecRangeSQL".'<CR>'
+        exec 'noremenu  <script> '.menuRoot.'.Execute\ SQL\ All<TAB>'.leader.'sea  :1,$DBExecRangeSQL<CR>'
+        exec 'noremenu  <script> '.menuRoot.'.Execute\ SQL\ Line<TAB>'.leader.'sel  :.,.DBExecRangeSQL<CR>'
         exec 'noremenu  <script> '.menuRoot.'.Execute\ SQL\ (Under\ cursor)<TAB>'.leader.'se  :call feedkeys("'.leader.'se")<CR>'
         exec 'vnoremenu <script> '.menuRoot.'.Execute\ SQL\ TopX\ (Visual\ selection)<TAB>'.leader.'sE  :DBExecVisualSQLTopX<CR>'
         exec 'noremenu  <script> '.menuRoot.'.Execute\ SQL\ TopX\ (Under\ cursor)<TAB>'.leader.'sE  :call feedkeys("'.leader.'sE")<CR>'
