@@ -1,7 +1,7 @@
 " File: update-last.vim
 " Author: ShadowStar, <orphen.leiliu@gmail.com>
 " Create Time: 2013-12-04 19:36:21 CST
-" Last Change: 08/29/2016 21:31:28
+" Last Change: 09/21/2016 22:12:04
 " Description: Automatic update Last Change time & author
 
 if exists("g:loaded_update_last")
@@ -25,7 +25,7 @@ else
 endif
 
 if !exists('g:update_last_author_stamp_leader')
-    let s:author_stamp_leader = ['Author:']
+    let s:author_stamp_leader = ['Author:', 'Maintainer:']
 else
     let s:author_stamp_leader = g:update_last_author_stamp_leader
 endif
