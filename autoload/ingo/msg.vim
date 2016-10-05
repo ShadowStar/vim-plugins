@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.027.009	22-Aug-2016	Add ingo#msg#MsgFromShellError().
 "   1.025.008	01-Aug-2016	ingo#msg#HighlightMsg(): Make a:hlgroup
 "				optional, default to 'None' (so the function is
 "				useful to return to normal highlighting).
@@ -107,6 +108,14 @@ function! ingo#msg#CustomExceptionMsg( customPrefixPattern )
     call ingo#msg#ErrorMsg(substitute(v:exception, printf('^\C\%%(%s\):\s*', a:customPrefixPattern), '', ''))
 endfunction
 
+function! ingo#msg#MsgFromShellError( whatFailure, shellOutput )
+    if empty(a:shellOutput)
+	let l:details = ['exit status ' . v:shell_error]
+    else
+	let l:details = split(a:shellOutput, "\n")
+    endif
+    return printf('Failed to %s: %s', a:whatFailure, join(l:details, ' '))
+endfunction
 function! ingo#msg#ShellError( whatFailure, shellOutput )
     if empty(a:shellOutput)
 	let l:details = ['exit status ' . v:shell_error]

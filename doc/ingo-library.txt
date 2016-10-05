@@ -83,6 +83,20 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.027	30-Sep-2016
+- Add ingo#buffer#temp#ExecuteWithText() and ingo#buffer#temp#CallWithText()
+  variants that pre-initialize the buffer (a common use case).
+- Add ingo#msg#MsgFromShellError().
+- ENH: ingo#query#fromlist#Query(): Support headless (testing) mode via
+  g:IngoLibrary_QueryChoices, like ingo#query#Confirm() already does.
+- Expose ingo#query#fromlist#RenderList(). Expose
+  ingo#query#StripAccellerator().
+- ENH: ingo#cmdargs#pattern#Parse(): Add second optional a:flagsMatchCount
+  argument, similar to what ingo#cmdargs#substitute#Parse() has in a:options.
+- Add ingo#cmdargs#pattern#RawParse().
+- Add ingo/regexp/collection.vim module.
+- Add ingo#str#trd().
+
 1.026	11-Aug-2016
 - Add ingo#strdisplaywidth#pad#Middle().
 - Add ingo/format/columns.vim module.
