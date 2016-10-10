@@ -1,10 +1,10 @@
 " Vim syntax support file
-" Maintainer:	ShadowStar <orphen.leiliu@gmail.com>
-" Last Change:	2012 Nov 21
+" Maintainer: ShadowStar, <orphen.leiliu@gmail.com>
+" Last Change: 09/22/2016 17:40:48
 
 " This file sets up the default methods for highlighting.
 
-let color_list = {1: 'Red', 2: 'Green', 3: 'Yellow', 4: 'Blue', 5: 'Magenta', 6: 'Cyan'}
+let color_list = {1: 'Red', 2: 'Green', 3: 'Yellow', 4: 'Blue', 5: 'Magenta', 6: 'Cyan', 7: 'White'}
 
 " Many terminals can only use six different colors (plus black and white).
 " Therefore the number of colors used is kept low. It doesn't look nice with
@@ -22,17 +22,6 @@ function! s:SetColor(v, k)
 endfun
 
 call s:SetColor('Black', '0')
-if &t_Co >= 16
-  if &t_Co == 256
-    call s:SetColor('Grey', '238')
-    call s:SetColor('Brown', '130')
-  else
-    call s:SetColor('Grey', '7')
-  endif
-  call s:SetColor('White', '15')
-else
-  call s:SetColor('White', '7')
-endif
 
 for [key, value] in items(color_list)
   call s:SetColor(value, key)
@@ -40,4 +29,11 @@ for [key, value] in items(color_list)
     call s:SetColor('Light' . value, (key + 8))
   endif
 endfor
+
+if &t_Co >= 16
+  call s:SetColor('Grey', '8')
+  if &t_Co == 256
+    call s:SetColor('Brown', '130')
+  endif
+endif
 
