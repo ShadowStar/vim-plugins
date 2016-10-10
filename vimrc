@@ -376,11 +376,7 @@ noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
 
 let g:EchoFuncKeyPrev = '<C-k>'
 let g:EchoFuncKeyNext = '<C-j>'
-"let VCSCommandSplit = 'vertical'
-"let g:C_FormatTime = '%H:%M'
-let g:BASH_FormatDate            = '%D'
-let g:BASH_FormatTime            = '%H:%M'
-let g:BASH_FormatYear            = 'year %Y'
+let g:VCSCommandDeleteOnHide = 1
 let g:C_Dictionary_File = $HOME.'/.vim/c-support/wordlists/std-keywords.list'
 let g:C_Ctrl_j = 'off'
 let g:BASH_Ctrl_j = 'off'
