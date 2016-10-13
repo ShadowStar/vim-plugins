@@ -281,6 +281,8 @@
 :EasyAlign!	easy_align.txt	/*:EasyAlign!*
 :Errors	syntastic.txt	/*:Errors*
 :Filter	ft-csv.txt	/*:Filter*
+:Linediff	linediff.txt	/*:Linediff*
+:LinediffReset	linediff.txt	/*:LinediffReset*
 :LiveEasyAlign	easy_align.txt	/*:LiveEasyAlign*
 :LogViewerDisable	LogViewer.txt	/*:LogViewerDisable*
 :LogViewerEnable	LogViewer.txt	/*:LogViewerEnable*
@@ -1358,6 +1360,10 @@ g:easy_align_ignore_unmatched	easy_align.txt	/*g:easy_align_ignore_unmatched*
 g:easy_align_indentation	easy_align.txt	/*g:easy_align_indentation*
 g:easy_align_interactive_modes	easy_align.txt	/*g:easy_align_interactive_modes*
 g:easy_align_last_command	easy_align.txt	/*g:easy_align_last_command*
+g:linediff_buffer_type	linediff.txt	/*g:linediff_buffer_type*
+g:linediff_first_buffer_command	linediff.txt	/*g:linediff_first_buffer_command*
+g:linediff_indent	linediff.txt	/*g:linediff_indent*
+g:linediff_second_buffer_command	linediff.txt	/*g:linediff_second_buffer_command*
 g:loaded_diffgofile	diffgofile.txt	/*g:loaded_diffgofile*
 g:mwAutoLoadMarks	mark.txt	/*g:mwAutoLoadMarks*
 g:mwAutoSaveMarks	mark.txt	/*g:mwAutoSaveMarks*
@@ -1502,6 +1508,15 @@ ingo-library.txt	ingo-library.txt	/*ingo-library.txt*
 ingo-library.vim	ingo-library.txt	/*ingo-library.vim*
 ingres	dbext.txt	/*ingres*
 interbase	dbext.txt	/*interbase*
+linediff	linediff.txt	/*linediff*
+linediff-commands	linediff.txt	/*linediff-commands*
+linediff-contents	linediff.txt	/*linediff-contents*
+linediff-installation	linediff.txt	/*linediff-installation*
+linediff-internals	linediff.txt	/*linediff-internals*
+linediff-issues	linediff.txt	/*linediff-issues*
+linediff-settings	linediff.txt	/*linediff-settings*
+linediff-usage	linediff.txt	/*linediff-usage*
+linediff.txt	linediff.txt	/*linediff.txt*
 list-snippets	snipMate.txt	/*list-snippets*
 mark-colors	mark.txt	/*mark-colors*
 mark-colors-redefine	mark.txt	/*mark-colors-redefine*
