@@ -8,14 +8,14 @@
 " |     || || |   | |   |  |__ |  _  ||  _  || |  | |
 " |____| |_||_|   |_|   |_____||_| |_||_| |_||_|  |_|
 "
-" Last Change:  06/13/16 01:56:52
-" Version:     6.2
-" Author:  ShadowStar, <orphen.leiliu@gmail.com>
+" Last Change: 2016/10/12
+" Version:     6.3
+" Author:      Rick Howe <rdcxy754@ybb.ne.jp>
 
 if exists('g:loaded_diffchar')
 	finish
 endif
-let g:loaded_diffchar = 6.2
+let g:loaded_diffchar = 6.3
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -29,18 +29,18 @@ command! -range TDChar call diffchar#ToggleDiffChar(range(<line1>, <line2>))
 noremap <silent> <Plug>ToggleDiffCharAllLines :%TDChar<CR>
 noremap <silent> <Plug>ToggleDiffCharCurrentLine :TDChar<CR>
 nnoremap <silent> <Plug>JumpDiffCharPrevStart
-				\ :call diffchar#JumpDiffChar(0, 1)<CR>
-nnoremap <silent> <Plug>JumpDiffCharNextStart
-				\ :call diffchar#JumpDiffChar(1, 1)<CR>
-nnoremap <silent> <Plug>JumpDiffCharPrevEnd
 				\ :call diffchar#JumpDiffChar(0, 0)<CR>
-nnoremap <silent> <Plug>JumpDiffCharNextEnd
+nnoremap <silent> <Plug>JumpDiffCharNextStart
 				\ :call diffchar#JumpDiffChar(1, 0)<CR>
+nnoremap <silent> <Plug>JumpDiffCharPrevEnd
+				\ :call diffchar#JumpDiffChar(0, 1)<CR>
+nnoremap <silent> <Plug>JumpDiffCharNextEnd
+				\ :call diffchar#JumpDiffChar(1, 1)<CR>
 if !hasmapto('<Plug>ToggleDiffCharAllLines', 'nv')
-	map <silent> \da <Plug>ToggleDiffCharAllLines
+	map <silent> <F7> <Plug>ToggleDiffCharAllLines
 endif
 if !hasmapto('<Plug>ToggleDiffCharCurrentLine', 'nv')
-	map <silent> \dc <Plug>ToggleDiffCharCurrentLine
+	map <silent> <F8> <Plug>ToggleDiffCharCurrentLine
 endif
 if !hasmapto('<Plug>JumpDiffCharPrevStart', 'n')
 	nmap <silent> [b <Plug>JumpDiffCharPrevStart
@@ -65,12 +65,19 @@ let g:DiffUnit = 'Word1'	" \w\+ word and any \W single character
 endif
 
 " Set a difference unit matching colors
-if !exists(':DiffColors')
+if !exists('g:DiffColors')
 let g:DiffColors = 0		" always 1 color
 " let g:DiffColors = 1		" 4 colors in fixed order
 " let g:DiffColors = 2		" 8 colors in fixed order
 " let g:DiffColors = 3		" 16 colors in fixed order
 " let g:DiffColors = 100	" all available colors in dynamic random order
+endif
+
+" Make a corresponding unit visible when cursor is moved on a diff unit
+if !exists('g:DiffPairVisible')
+let g:DiffPairVisible = 2	" cursor-like highlight + echo
+" let g:DiffPairVisible = 1	" cursor-like highlight
+" let g:DiffPairVisible = 0	" nothing visible
 endif
 
 " Set a difference unit updating while editing
