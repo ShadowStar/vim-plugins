@@ -83,6 +83,38 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.028	30-Nov-2016
+- ENH: Also support optional a:flagsMatchCount in
+  ingo#cmdargs#pattern#ParseUnescaped() and
+  ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord().
+- Add missing ingo#cmdargs#pattern#ParseWithLiteralWholeWord() variant.
+- ingo#codec#URL#Decode(): Also convert the character set to UTF-8 to properly
+  handle non-ASCII characters. For example, %C3%9C should decode to "Ü", not
+  to "É".
+- Add ingo#collections#SeparateItemsAndSeparators(), a variant of
+  ingo#collections#SplitKeepSeparators().
+- Add ingo/collections/fromsplit.vim module.
+- Add ingo#list#Join().
+- Add ingo/compat/window.vim module.
+- Add ingo/fs/path/asfilename.vim module.
+- Add ingo/list/find.vim module.
+- Add ingo#option#Join().
+- FIX: Correct delegation in ingo#buffer#temp#Execute(); wrong recursive call
+  was used (after 1.027).
+- ENH: Add optional a:isSilent argument to ingo#buffer#temp#Execute().
+- ENH: Add optional a:reservedColumns also to ingo#avoidprompt#TruncateTo(),
+  and pass this from ingo#avoidprompt#Truncate().
+- ingo#avoidprompt#TruncateTo(): The strright() cannot precisely account for
+  the rendering of tab widths. Check the result, and if necessary, remove
+  further characters until we go below the limit.
+- ENH: Add optional {context} to all ingo#err#... functions, in case other
+  custom commands can be called between error setting and checking, to avoid
+  clobbering of your error message.
+- Add ingo/buffer/locate.vim module.
+- Add ingo/window/locate.vim module.
+- Add ingo/indent.vim module.
+- Add ingo#compat#getcurpos().
+
 1.027	30-Sep-2016
 - Add ingo#buffer#temp#ExecuteWithText() and ingo#buffer#temp#CallWithText()
   variants that pre-initialize the buffer (a common use case).
