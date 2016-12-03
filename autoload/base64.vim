@@ -4,7 +4,12 @@ endfunction
 
 function! base64#encode(input)
 	if has("unix")
-		return base64#strip(system('base64 --wrap=0', a:input))
+		let s:os = system("uname")
+		if s:os == "Darwin\n"
+			return base64#strip(system('base64', a:input))
+		else
+			return base64#strip(system('base64 --wrap=0', a:input))
+		endif
 	elseif has("win32")
 		return base64#strip(system('python -m base64', a:input))
 	else
@@ -14,7 +19,12 @@ endfunction
 
 function! base64#decode(input)
 	if has("unix")
-		return base64#strip(system('base64 --decode --wrap=0 --ignore-garbage', a:input))
+		let s:os = system("uname")
+		if s:os == "Darwin\n"
+			return base64#strip(system('base64 --decode', a:input))
+		else
+			return base64#strip(system('base64 --decode --wrap=0 --ignore-garbage', a:input))
+		endif
 	elseif has("win32")
 		return base64#strip(system('python -m base64 -d', a:input))
 	else
