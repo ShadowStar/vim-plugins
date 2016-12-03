@@ -801,6 +801,16 @@ b:VCSCommandVCSType	vcscommand.txt	/*b:VCSCommandVCSType*
 b:logTimestampExpr	LogViewer.txt	/*b:logTimestampExpr*
 b:tcomment_def_{NAME}	tcomment.txt	/*b:tcomment_def_{NAME}*
 b:topic	viewdoc.txt	/*b:topic*
+base64	base64.txt	/*base64*
+base64-<leader>-atob	base64.txt	/*base64-<leader>-atob*
+base64-<leader>-atob/	base64.txt	/*base64-<leader>-atob\/*
+base64-<leader>-btoa/	base64.txt	/*base64-<leader>-btoa\/*
+base64-about	base64.txt	/*base64-about*
+base64-base64#decode	base64.txt	/*base64-base64#decode*
+base64-base64#encode	base64.txt	/*base64-base64#encode*
+base64-commands	base64.txt	/*base64-commands*
+base64-mappings	base64.txt	/*base64-mappings*
+base64.txt	base64.txt	/*base64.txt*
 bash-support	bashsupport.txt	/*bash-support*
 bashsupport	bashsupport.txt	/*bashsupport*
 bashsupport-Ctrl-j	bashsupport.txt	/*bashsupport-Ctrl-j*
@@ -1080,6 +1090,7 @@ dbext-tutorial-select	dbext.txt	/*dbext-tutorial-select*
 dbext-tutorial-variables	dbext.txt	/*dbext-tutorial-variables*
 dbext.txt	dbext.txt	/*dbext.txt*
 dbext.vim	dbext.txt	/*dbext.vim*
+debase64-<leader>-btoa	base64.txt	/*debase64-<leader>-btoa*
 diffchar	diffchar.txt	/*diffchar*
 diffchar-commands	diffchar.txt	/*diffchar-commands*
 diffchar-history	diffchar.txt	/*diffchar-history*
