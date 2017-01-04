@@ -1474,6 +1474,7 @@ gitlog	gitlog.txt	/*gitlog*
 gitlog-config	gitlog.txt	/*gitlog-config*
 gitlog-contents	gitlog.txt	/*gitlog-contents*
 gitlog-description	gitlog.txt	/*gitlog-description*
+gitlog-file-commands	gitlog.txt	/*gitlog-file-commands*
 gitlog-history	gitlog.txt	/*gitlog-history*
 gitlog-mapping	gitlog.txt	/*gitlog-mapping*
 gitlog-searching	gitlog.txt	/*gitlog-searching*
