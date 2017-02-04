@@ -7,7 +7,7 @@
 "                It adds transaction support and the ability
 "                to reach any database currently supported
 "                by Perl and DBI.
-" Version:       24.00
+" Version:       25.00
 " Maintainer:    David Fishburn <dfishburn dot vim at gmail dot com>
 " Authors:       David Fishburn <dfishburn dot vim at gmail dot com>
 " Last Modified: 2016 Sep 04
@@ -146,7 +146,7 @@
 if exists("g:loaded_dbext_dbi")
    finish
 endif
-let g:loaded_dbext_dbi = 2400
+let g:loaded_dbext_dbi = 2500
 
 " Turn on support for line continuations when creating the script
 let s:cpo_save = &cpo

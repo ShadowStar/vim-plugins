@@ -1,11 +1,11 @@
 " dbext.vim - Commn Database Utility
 " Copyright (C) 2002-16, Peter Bagyinszki, David Fishburn
 " ---------------------------------------------------------------
-" Version:       24.00
+" Version:       25.00
 " Maintainer:    David Fishburn <dfishburn dot vim at gmail dot com>
 " Authors:       Peter Bagyinszki <petike1 at dpg dot hu>
 "                David Fishburn <dfishburn dot vim at gmail dot com>
-" Last Modified: 2016 Sep 09
+" Last Modified: 2017 Jan 28
 " Based On:      sqlplus.vim (author: Jamis Buck)
 " Created:       2002-05-24
 " Homepage:      http://vim.sourceforge.net/script.php?script_id=356
@@ -38,7 +38,7 @@ if v:version < 700
     echomsg "dbext: Version 4.00 or higher requires Vim7.  Version 3.50 can stil be used with Vim6."
     finish
 endif
-let g:loaded_dbext_auto = 2400
+let g:loaded_dbext_auto = 2500
 
 " Turn on support for line continuations when creating the script
 let s:cpo_save = &cpo
@@ -67,6 +67,10 @@ let s:dbext_buffer_last       = -1
 " let s:dbext_prev_winnr        = 0
 " let s:dbext_prev_bufnr        = 0
 " }}}
+let s:dbext_job_support = 0
+if has('channel') && has('job')
+    let s:dbext_job_support = 1
+endif
 
 " Build internal lists {{{
 function! dbext#DB_buildLists()
@@ -190,6 +194,8 @@ function! dbext#DB_buildLists()
     call add(s:config_params_mv, 'strip_into')
     call add(s:config_params_mv, 'strip_at_variables')
     call add(s:config_params_mv, 'passwd_use_secret')
+    call add(s:config_params_mv, 'use_jobs')
+    call add(s:config_params_mv, 'job_status_update_ms')
 
     " Script parameters
     let s:script_params_mv = []
@@ -910,6 +916,8 @@ function! s:DB_getDefault(name)
     elseif a:name ==# "strip_into"              |return (exists("g:dbext_default_strip_into")?g:dbext_default_strip_into.'':'1')
     elseif a:name ==# "strip_at_variables"      |return (exists("g:dbext_default_strip_at_variables")?g:dbext_default_strip_at_variables.'':'0')
     elseif a:name ==# "passwd_use_secret"       |return (exists("g:dbext_default_passwd_use_secret")?g:dbext_default_passwd_use_secret.'':'0')
+    elseif a:name ==# "use_jobs"                |return (exists("g:dbext_default_use_jobs")?g:dbext_default_use_jobs.'':'1')
+    elseif a:name ==# "job_status_update_ms"    |return (exists("g:dbext_default_job_status_update_ms")?g:dbext_default_job_status_update_ms.'':'2000')
     elseif a:name ==# "ASA_bin"                 |return (exists("g:dbext_default_ASA_bin")?g:dbext_default_ASA_bin.'':'dbisql')
     elseif a:name ==# "ASA_cmd_terminator"      |return (exists("g:dbext_default_ASA_cmd_terminator")?g:dbext_default_ASA_cmd_terminator.'':';')
     elseif a:name ==# "ASA_cmd_options"         |return (exists("g:dbext_default_ASA_cmd_options")?g:dbext_default_ASA_cmd_options.'':'-nogui')
@@ -1816,7 +1824,7 @@ function! s:DB_ASA_execSql(str)
     else
         let links = ""
     endif
-    let cmd = dbext_bin .  ' ' . dbext#DB_getWType("cmd_options") . ' ' .
+    let cmd = dbext#DB_getWType("cmd_options") . ' ' .
                 \ s:DB_option('-onerror ', dbext#DB_getWType("on_error"), ' ') .
                 \ ' -c "' .
                 \ s:DB_option('uid=', s:DB_get("user"), ';') .
@@ -1832,7 +1840,7 @@ function! s:DB_ASA_execSql(str)
     endif
     let cmd = cmd .  '" ' .
                 \ ' read ' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -2080,7 +2088,7 @@ function! s:DB_IQ_execSql(str)
     else
         let links = ""
     endif
-    let cmd = dbext_bin .  ' ' . dbext#DB_getWType("cmd_options") . ' ' .
+    let cmd = dbext#DB_getWType("cmd_options") . ' ' .
                 \ s:DB_option('-onerror ', dbext#DB_getWType("on_error"), ' ') .
                 \ ' -c "' .
                 \ s:DB_option('uid=', s:DB_get("user"), ';') .
@@ -2096,7 +2104,7 @@ function! s:DB_IQ_execSql(str)
     endif
     let cmd = cmd .  '" ' .
                 \ ' read ' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -2322,7 +2330,7 @@ function! s:DB_ULTRALITE_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .  ' ' . dbext#DB_getWType("cmd_options") . ' ' .
+    let cmd = dbext#DB_getWType("cmd_options") . ' ' .
                 \ s:DB_option('-onerror ', dbext#DB_getWType("on_error"), ' ') .
                 \ ' -c "' .
                 \ s:DB_option('uid=', s:DB_get("user"), ';') .
@@ -2332,7 +2340,7 @@ function! s:DB_ULTRALITE_execSql(str)
                 \ s:DB_option('', dbext#DB_getWTypeDefault("extra"), '')
     let cmd = cmd .  '" ' .
                 \ ' read ' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -2451,7 +2459,7 @@ function! s:DB_ASE_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin . ' ' .
+    let cmd = '' .
                 \ s:DB_option('',    dbext#DB_getWType("cmd_options"), ' ') .
                 \ s:DB_option('-U ', s:DB_get("user"), ' ') .
                 \ s:DB_option('-P ', s:DB_get("passwd"), ' ') .
@@ -2461,7 +2469,7 @@ function! s:DB_ASE_execSql(str)
                 \ s:DB_option('', dbext#DB_getWTypeDefault("extra"), '') .
                 \ ' -i ' . s:dbext_tempfile
 
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -2608,14 +2616,14 @@ function! s:DB_CRATE_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .  ' ' . dbext#DB_getWType("cmd_options")
+    let cmd = dbext#DB_getWType("cmd_options")
     let cmd = cmd .
                 \ s:DB_option('--hosts ', s:DB_get("host") . ":" . s:DB_get("port"), '') .
                 \ ' < ' . s:dbext_tempfile
                 " This fix requires PR with adds support for piping under
                 " windows (crate/crash#99 - https://github.com/crate/crash/pull/99).
                 "\ ' -c "' . join(readfile(s:dbext_tempfile)) . '"'
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -2756,9 +2764,9 @@ function! s:DB_DB2_execSql(str)
     " In batch files I used the following
     "     -c close when done
     "     -w wait until command finishes
-    "     -i don’t spawn a new cmd window
-    "     -t don’t change the window title
-    "     db2cmd -c -w -i –t “db2 -s -t ; -v -f dave.sql”
+    "     -i do not spawn a new cmd window
+    "     -t do not change the window title
+    "     db2cmd -c -w -i -t "db2 -s -t ; -v -f dave.sql"
     " To see command line options
     "     cd IBM\SQLLIB\BIN
     "     db2cmd -w -i
@@ -2788,7 +2796,7 @@ function! s:DB_DB2_execSql(str)
 
         let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-        let cmd = dbext_bin . ' ' . dbext#DB_getWType("cmd_options") . ' '
+        let cmd = dbext#DB_getWType("cmd_options") . ' '
         if s:DB_get("user") != ""
             let cmd = cmd . ' -a ' . s:DB_get("user") . '/' .
                         \ s:DB_get("passwd") . ' '
@@ -2839,14 +2847,14 @@ function! s:DB_DB2_execSql(str)
 
         let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("db2cmd_bin"))
 
-        let cmd = dbext_bin .  ' ' . dbext#DB_getWType("db2cmd_cmd_options")
+        let cmd = dbext#DB_getWType("db2cmd_cmd_options")
         let cmd = cmd . ' ' .  s:DB_option('', dbext#DB_getWTypeDefault("extra"), ' ') .
                     \ ((dbext#DB_getWType("cmd_terminator")!='')?(s:DB_option('-t', dbext#DB_getWType("cmd_terminator"), ' ')):' ') .
                     \ '-f ' . s:dbext_tempfile
     endif
 
 
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -3022,12 +3030,12 @@ function! s:DB_INGRES_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .  ' ' .
+    let cmd = '' .
                 \ s:DB_option('', dbext#DB_getWTypeDefault("extra"), ' ') .
                 \ s:DB_option('-S ', s:DB_get("dbname"), ' ') .
                 \ s:DB_option('', dbext#DB_getWType("cmd_options"), ' ') .
                 \ ' < ' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -3109,14 +3117,14 @@ function! s:DB_INTERBASE_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .  ' ' .
+    let cmd = '' .
                 \ s:DB_option('-username ', s:DB_get("user"), ' ') .
                 \ s:DB_option('-password ', s:DB_get("passwd"), ' ') .
                 \ s:DB_option('', dbext#DB_getWType("cmd_options"), ' ') .
                 \ s:DB_option('', dbext#DB_getWTypeDefault("extra"), ' ') .
                 \ '-input ' . s:dbext_tempfile .
                 \ s:DB_option(' ', s:DB_get("dbname"), '')
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -3198,7 +3206,7 @@ function! s:DB_MYSQL_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .  ' ' . dbext#DB_getWType("cmd_options")
+    let cmd = dbext#DB_getWType("cmd_options")
     let cmd = cmd .
                 \ s:DB_option(' -u ', s:DB_get("user"), '') .
                 \ s:DB_option(' -p',  s:DB_get("passwd"), '') .
@@ -3208,7 +3216,7 @@ function! s:DB_MYSQL_execSql(str)
                 \ s:DB_option(' ', dbext#DB_getWTypeDefault("extra"), '') .
                 \ ' < ' . s:dbext_tempfile
                 " \ s:DB_option(' ', '-t', '') .
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -3375,12 +3383,12 @@ function! s:DB_SQLITE_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .  ' ' . dbext#DB_getWType("cmd_options")
+    let cmd = dbext#DB_getWType("cmd_options")
     let cmd = cmd .
                 \ s:DB_option(' ', dbext#DB_getWTypeDefault("extra"), '') .
                 \ s:DB_option(' ', s:DB_get("dbname"), '') .
                 \ ' < ' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -3508,14 +3516,13 @@ function! s:DB_ORA_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .
-                \ ' ' . dbext#DB_getWType("cmd_options") .
+    let cmd = dbext#DB_getWType("cmd_options") .
                 \ s:DB_option(' "', s:DB_get("user"), '') .
                 \ s:DB_option('/', s:DB_get("passwd"), '') .
                 \ s:DB_option('@', s:DB_get("srvname"), '') .
                 \ s:DB_option(' ', dbext#DB_getWTypeDefault("extra"), '') .
                 \ '" @' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -3720,15 +3727,14 @@ function! s:DB_PGSQL_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .  ' ' .
-                \ s:DB_option('', dbext#DB_getWType("cmd_options"), ' ') .
+    let cmd = s:DB_option('', dbext#DB_getWType("cmd_options"), ' ') .
                 \ s:DB_option('-d ', s:DB_get("dbname"), ' ') .
                 \ s:DB_option('-U ', s:DB_get("user"), ' ') .
                 \ s:DB_option('-h ', s:DB_get("host"), ' ') .
                 \ s:DB_option('-p ', s:DB_get("port"), ' ') .
                 \ s:DB_option(' ', dbext#DB_getWTypeDefault("extra"), '') .
                 \ ' -q -f ' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -3922,8 +3928,8 @@ function! s:DB_RDB_execSql(str) "{{{
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin . ' @' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let cmd = '@' . s:dbext_tempfile
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction "}}}
@@ -4092,7 +4098,7 @@ function! s:DB_SQLSRV_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin . ' ' . dbext#DB_getWType("cmd_options")
+    let cmd = dbext#DB_getWType("cmd_options")
 
     if has("win32") && s:DB_get("integratedlogin") == 1
         let cmd = cmd .  ' -E'
@@ -4106,7 +4112,7 @@ function! s:DB_SQLSRV_execSql(str)
                 \ s:DB_option(' -d ', s:DB_get("dbname"), ' ') .
                 \ s:DB_option(' ', dbext#DB_getWTypeDefault("extra"), '') .
                 \ ' -i ' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -4245,14 +4251,14 @@ function! s:DB_FIREBIRD_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .  ' ' . dbext#DB_getWType("cmd_options")
+    let cmd = dbext#DB_getWType("cmd_options")
     let cmd = cmd .
                 \ s:DB_option(' -u ', s:DB_get("user"), '') .
                 \ s:DB_option(' -p ',  s:DB_get("passwd"), '') .
                 \ s:DB_option(' ', s:DB_get("dbname"), '') .
                 \ s:DB_option(' ', dbext#DB_getWTypeDefault("extra"), '') .
                 \ ' < ' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -4376,14 +4382,14 @@ function! s:DB_HANA_execSql(str)
 
     let dbext_bin = s:DB_fullPath2Bin(dbext#DB_getWType("bin"))
 
-    let cmd = dbext_bin .  ' ' . dbext#DB_getWType("cmd_options") . ' ' .
+    let cmd = dbext#DB_getWType("cmd_options") . ' ' .
                 \ s:DB_option('-n ', s:DB_get("host"), ' ') .
                 \ s:DB_option('-u ', s:DB_get("user"), ' ') .
                 \ s:DB_option('-p ', s:DB_get("passwd"), ' ') .
                 \ s:DB_option('', dbext#DB_getWTypeDefault("extra"), '')
     let cmd = cmd .  ' ' .
                 \ ' -I ' . s:dbext_tempfile
-    let result = s:DB_runCmd(cmd, output, "")
+    let result = s:DB_runCmdJobSupport(dbext_bin, cmd, output, "")
 
     return result
 endfunction
@@ -6355,6 +6361,10 @@ endfunction
 
 "}}}
 " General {{{
+function! s:DB_infoMsg(msg)
+    echomsg a:msg
+endfunction
+
 function! s:DB_warningMsg(msg)
     echohl WarningMsg
     echomsg a:msg
@@ -7124,6 +7134,265 @@ function! s:DB_runCmd(cmd, sql, result)
 
     return
 endfunction "}}}
+" JobSupport {{{
+function! s:DB_runCmdJobSupport(binary, args, sql, result)
+    let cmd = a:binary . ' ' . a:args
+    if s:dbext_job_support == 0 || g:dbext_default_use_jobs == 0 || s:DB_get('use_result_buffer') != 1
+        " s:dbext_job_support == 0 Vim not compiled with Job / Channel support
+        " g:dbext_default_use_jobs == 0 User doesn't want to use Jobs
+        " s:DB_get('use_result_buffer') != 1 User requsted the results as a
+        " string then we cannot use the asynchronous support
+        return s:DB_runCmd(cmd, a:sql, a:result)
+    endif
+
+    let s:dbext_prev_sql     = a:sql
+    let s:dbext_job_result   = ""
+    let s:dbext_job_elapsed  = 0
+    let s:dbext_job_timer_id = 0
+    let s:dbext_job_cmd      = cmd
+    let s:dbext_job_sql      = a:sql
+    let l:job_bufnr          = 0
+
+    " Store current connection parameters
+    call s:DB_saveConnParameters()
+
+    let l:display_cmd_line = s:DB_get('display_cmd_line')
+
+    let cmd_line = "Last command:\n" .
+                \ cmd . "\n" .
+                \ "Last SQL:\n" .
+                \ a:sql
+
+    let l:job_bufnr = s:DB_addToResultBuffer('', "clear")
+    if l:display_cmd_line == 1
+        call s:DB_addToResultBuffer(cmd_line, "add")
+    endif
+
+    " Return to original window
+    exec s:dbext_prev_winnr."wincmd w"
+
+    let s:dbext_job = job_start( 
+                \ cmd, 
+                \ {
+                \ 'out_cb': function('s:DB_runCmdJobOutput'), 
+                \ 'err_cb': function('s:DB_runCmdJobError'), 
+                \ 'close_cb': function('s:DB_runCmdJobClose')
+                \ }
+                \ )
+                "\ [&shell, &shellcmdflag, cmd], 
+                "\ 'out_io': 'buffer', 
+                "\ 'out_buf': l:job_bufnr,
+                "\ 'out_modifiable': 0,
+                "\ 'out_cb': function('s:DB_runCmdJobOutput'), 
+                "\ 'err_cb': function('s:DB_runCmdJobError'), 
+
+    if job_status(s:dbext_job) == "run"
+        call dbext#DB_jobTimerStart()
+        call s:DB_infoMsg(
+                    \ 'dbext job started:' . 
+                    \ strftime("%H:%M:%S", localtime()) . 
+                    \ " updates every " . 
+                    \ s:DB_get('job_status_update_ms') .
+                    \ " ms"
+                    \ )
+    else
+        call s:DB_warningMsg("dbext job failed to start running without job.  Error:" . string(job_info(s:dbext_job)))
+        " Try again without using jobs
+        return s:DB_runCmd(cmd, a:sql, a:result)
+    endif
+    " call s:DB_warningMsg("dbext job info:" . string(job_info(s:dbext_job)))
+
+    return
+endfunction 
+function! s:DB_runCmdJobOutput(channel, msg)
+    " echomsg "DB_runCmdJobOutput: " . ch_status(a:channel) . " msg:" . a:msg
+    let s:dbext_job_result     .= a:msg . "\n"
+    return
+endfunction
+function! s:DB_runCmdJobError(channel, msg)
+    " echomsg "DB_runCmdJobError: " . ch_status(a:channel) . " msg:" . a:msg
+    let s:dbext_job_result     .= a:msg . "\n"
+    return
+endfunction
+function! s:DB_runCmdJobUpdateStatus(timer)
+    if job_status(s:dbext_job) == "run"
+        let s:dbext_job_elapsed += s:DB_get('job_status_update_ms')
+        echo "dbext job status:" . 
+                    \ job_status(s:dbext_job) . 
+                    \ " running time(ms):" . 
+                    \ s:dbext_job_elapsed .
+                    \ ' DBJobStop to cancel'
+    else
+        call dbext#DB_jobTimerStop()
+    endif
+endfunction
+function! s:DB_runCmdJobClose(channel)
+    " Stop the job status timer which runs forever
+    if s:dbext_job_timer_id > 0
+        call dbext#DB_jobTimerStop()
+        " call timer_stop(s:dbext_job_timer_id)
+        " let s:dbext_job_timer_id = 0
+    endif
+    " out_cb (DB_runCmdJobOutput) may still be active at this point
+    " echomsg "DB_runCmdJobClose: " . ch_status(a:channel)
+    " This code is only required if the job is started
+    " without using out_cb and err_cb.
+    " while ch_status(a:channel) == 'buffered'
+    "     try
+    "         let s:dbext_job_result     .= ch_read(a:channel) . "\n"
+    "     catch /E906/
+    "         " Seems to happen after running for a while
+    "         echomsg 'Job E906:' . strftime("%H:%M:%S", localtime())
+    "         echomsg 'ch_status:' . ch_status(a:channel)
+    "         " call ch_close(a:channel)
+    "         break
+    "     endtry
+    "     "echomsg "DB_runCmdJobClose: " . ch_read(a:channel)
+    " endwhile
+    " This timer runs once and stops (milliseconds)
+    call timer_start(100, function('s:DB_runCmdJobFinish'))
+endfunction
+function! s:DB_runCmdJobFinish(channel)
+    if s:DB_get('use_result_buffer') == 1
+        let result = s:dbext_job_result
+        " Look up the binary return code from the job info
+        let l:shell_error = job_info(s:dbext_job).exitval
+
+        if l:shell_error !~ '^\d\+$'
+            let l:shell_error = 0
+        endif
+
+        call s:DB_addToResultBuffer(result, "add")
+
+        let l:db_type  = s:DB_get('type')
+        let dbi_result = 0
+        if exists("g:dbext_dbi_result")
+            let dbi_result = g:dbext_dbi_result
+        endif
+
+        " If there was an error, show the command just executed
+        " for debugging purposes
+        if (l:shell_error && l:db_type !~ '\<DBI\>\|\<ODBC\>') ||
+                    \ (dbi_result == -1 && l:db_type =~ '\<DBI\>\|\<ODBC\>')
+            let output = "To change connection parameters:\n" .
+                        \ ":DBPromptForBufferParameters\n" .
+                        \ "Or\n" .
+                        \ ":DBSetOption user\|passwd\|dsnname\|srvname\|dbname\|host\|port\|...=<value>\n" .
+                        \ ":DBSetOption user=tiger:passwd=scott\n" .
+                        \ "Last command(rc=".l:shell_error."):\n" .
+                        \ s:dbext_job_cmd . "\n" .
+                        \ "Last SQL:\n" .
+                        \ s:dbext_job_sql . "\n"
+            call s:DB_addToResultBuffer(output, "add")
+
+            let idx = index(s:dbext_buffers_connected, bufnr('%'))
+            if idx > -1
+                " Remove persistent connection
+                if s:DB_get('DBI_disconnect_onerror') == '1'
+                    call dbext#DB_disconnect(bufnr('%'))
+                endif
+            endif
+        else
+            if exists('*DBextPostResult')
+                let res_buf_name   = s:DB_resBufName()
+                if s:DB_switchToBuffer(res_buf_name, res_buf_name, 'result_bufnr') == 1
+                    " Switch back to the result buffer and execute
+                    " the user defined function
+                    call DBextPostResult(l:db_type, (s:DB_get('result_bufnr')+0))
+                endif
+            endif
+            if s:DB_get('autoclose') == '1' && s:dbext_result_count <= s:DB_get('autoclose_min_lines')
+                " Determine rows affected
+                if l:db_type !~ '\<DBI\>\|\<ODBC\>'
+                    call s:DB_{l:db_type}_stripHeaderFooter(result)
+                endif
+                if s:dbext_result_count >= 2
+                    if getline(2) !~ '^SQLCode:'
+                        call dbext#DB_windowClose(s:DB_resBufName())
+                        echon 'dbext: Rows affected:'.g:dbext_rows_affected.' Autoclose enabled, DBSetOption autoclose=0 to disable'
+                    endif
+                else
+                    call dbext#DB_windowClose(s:DB_resBufName())
+                    " echon 'dbext: Autoclose enabled, DBSetOption autoclose=0 to disable'
+                    echon 'dbext: Rows affected:'.g:dbext_rows_affected.' Autoclose enabled, DBSetOption autoclose=0 to disable'
+                endif
+            endif
+        endif
+
+        " Return to original window
+        exec s:dbext_prev_winnr."wincmd w"
+    endif
+
+    return
+endfunction
+function! dbext#DB_jobStop(...)
+    if s:dbext_job_support == 1
+        if exists('s:dbext_job')
+            if a:0 > 0
+                let job_stop_rc = job_stop(s:dbext_job, a:1)
+            else
+                let job_stop_rc = job_stop(s:dbext_job)
+            endif
+            if job_stop_rc == 0
+                call s:DB_warningMsg("dbext job stop how not supported:" . ((a:0 > 0) ? (a:1) : ''))
+            endif
+            let job_status = job_status(s:dbext_job)
+            call s:DB_infoMsg("dbext job stopped:" . job_status)
+            if job_status != "run"
+                call dbext#DB_jobTimerStop()
+            endif
+        else
+            call s:DB_warningMsg("dbext no active job")
+        endif
+    else
+        call s:DB_warningMsg("dbext Vim was not compiled with job support")
+    endif
+endfunction
+function! dbext#DB_jobStatus()
+    if s:dbext_job_support == 1
+        if exists('s:dbext_job')
+            call s:DB_infoMsg("dbext job status:" . job_status(s:dbext_job))
+        else
+            call s:DB_warningMsg("dbext no active job")
+        endif
+    else
+        call s:DB_warningMsg("dbext Vim was not compiled with job support")
+    endif
+endfunction
+function! dbext#DB_jobTimerStart()
+    if s:dbext_job_support == 1
+        let job_status = ''
+        if exists('s:dbext_job') 
+            let job_status = job_status(s:dbext_job)
+        endif
+        if job_status != "run"
+            call s:DB_warningMsg("dbext no active jobs, aborting timer start" . (job_status != '' ? ':'.job_status : ''))
+            return
+        endif
+        if !exists('s:dbext_job_timer_id') || s:dbext_job_timer_id == 0
+            " If the job started, report it's status every 2 seconds
+            let s:dbext_job_timer_id = timer_start(s:DB_get('job_status_update_ms'), function('s:DB_runCmdJobUpdateStatus'), { 'repeat': -1 })
+        else
+            call s:DB_warningMsg("dbext timer is already active, aborting timer start")
+        endif
+    else
+        call s:DB_warningMsg("dbext Vim was not compiled with job support")
+    endif
+endfunction
+function! dbext#DB_jobTimerStop()
+    if s:dbext_job_support == 1
+        if exists('s:dbext_job_timer_id')
+            call timer_stop(s:dbext_job_timer_id)
+            let s:dbext_job_timer_id = 0
+            call s:DB_infoMsg("dbext job timer cancelled after " . string(s:dbext_job_elapsed) . " ms")
+        else
+            call s:DB_warningMsg("dbext no active timer")
+        endif
+    else
+        call s:DB_warningMsg("dbext Vim was not compiled with job support")
+    endif
+endfunction
+"}}}
 " switchToBuffer {{{
 function! s:DB_switchToBuffer(buf_name, buf_file, get_buf_nr_name)
     " Retieve this value before we switch buffers
@@ -7428,6 +7697,7 @@ function! s:DB_addToResultBuffer(output, do_clear)
     " Store current window number so we can return to it
     " let cur_winnr      = winnr()
     let res_buf_name   = s:DB_resBufName()
+    let res_bufnr      = 0
     let conn_props     = s:DB_getTitle()
     let dbi_orient     = s:DB_get('DBI_orientation')
 
@@ -7435,6 +7705,7 @@ function! s:DB_addToResultBuffer(output, do_clear)
 
     " Open buffer in required location
     if s:DB_switchToBuffer(res_buf_name, res_buf_name, 'result_bufnr') == 1
+        let res_bufnr      = bufnr('%')
         nnoremap <buffer> <silent> R   :DBResultsRefresh<cr>
         nnoremap <buffer> <silent> O   :DBOrientationToggle<cr>
         nnoremap <buffer> <silent> dd  :call dbext#DB_removeVariable()<CR>
@@ -7521,7 +7792,7 @@ function! s:DB_addToResultBuffer(output, do_clear)
         call s:DB_warningMsg("dbext: No previous window")
     endif
 
-    return
+    return res_bufnr
 endfunction "}}}
 " Parsers {{{
 function! dbext#DB_parseQuery(query)

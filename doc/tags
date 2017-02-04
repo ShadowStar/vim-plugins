@@ -1065,15 +1065,15 @@ dbext-in-mappings	dbext.txt	/*dbext-in-mappings*
 dbext-install	dbext.txt	/*dbext-install*
 dbext-integration	dbext.txt	/*dbext-integration*
 dbext-intellisense	dbext.txt	/*dbext-intellisense*
+dbext-job	dbext.txt	/*dbext-job*
 dbext-list-objects	dbext.txt	/*dbext-list-objects*
-dbext-mappings	dbext.txt	/*dbext-mappings*
+dbext-maps-commands	dbext.txt	/*dbext-maps-commands*
 dbext-modelines	dbext.txt	/*dbext-modelines*
 dbext-new	dbext.txt	/*dbext-new*
 dbext-newdb	dbext.txt	/*dbext-newdb*
 dbext-omni-completion	dbext.txt	/*dbext-omni-completion*
 dbext-overview	dbext.txt	/*dbext-overview*
 dbext-prompting	dbext.txt	/*dbext-prompting*
-dbext-sourceforge	dbext.txt	/*dbext-sourceforge*
 dbext-tutorial	dbext.txt	/*dbext-tutorial*
 dbext-tutorial-completion	dbext.txt	/*dbext-tutorial-completion*
 dbext-tutorial-connection	dbext.txt	/*dbext-tutorial-connection*

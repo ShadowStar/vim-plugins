@@ -1,11 +1,11 @@
 " dbext.vim - Commn Database Utility
 " Copyright (C) 2002-16, Peter Bagyinszki, David Fishburn
 " ---------------------------------------------------------------
-" Version:       24.00
+" Version:       25.00
 " Maintainer:    David Fishburn <dfishburn dot vim at gmail dot com>
 " Authors:       Peter Bagyinszki <petike1 at dpg dot hu>
 "                David Fishburn <dfishburn dot vim at gmail dot com>
-" Last Modified: 2016 Sep 09
+" Last Modified: 2017 Jan 27
 " Based On:      sqlplus.vim (author: Jamis Buck)
 " Created:       2002-05-24
 " Homepage:      http://vim.sourceforge.net/script.php?script_id=356
@@ -40,7 +40,7 @@ if v:version < 702
     echomsg "dbext: Version 22.00 or higher requires Vim7.2 or higher.  Version 21.00 can stil be used with Vim 7.1 and lower."
     finish
 endif
-let g:loaded_dbext = 2400
+let g:loaded_dbext = 2500
 
 " Turn on support for line continuations when creating the script
 let s:cpo_save = &cpo
@@ -70,6 +70,10 @@ if !exists('g:dbext_map_or_cmd')
     endif
 endif
 
+if !exists('g:dbext_default_use_jobs')
+    let g:dbext_default_use_jobs = 1
+endif
+
 " Commands {{{
 command! -nargs=+ DBExecSQL         :call dbext#DB_execSql(<q-args>)
 command! -nargs=+ DBExecSQLTopX     :call dbext#DB_execSqlTopX(<q-args>)
@@ -80,6 +84,10 @@ command! -nargs=0 DBCommit          :call dbext#DB_commit()
 command! -nargs=0 DBRollback        :call dbext#DB_rollback()
 command! -nargs=0 DBListConnections :call dbext#DB_getListConnections()
 command! -nargs=0 DBProfilesRefresh :call dbext#DB_buildLists()
+command! -nargs=* -complete=customlist,DB_completeJobStop DBJobStop         :call dbext#DB_jobStop(<q-args>)
+command! -nargs=0 DBJobStatus       :call dbext#DB_jobStatus()
+command! -nargs=0 DBJobTimerStop    :call dbext#DB_jobTimerStop()
+command! -nargs=0 DBJobTimerStart   :call dbext#DB_jobTimerStart()
 command! -range -nargs=0 DBExecRangeSQL <line1>,<line2>call dbext#DB_execRangeSql()
 command! -nargs=+ Call              :call dbext#DB_execSql("call " . <q-args>)
 command! -nargs=+ -complete=customlist,dbext#DB_completeTables Select            :call dbext#DB_execSql("select " . <q-args>)
@@ -580,6 +588,10 @@ function! DB_checkModeline()
     let @/ = saveSearch
     call cursor(saveLine, saveCol)
     return rc
+endfunction
+
+function! DB_completeJobStop(ArgLead, CmdLine, CursorPos)
+    return filter(["term", "hup", "quit", "int", "kill"], "v:val =~ '^" . a:ArgLead . "'")
 endfunction
 
 augroup dbext
