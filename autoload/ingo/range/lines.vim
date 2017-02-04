@@ -1,14 +1,30 @@
 " ingo/range/Lines.vim: Functions for retrieving line numbers of ranges.
 "
 " DEPENDENCIES:
+"   - ingo/cmdsargs/pattern.vim autoload script
 "   - ingo/range.vim autoload script
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.005	23-Dec-2016	ingo#range#lines#Get(): If the range is a
+"				backwards-looking ?{pattern}?, we need to
+"				attempt the match on any line with :global/^/...
+"				Else, the border behavior is inconsistent:
+"				ranges that extend the passed range at the
+"				bottom are (partially) included, but ranges that
+"				extend at the front would not be.
+"   1.029.004	07-Dec-2016	ingo#range#lines#Get(): A single
+"				(a:isGetAllRanges = 0) /.../ range already
+"				clobbers the last search pattern. Save and
+"				restore if necessary, and base
+"				didClobberSearchHistory on that check.
+"				ingo#range#lines#Get(): Drop the ^ anchor for
+"				the range check to also detect /.../ as the
+"				end of the range.
 "   1.023.003	26-Dec-2014	ENH: Add a:isGetAllRanges optional argument to
 "				ingo#range#lines#Get().
 "   1.022.002	23-Sep-2014	ingo#range#lines#Get() needs to consider and
@@ -70,23 +86,34 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
     let l:recordedLines = {}
     let l:startLines = []
     let l:endLines = []
+    let l:save_search = @/
+    let l:didClobberSearchHistory = 0
 
-    if l:isGetAllRanges && a:range =~# '^[/?]'
+    if l:isGetAllRanges && a:range =~# '[/?]'
 	" For patterns, we need :global to find _all_ (not just the first)
 	" matching ranges. For that, folds must be open / disabled. And because
 	" of that, the actual ranges must be determined first.
 	let l:save_foldenable = &l:foldenable
 	setlocal nofoldenable
+
+	let l:searchRange = a:range
+	if ingo#cmdargs#pattern#RawParse(a:range, [''], '\s*[,;]\s*\S.*')[0] ==# '?'
+	    " If this is a simple /{pattern}/, we can just match that with
+	    " :global. But for actual ranges, these should extend both upwards
+	    " (?foo?,/bar/) as well as downwards (/foo/,/bar/). To handle the
+	    " former, we must make :global attempt a match at any line.
+	    let l:searchRange = '/^/' . a:range
+	endif
+
 	try
 	    execute printf('silent! %d,%dglobal %s call <SID>RecordLines(l:recordedLines, l:startLines, l:endLines, %d, %d)',
 	    \  l:startLnum, l:endLnum,
-	    \  a:range,
+	    \  l:searchRange,
 	    \  l:startLnum, l:endLnum
 	    \)
 	finally
 	    let &l:foldenable = l:save_foldenable
 	endtry
-	let l:didClobberSearchHistory = 1
     else
 	" For line number, marks, etc., we can just record them (limited to
 	" those that fall into the command's range).
@@ -94,7 +121,11 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 	\  a:range,
 	\  l:startLnum, l:endLnum
 	\)
-	let l:didClobberSearchHistory = 0
+    endif
+
+    if @/ !=# l:save_search
+	let @/ = l:save_search
+	let l:didClobberSearchHistory = 1
     endif
 
     return [l:recordedLines, l:startLines, l:endLines, l:didClobberSearchHistory]

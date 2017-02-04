@@ -83,6 +83,66 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.029	24-Jan-2017
+- CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
+  before the comment prefix. Change its implementation to just erase the
+  prefix itself.
+- Add ingo#comments#SplitIndentAndText() to provide what
+  ingo#comments#RemoveCommentPrefix() was previously used to: The line broken
+  into indent (before, after, and with the comment prefix), and the remaining
+  text.
+- Add ingo#indent#Split(), a simpler version of
+  ingo#comments#SplitIndentAndText().
+- Add ingo#fs#traversal#FindFirstContainedInUpDir().
+- ingo#range#lines#Get(): A single (a:isGetAllRanges = 0) /.../ range already
+  clobbers the last search pattern. Save and restore if necessary, and base
+  didClobberSearchHistory on that check.
+- ingo#range#lines#Get(): Drop the ^ anchor for the range check to also detect
+  /.../ as the end of the range.
+- Add ingo#cmdargs#register#ParsePrependedWritableRegister() alternative to
+  ingo#cmdargs#register#ParseAppendedWritableRegister().
+- BUG: Optional a:position argument to ingo#window#preview#SplitToPreview() is
+  mistakenly truncated to [1:2]. Inline the l:cursor and l:bufnr variables;
+  they are only used in the function call, anyway.
+- Add ingo/str/find.vim module.
+- Add ingo/str/fromrange.vim module.
+- Add ingo#pos#SameLineIs[OnOr]After/Before() variants.
+- Add ingo/regexp/build.vim module.
+- Add ingo#err#SetAndBeep().
+- FIX: ingo#query#get#Char() does not beep when validExpr is given and invalid
+  character pressed.
+- Add ingo#query#get#ValidChar() variant that loops until a valid character
+  has been pressed.
+- Add ingo/range/invert.vim module.
+- Add ingo/line/replace.vim and ingo/lines/replace.vim modules.
+- Extract ingo#range#merge#FromLnums() from ingo#range#merge#Merge().
+- ingo#range#lines#Get(): If the range is a backwards-looking ?{pattern}?, we
+  need to attempt the match on any line with :global/^/... Else, the border
+  behavior is inconsistent: ranges that extend the passed range at the bottom
+  are (partially) included, but ranges that extend at the front would not be.
+- Add ingo/math.vim, ingo/binary.vim and ingo/list/split.vim modules.
+- Add ingo#comments#SplitAll(), a more powerful variant of
+  ingo#comments#SplitIndentAndText().
+- Add ingo#compat#systemlist().
+- Add ingo#escape#OnlyUnescaped().
+- Add ingo#msg#ColoredMsg() and ingo#msg#ColoredStatusMsg().
+- Add ingo/query/recall.vim module.
+- Add ingo#register#GetAsList().
+- FIX: ingo#format#Format(): An invalid %0$ references the last passed
+  argument instead of yielding the empty string (as [argument-index$] is
+  1-based). Add bounds check to avoid that
+- FIX: ingo#format#Format(): Also support escaping via "%%", as in printf().
+- Add ingo#subst#FirstSubstitution(), ingo#subst#FirstPattern(),
+  ingo#subst#FirstParameter().
+- Add ingo#regexp#collection#Expr().
+- BUG: ingo#regexp#magic#Normalize() also processes the contents of
+  collections [...]; especially the escaping of "]" wreaks havoc on the
+  pattern. Rename s:ConvertMagicness() into
+  ingo#regexp#magic#ConvertMagicnessOfElement() and introduce intermediate
+  s:ConvertMagicnessOfFragment() that first separates collections from other
+  elements and only invokes the former on those other elements.
+- Add ingo#collections#fromsplit#MapItemsAndSeparators().
+
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
   ingo#cmdargs#pattern#ParseUnescaped() and
@@ -618,7 +678,7 @@ First published version as separate shared library.
 Started development of shared autoload functionality.
 
 ==============================================================================
-Copyright: (C) 2009-2016 Ingo Karkat
+Copyright: (C) 2009-2017 Ingo Karkat
 Contains URL encoding / decoding algorithms written by Tim Pope.
 The VIM LICENSE applies to this plugin; see |copyright|.
 
