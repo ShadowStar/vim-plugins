@@ -1,7 +1,7 @@
 " File: update-last.vim
 " Author: ShadowStar, <orphen.leiliu@gmail.com>
 " Create Time: 2013-12-04 19:36:21 CST
-" Last Change: 02/09/2017 12:13:57
+" Last Change: 03/01/2017 14:03:56
 " Description: Automatic update Last Change time & author
 
 if exists("g:loaded_update_last")
@@ -74,7 +74,7 @@ fun s:Update_last_time()
     let line_num = search('\<' . s:time_stamp_leader . '\c', '', s:end_line)
     if line_num > 0
         let line = getline(line_num)
-        let line = substitute(line, s:time_stamp_leader . '\c\zs.*', ' ' . strftime(s:time_format), '')
+        let line = substitute(line, s:time_stamp_leader . '\s*\c\zs.*', strftime(s:time_format), '')
         call setline(line_num, line)
     endif
     silent exe 'language time ' . save_lang
@@ -107,10 +107,10 @@ fun s:Update_last_author()
     let pos = line('.').' | normal! '.virtcol('.').'|'
     exe s:begin_line
     for auth in s:author_stamp_leader
-        let line_num = search('\<' . auth.'\c', '', s:end_line)
+        let line_num = search('\<' . auth. '\c', '', s:end_line)
         if line_num > 0
             let line = getline(line_num)
-            let line = substitute(line, auth . '\c\zs.*', ' '.author, '')
+            let line = substitute(line, auth . '\s*\c\zs.*', author, '')
             call setline(line_num, line)
         endif
     endfor
@@ -120,7 +120,7 @@ fun s:Update_last_author()
             let line_num = search('\<' . company . '\c', '', s:end_line)
             if line_num > 0
                 let line = getline(line_num)
-                let line = substitute(line, company . '\c\zs.*', ' '.com, '')
+                let line = substitute(line, company . '\s*\c\zs.*', com, '')
                 call setline(line_num, line)
             endif
         endfor
