@@ -2980,7 +2980,7 @@ function! s:PrepareStdTempl ( cmds, text, name )
 			let m_local.PICK     = file
 			let m_local.PATH     = fnamemodify ( file, ':h'   )
 			let m_local.FILENAME = fnamemodify ( file, ':t'   )
-			let m_local.BASENAME = fnamemodify ( file, ':t:r' )
+			let m_local.BASENAME = fnamemodify ( file, ':t:r:gs?-?_?' )
 			let m_local.SUFFIX   = fnamemodify ( file, ':e'   )
 			"
 		elseif f_name == 'PickEntry'
@@ -3397,7 +3397,7 @@ endfunction    " ----------  end of function s:PrepareTemplate  ----------
 
 function! s:RenewStdMacros ( to_list, from_list )
 
-	let a:to_list[ 'BASENAME' ] = expand( '%:t:r' )
+	let a:to_list[ 'BASENAME' ] = expand( '%:t:r:gs?-?_?' )
 	let a:to_list[ 'FILENAME' ] = expand( '%:t'   )
 	let a:to_list[ 'PATH'     ] = expand( '%:p:h' )
 	let a:to_list[ 'SUFFIX'   ] = expand( '%:e'   )
