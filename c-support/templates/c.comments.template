@@ -83,6 +83,10 @@
  *
  * =====================================================================================
  */
+#ifndef __|?BASENAME:u|_INC__
+#define __|BASENAME:u|_INC__
+<SPLIT>
+#endif   /* ----- end of header file __|BASENAME:u|_INC__  ----- */
 == ENDTEMPLATE ==
 
 == LIST: comments_c_sections == hash ==
