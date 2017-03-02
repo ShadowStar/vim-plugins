@@ -1,7 +1,7 @@
 " ============================================================================
 " File:        reco.vim
 " Description: Reco automates Vim recovery from swap file process
-" Maintainer:  Mirek Malinowski <malinowski.miroslaw@yahoo.com>
+" Maintainer:  ShadowStar, <orphen.leiliu@gmail.com>
 " License:     GPLv2+ -- look it up.
 "
 " ============================================================================
@@ -31,9 +31,9 @@ endfunction
 
 function! Reco_SwapCmd()
 let _escape_file = substitute(expand("<afile>:p"),"/","\\\\%","g")
-exe "silent! !cp -u <afile> ".g:_reco_dir."/"._escape_file
+exe "silent! ![ \"".g:_reco_dir."/"._escape_file."\" -ot \"<afile>\" ] && cp <afile> ".g:_reco_dir."/"._escape_file
 let g:_recover_swap = substitute(v:swapname,"/","\\\\%","g")
-exe "silent! !cp -u ".v:swapname." ".g:_reco_dir."/".g:_recover_swap
+exe "silent! ![ \"".g:_reco_dir."/".g:_recover_swap."\" -ot \"".v:swapname."\" ] && cp ".v:swapname." ".g:_reco_dir."/".g:_recover_swap
 let v:swapchoice = 'd'
 call extend(g:_reco_cleanup,[g:_recover_swap,_escape_file])
 au Reco VimLeavePre * :call Reco_CleanUp()
