@@ -174,6 +174,12 @@
 :AcpEnable	acp.txt	/*:AcpEnable*
 :AcpLock	acp.txt	/*:AcpLock*
 :AcpUnlock	acp.txt	/*:AcpUnlock*
+:AddCToBuffer	add-git-managed-file-to-buffer.txt	/*:AddCToBuffer*
+:AddCToTab	add-git-managed-file-to-buffer.txt	/*:AddCToTab*
+:AddMToBuffer	add-git-managed-file-to-buffer.txt	/*:AddMToBuffer*
+:AddMToTab	add-git-managed-file-to-buffer.txt	/*:AddMToTab*
+:AddUToBuffer	add-git-managed-file-to-buffer.txt	/*:AddUToBuffer*
+:AddUToTab	add-git-managed-file-to-buffer.txt	/*:AddUToTab*
 :AnsiEsc	AnsiEsc.txt	/*:AnsiEsc*
 :ArrangeColumn	ft-csv.txt	/*:ArrangeColumn*
 :CMake	toolboxcmake.txt	/*:CMake*
@@ -307,6 +313,7 @@
 :NERDTreeFromBookmark	NERD_tree.txt	/*:NERDTreeFromBookmark*
 :NERDTreeMirror	NERD_tree.txt	/*:NERDTreeMirror*
 :NERDTreeToggle	NERD_tree.txt	/*:NERDTreeToggle*
+:OpenAllBuffersInTab	add-git-managed-file-to-buffer.txt	/*:OpenAllBuffersInTab*
 :PatchReview	patchreview.txt	/*:PatchReview*
 :ReversePatchReview	patchreview.txt	/*:ReversePatchReview*
 :SrcExpl	srcexpl.txt	/*:SrcExpl*
@@ -747,6 +754,12 @@ acp-snipMate	acp.txt	/*acp-snipMate*
 acp-thanks	acp.txt	/*acp-thanks*
 acp-usage	acp.txt	/*acp-usage*
 acp.txt	acp.txt	/*acp.txt*
+add-git-managed-file-to-buffer	add-git-managed-file-to-buffer.txt	/*add-git-managed-file-to-buffer*
+add-git-managed-file-to-buffer-commnads	add-git-managed-file-to-buffer.txt	/*add-git-managed-file-to-buffer-commnads*
+add-git-managed-file-to-buffer-contents	add-git-managed-file-to-buffer.txt	/*add-git-managed-file-to-buffer-contents*
+add-git-managed-file-to-buffer-interface	add-git-managed-file-to-buffer.txt	/*add-git-managed-file-to-buffer-interface*
+add-git-managed-file-to-buffer-introduction	add-git-managed-file-to-buffer.txt	/*add-git-managed-file-to-buffer-introduction*
+add-git-managed-file-to-buffer.txt	add-git-managed-file-to-buffer.txt	/*add-git-managed-file-to-buffer.txt*
 asa	dbext.txt	/*asa*
 ase	dbext.txt	/*ase*
 autocomplpop	acp.txt	/*autocomplpop*
