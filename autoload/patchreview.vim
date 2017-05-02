@@ -1,13 +1,23 @@
 " VIM plugin for doing single, multi-patch or diff code reviews             {{{
 " Home:  http://www.vim.org/scripts/script.php?script_id=1563
 
-" Version       : 1.2.1                                                     {{{
+" Version       : 1.3.0                                                     {{{
 " Author        : Manpreet Singh < junkblocker@yahoo.com >
-" Copyright     : 2006-2015 by Manpreet Singh
+" Copyright     : 2006-2017 by Manpreet Singh
 " License       : This file is placed in the public domain.
 "                 No warranties express or implied. Use at your own risk.
 "
 " Changelog : {{{
+"
+"   1.3.0 - Added g:patchreview_foldlevel setting
+"         - Added g:patchreview_disable_syntax control syntax highlighting
+"         - Prevent most autocmds from executing during plugin execution
+"         - Add dein.vim & consolidate install instructions
+"         - Linting, README and help fixes and improvements
+"         - Fix and enhance the notification example
+"         - Fix DiffReview count style invocation
+"         - ignore shell error for bzr diff as it returns 1 on differences
+"           (lutostag)
 "
 "   1.2.1 - Added pathogen instructions (Daniel Lobato García)
 "           Fixed subversion support (wilywampa, Michael Leuchtenburg)
@@ -109,6 +119,10 @@ let s:vsplit = get(g:, 'patchreview_split_right', 0)
       \ ? 'vertical rightbelow'
       \ : 'vertical leftabove'
 
+let s:disable_syntax = get(g:, 'patchreview_disable_syntax', 1)
+
+let s:foldlevel = get(g:, 'patchreview_foldlevel', 0)
+
 let s:modules = {}
 " }}}
 " Functions {{{
@@ -207,7 +221,7 @@ endfunction
 " }}}
 " }}}
 function! s:me.progress(str)                                                 "{{{
-  " call s:me.debug(a:str)
+  call s:me.debug(a:str)
   if ! &cmdheight
     return
   endif
@@ -216,7 +230,7 @@ function! s:me.progress(str)                                                 "{{
 endfunction
 " }}}
 function! s:me.debug(str)                                                  "{{{
-  if exists('g:patchreview_debug')
+  if exists('g:patchreview_debug') && g:patchreview_debug
     call s:me.buflog('DEBUG: ' . a:str)
   endif
 endfunction
@@ -225,18 +239,18 @@ function! s:wipe_message_buffer()                                            "{{
   let l:cur_tabnr = tabpagenr()
   let l:cur_winnr = winnr()
   if exists('s:origtabpagenr')
-    exe 'tabnext ' . s:origtabpagenr
+    noautocmd exe 'tabnext ' . s:origtabpagenr
   endif
   let l:winnum = bufwinnr(s:msgbufname)
   if l:winnum != -1 " If the window is already open, jump to it
     if winnr() != l:winnum
-      exe l:winnum . 'wincmd w'
+      noautocmd exe l:winnum . 'wincmd w'
       bw
     endif
   endif
-  exe 'tabnext ' . l:cur_tabnr
+  noautocmd exe 'tabnext ' . l:cur_tabnr
   if winnr() != l:cur_winnr
-    exe l:cur_winnr . 'wincmd w'
+    noautocmd exe l:cur_winnr . 'wincmd w'
   endif
 endfunction
 "}}}
@@ -247,7 +261,7 @@ function! s:me.buflog(...)                                                   "{{
   let l:cur_tabnr = tabpagenr()
   let l:cur_winnr = winnr()
   if exists('s:msgbuftabnr')
-    exe 'tabnext ' . s:msgbuftabnr
+    noautocmd exe 'tabnext ' . s:msgbuftabnr
   else
     let s:msgbuftabnr = tabpagenr()
   endif
@@ -258,12 +272,12 @@ function! s:me.buflog(...)                                                   "{{
   let l:winnum = bufwinnr(s:msgbufname)
   if l:winnum != -1 " If the window is already open, jump to it
     if winnr() != l:winnum
-      exe l:winnum . 'wincmd w'
+      noautocmd exe l:winnum . 'wincmd w'
     endif
   else
     let l:bufnum = bufnr(s:msgbufname)
     let l:wcmd = l:bufnum == -1 ? s:msgbufname : '+buffer' . l:bufnum
-    exe 'silent! botright 5split ' . l:wcmd
+    noautocmd exe 'silent! botright 5split ' . l:wcmd
     let s:msgbuftabnr = tabpagenr()
     setlocal buftype=nofile
     setlocal bufhidden=delete
@@ -283,11 +297,11 @@ function! s:me.buflog(...)                                                   "{{
   endif
   normal! G
   setlocal nomodifiable
-  exe l:msgtab_orgwinnr . 'wincmd w'
+  noautocmd exe l:msgtab_orgwinnr . 'wincmd w'
   if a:0 == 1 ||  a:0 > 1 && a:2 != 0
-    exe ':tabnext ' . l:cur_tabnr
+    noautocmd exe ':tabnext ' . l:cur_tabnr
     if l:cur_winnr != -1 && winnr() != l:cur_winnr
-      exe l:cur_winnr . 'wincmd w'
+      noautocmd exe l:cur_winnr . 'wincmd w'
     endif
   endif
 endfunction
@@ -312,7 +326,7 @@ function! s:check_binary(binary_name)                                 "{{{
 endfunction
 "}}}
 function! s:guess_prefix_strip_value(diff_file_path, default_strip) " {{{
-  " call s:me.debug("Trying to guess strip level for " . a:diff_file_path . " with " .a:default_strip . " as default")
+  call s:me.debug("Trying to guess strip level for " . a:diff_file_path . " with " .a:default_strip . " as default")
   if stridx(a:diff_file_path, '/') != -1
     let l:splitchar = '/'
   elseif stridx(a:diff_file_path, '\') !=  -1
@@ -326,24 +340,26 @@ function! s:guess_prefix_strip_value(diff_file_path, default_strip) " {{{
     if len(l:path) >= i
       if filereadable(join(['.'] + l:path[i : ], l:splitchar))
         let s:guess_strip[i] += 1
-        " call s:me.debug("Guessing strip: " . i)
+        call s:me.debug("Guessing strip: " . i)
         return
       endif
     endif
     let i = i + 1
   endwhile
-  " call s:me.debug("REALLY Guessing strip: " . a:default_strip)
+  call s:me.debug("REALLY Guessing strip: " . a:default_strip)
   let s:guess_strip[a:default_strip] += 1
 endfunction
 " }}}
-function s:is_bsd() " {{{
+function! s:is_bsd() " {{{
   return filereadable('/etc/rc.subr')
 endfunction
 " }}}
 function! s:state(...)  " For easy manipulation of diff parsing state {{{
   if a:0 != 0
+    if ! exists('s:PARSE_STATE') || s:PARSE_STATE != a:1
+      call s:me.debug('Set PARSE_STATE: ' . a:1)
+    endif
     let s:PARSE_STATE = a:1
-    " call s:me.debug('Set PARSE_STATE: ' . a:1)
   else
     if ! exists('s:PARSE_STATE')
       let s:PARSE_STATE = 'START'
@@ -382,7 +398,6 @@ function! patchreview#get_patchfile_lines(patchfile)                      " {{{
   let l:patchfile = expand(a:patchfile, ":p")
   if ! filereadable(expand(l:patchfile))
     throw "File " . l:patchfile . " is not readable"
-    return
   endif
   return readfile(l:patchfile, 'b')
 endfunction
@@ -391,7 +406,7 @@ function! s:me.generate_diff(shell_escaped_cmd)                            "{{{
   let l:diff = []
   let v:errmsg = ''
   let l:cout = system(a:shell_escaped_cmd)
-  if v:errmsg != '' || v:shell_error
+  if v:errmsg != '' || v:shell_error && split(a:shell_escaped_cmd)[0] != 'bzr'
     call s:me.buflog(v:errmsg)
     call s:me.buflog('Could not execute [' . a:shell_escaped_cmd . ']')
     if v:shell_error
@@ -405,7 +420,7 @@ function! s:me.generate_diff(shell_escaped_cmd)                            "{{{
 endfunction
 " }}}
 function! patchreview#extract_diffs(lines, default_strip_count)            "{{{
-  " call s:me.debug("patchreview#extract_diffs called with default_strip_count " . a:default_strip_count)
+  call s:me.debug("patchreview#extract_diffs called with default_strip_count " . a:default_strip_count)
   " Sets g:patches = {'fail':'', 'patch':[
   " {
   "  'filename': filepath
@@ -431,11 +446,20 @@ function! patchreview#extract_diffs(lines, default_strip_count)            "{{{
   "
   let l:collect = []
   let l:line_num = 0
+  let l:p_first_file = ''
+  let l:o_count = -1
+  let l:n_count = -1
+  let l:c_count = -1
+  let l:goal_count = -1
+  let l:old_goal_count = -1
+  let l:new_goal_count = -1
+  let l:p_type = ''
+  let l:filepath = ''
   let l:linescount = len(a:lines)
   call s:state('START')
   while l:line_num < l:linescount
     let l:line = a:lines[l:line_num]
-    " call s:me.debug(l:line)
+    call s:me.debug('|' . l:line . '|')
     let l:line_num += 1
     if l:line =~ '^#'
       continue
@@ -497,7 +521,7 @@ function! patchreview#extract_diffs(lines, default_strip_count)            "{{{
           let l:filepath = l:p_second_file
         endif
       endif
-      " call s:me.debug('l:p_type ' . l:p_type)
+      call s:me.debug('l:p_type ' . l:p_type)
       call s:me.progress('Collecting ' . l:filepath)
       call s:state('EXPECT_15_STARS')
       let l:collect += [l:line]
@@ -526,8 +550,8 @@ function! patchreview#extract_diffs(lines, default_strip_count)            "{{{
       if l:line !~ '^[ !+-] .*$'
         let l:mat = matchlist(l:line, '^--- \(\d\+\),\(\d\+\) ----$')
         if ! empty(l:mat) && l:mat[1] != '' && l:mat[2] != ''
-          let goal_count = l:mat[2] - l:mat[1] + 1
-          let c_count = 0
+          let l:goal_count = l:mat[2] - l:mat[1] + 1
+          let l:c_count = 0
           call s:state('READ_CONTEXT_CHUNK')
           let l:collect += [l:line]
           continue
@@ -540,8 +564,8 @@ function! patchreview#extract_diffs(lines, default_strip_count)            "{{{
       continue
       " }}}
     elseif s:state() == 'READ_CONTEXT_CHUNK' " {{{
-      let c_count += 1
-      if c_count == goal_count
+      let l:c_count += 1
+      if l:c_count == l:goal_count
         let l:collect += [l:line]
         call s:state('BACKSLASH_OR_CRANGE_EOF')
         continue
@@ -670,6 +694,7 @@ function! patchreview#extract_diffs(lines, default_strip_count)            "{{{
           let l:o_count = 0
           let l:n_count = 0
           let l:collect += [l:line]
+          call s:me.debug("Will collect another unified chunk")
           continue
         endif
         let l:this_patch = {'filename': l:filepath, 'type': l:p_type, 'content': l:collect}
@@ -710,7 +735,7 @@ function! patchreview#extract_diffs(lines, default_strip_count)            "{{{
   "call s:me.buflog(s:state())
   if (
         \ (s:state() == 'READ_CONTEXT_CHUNK'
-        \  && c_count == goal_count
+        \  && l:c_count == l:goal_count
         \ ) ||
         \ (s:state() == 'READ_UNIFIED_CHUNK'
         \  && l:n_count == l:new_goal_count
@@ -815,7 +840,7 @@ function! s:wiggle(out, rej) " {{{
   endif
   let l:wiggle_out = s:temp_name()
   let v:errmsg = ''
-  let l:cout = system('wiggle --merge ' . shellescape(a:out) . ' ' . shellescape(a:rej) . ' > ' . shellescape(l:wiggle_out))
+  call system('wiggle --merge ' . shellescape(a:out) . ' ' . shellescape(a:rej) . ' > ' . shellescape(l:wiggle_out))
   if v:errmsg != '' || v:shell_error
     call s:me.buflog('ERROR: wiggle was not completely successful.')
     if v:errmsg != ''
@@ -826,9 +851,11 @@ function! s:wiggle(out, rej) " {{{
     " modelines in loaded files mess with diff comparison
     let s:keep_modeline=&modeline
     let &modeline=0
-    silent! exe s:vsplit . ' diffsplit ' . fnameescape(l:wiggle_out)
+    noautocmd silent! exe s:vsplit . ' diffsplit ' . fnameescape(l:wiggle_out)
     setlocal noswapfile
-    setlocal syntax=none
+    if s:disable_syntax
+      setlocal syntax=none
+    endif
     setlocal bufhidden=delete
     setlocal nobuflisted
     setlocal modifiable
@@ -839,7 +866,10 @@ function! s:wiggle(out, rej) " {{{
       silent! 0f
     endif
     let &modeline=s:keep_modeline
-    wincmd p
+    if has('folding')
+      let &foldlevel=s:foldlevel
+    endif
+    noautocmd wincmd p
   endif
 endfunction
 " }}}
@@ -853,7 +883,7 @@ function! s:generic_review(argslist)                                   "{{{
   "   arg3 = strip count
 
   " VIM 7+ required
-  if version < 700
+  if v:version < 700
     call s:me.buflog('This plugin needs VIM 7 or higher')
     return
   endif
@@ -919,6 +949,7 @@ function! s:generic_review(argslist)                                   "{{{
     let l:strip_count = eval(a:argslist[1])
   else
     call s:me.buflog('Fatal internal error in patchreview.vim plugin')
+    return
   endif " diff
 
   " Verify that patch command and temporary directory are available or specified
@@ -934,6 +965,7 @@ function! s:generic_review(argslist)                                   "{{{
     let l:defsc = 0
   else
     call s:me.buflog('Fatal internal error in patchreview.vim plugin')
+    return
   endif
   try
     call patchreview#extract_diffs(l:patchlines, l:defsc)
@@ -992,12 +1024,15 @@ function! s:generic_review(argslist)                                   "{{{
       elseif s:reviewmode == 'diff'
         let l:msgtype = 'Removed file    : '
       endif
+    else
+      call s:me.buflog('Fatal internal error in patchreview.vim plugin')
+      return
     endif
     let l:bufnum = bufnr(l:relpath)
     if buflisted(l:bufnum) && getbufvar(l:bufnum, '&mod')
       call s:me.buflog('Old buffer for file [' . l:relpath . '] exists in modified state. Skipping review.')
-      continue
       unlet! patch
+      continue
     endif
     let l:tmp_patch = s:temp_name()
     let l:tmp_patched = s:temp_name()
@@ -1068,7 +1103,7 @@ function! s:generic_review(argslist)                                   "{{{
           if l:pout != ''
             call s:me.buflog('ERROR: ' . l:pout)
           endif
-          call s:me.buflog('ERROR: ' . v:errmsg)
+          call s:me.buflog('ERROR: ' . l:errmsg)
           if filereadable(l:tmp_patched)
             call s:me.buflog('ERROR: Diff partially shown.')
           else
@@ -1079,28 +1114,29 @@ function! s:generic_review(argslist)                                   "{{{
       "if expand('%') == '' && line('$') == 1 && getline(1) == '' && ! &modified && ! &diff
         "silent! exe 'edit ' . l:stripped_rel_path
       "else
-        silent! exe 'tabedit ' . fnameescape(l:stripped_rel_path)
+        noautocmd silent! exe 'tabedit ' . fnameescape(l:stripped_rel_path)
         if filereadable(l:tmp_patched) && l:pout =~ 'Only garbage was found in the patch input'
           topleft new
-          exe 'r ' . fnameescape(l:tmp_patch)
+          noautocmd exe 'r ' . fnameescape(l:tmp_patch)
           normal! gg
           0 delete _
           exe 'file bad_patch_for_' . fnameescape(fnamemodify(l:inputfile, ':t'))
           setlocal nomodifiable nomodified ft=diff bufhidden=delete
                 \ buftype=nofile noswapfile nowrap nobuflisted
-          wincmd p
+          noautocmd wincmd p
         endif
       "endif
-      let l:winnum = winnr()
       if ! error || filereadable(l:tmp_patched)
         let l:filetype = &filetype
         if exists('l:patchcmd')
           " modelines in loaded files mess with diff comparison
           let s:keep_modeline=&modeline
           let &modeline=0
-          silent! exe s:vsplit . ' diffsplit ' . fnameescape(l:tmp_patched)
+          noautocmd silent! exe s:vsplit . ' diffsplit ' . fnameescape(l:tmp_patched)
           setlocal noswapfile
-          setlocal syntax=none
+          if s:disable_syntax
+            setlocal syntax=none
+          endif
           setlocal bufhidden=delete
           setlocal nobuflisted
           setlocal modifiable
@@ -1112,15 +1148,19 @@ function! s:generic_review(argslist)                                   "{{{
           endif
           let &filetype = l:filetype
           let &fdm = 'diff'
-          normal! zM
-          wincmd p
+          if has('folding')
+            let &foldlevel=s:foldlevel
+          endif
+          noautocmd wincmd p
           let &modeline=s:keep_modeline
         else
-          silent! exe s:vsplit . ' new'
+          noautocmd silent! exe s:vsplit . ' new'
           let &filetype = l:filetype
           let &fdm = 'diff'
-          normal! zM
-          wincmd p
+          if has('folding')
+            let &foldlevel=s:foldlevel
+          endif
+          noautocmd wincmd p
         endif
       endif
       if ! filereadable(l:stripped_rel_path)
@@ -1128,9 +1168,11 @@ function! s:generic_review(argslist)                                   "{{{
         " modelines in loaded files mess with diff comparison
         let s:keep_modeline=&modeline
         let &modeline=0
-        silent! exe 'topleft split ' . fnameescape(l:tmp_patch)
+        noautocmd silent! exe 'topleft split ' . fnameescape(l:tmp_patch)
         setlocal noswapfile
-        setlocal syntax=none
+        if s:disable_syntax
+          setlocal syntax=none
+        endif
         setlocal bufhidden=delete
         setlocal nobuflisted
         setlocal modifiable
@@ -1140,14 +1182,17 @@ function! s:generic_review(argslist)                                   "{{{
           setlocal buftype=nofile
           silent! 0f
         endif
-        wincmd p
+        if has('folding')
+          let &foldlevel=s:foldlevel
+        endif
+        noautocmd wincmd p
         let &modeline=s:keep_modeline
       endif
       if filereadable(l:tmp_patched_rej)
         " modelines in loaded files mess with diff comparison
         let s:keep_modeline=&modeline
         let &modeline=0
-        silent! exe 'topleft split ' . fnameescape(l:tmp_patched_rej)
+        noautocmd silent! exe 'topleft split ' . fnameescape(l:tmp_patched_rej)
         " Try to convert rejects to unified format unless explicitly disabled
         if (! exists('g:patchreview_unified_rejects') || g:patchreview_unified_rejects == 1) &&
               \ getline(1) =~ '\m\*\{15}'
@@ -1171,7 +1216,9 @@ function! s:generic_review(argslist)                                   "{{{
           endif
         endif
         setlocal noswapfile
-        setlocal syntax=none
+        if s:disable_syntax
+          setlocal syntax=none
+        endif
         setlocal bufhidden=delete
         setlocal nobuflisted
         setlocal modifiable
@@ -1181,7 +1228,10 @@ function! s:generic_review(argslist)                                   "{{{
           setlocal buftype=nofile
           silent! 0f
         endif
-        wincmd p
+        if has('folding')
+          let &foldlevel=s:foldlevel
+        endif
+        noautocmd wincmd p
         let &modeline=s:keep_modeline
         call s:me.buflog(l:msgtype . '*** REJECTED *** ' . l:relpath)
         call s:wiggle(l:tmp_patched, l:tmp_patched_rej)
@@ -1230,7 +1280,7 @@ function! patchreview#diff_review(...) " {{{
   try
     if a:0 != 0  " :DiffReview some command with arguments
       let l:outfile = s:temp_name()
-      if a:1 =~ '^\d+$'
+      if a:1 =~ '^\d\+$'
         " DiffReview strip_count command
         let l:cmd = join(map(deepcopy(a:000[1:]), 'shellescape(v:val)') + ['>', shellescape(l:outfile)], ' ')
         let l:binary = copy(a:000[1])
@@ -1243,7 +1293,7 @@ function! patchreview#diff_review(...) " {{{
       let v:errmsg = ''
       let l:cout = system(l:cmd)
       if v:errmsg == '' &&
-            \  (a:0 != 0 && l:binary =~ '^\(cvs\|diff\)$')
+            \  (a:0 != 0 && l:binary =~ '^\(cvs\|diff\|bzr\)$')
             \ && v:shell_error == 1
         " Ignoring diff and CVS non-error
       elseif v:errmsg != '' || v:shell_error

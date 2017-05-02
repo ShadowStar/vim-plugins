@@ -1,22 +1,29 @@
 *patchreview.txt* Vim global plugin for doing single, multi-patch or diff code reviews
-                    Version 1.2.1 (for Vim version 7.0 or higher)
+                    Version 1.3.0 (for Vim version 7.0 or higher)
 
                 Author: Manpreet Singh < junkblocker@yahoo.com >
-                   Copyright (C) 2006-2014 by Manpreet Singh
+                   Copyright (C) 2006-2017 by Manpreet Singh
               License : This file is placed in the public domain.
             No warranties express or implied. Use at your own risk.
 
 =============================================================================
 
-CONTENTS                    *patchreview* *diffreview* *patchreview-contents*
+CONTENTS                                               *PatchReview* *DiffReview*
+                                                       *patchreview* *diffreview*
+                                                       *patchreview-contents*
 
   1. Contents.........................................: |patchreview-contents|
   2. Introduction.....................................: |patchreview-intro|
   3. PatchReview Usage................................: |patchreview-usage|
-     4.1 DiffReview Usage.............................: |:DiffReview|
-     4.2 PatchReview Usage............................: |:PatchReview|
-     4.3 ReversePatchReview Usage.....................: |:ReversePatchReview|
+     3.1 DiffReview Usage.............................: |:DiffReview|
+     3.2 PatchReview Usage............................: |:PatchReview|
+     3.3 ReversePatchReview Usage.....................: |:ReversePatchReview|
   4. PatchReview options..............................: |patchreview-options|
+     4.1 Optional path to the "patch" binary..........: |patchreview_patch|
+     4.2 Dealing with DOS line endings................: |patchreview_patch_needs_crlf|
+     4.3 Vertical split direction control.............: |patchreview_split_right|
+     4.4 Hide/show generated .rej files...............: |patchreview_unified_rejects|
+     4.5 Optional path to "wiggle" binary.............: |patchreview_wiggle|
   5. Hooks............................................: |patchreview-hooks|
   6. Adding new version control plugins...............: |patchreview-plugins|
 
@@ -101,12 +108,35 @@ PatchReview Options                                     *patchreview-options*
 
 The following variables are available:
 
+|patchreview_disable_syntax|
+|patchreview_foldlevel|
 |patchreview_patch|
 |patchreview_patch_needs_crlf|
-patchreview_split_right
+|patchreview_split_right|
 |patchreview_unified_rejects|
 |patchreview_wiggle|
 
+                                                *g:patchreview_disable_syntax*
+                                                  *patchreview_disable_syntax*
+  g:patchreview_disable_syntax = {0|1}
+      Optional flag to disable or not disable syntax highlighting in diff buffers.
+      If the value is 0, syntax highlighting is left untouched.
+      Default is 1 for speed.
+
+    Example: >
+           let g:patchreview_disable_syntax = 0
+<
+
+                                                     *g:patchreview_foldlevel*
+                                                       *patchreview_foldlevel*
+  g:patchreview_foldlevel = {number}
+      Optional flag to control the foldlevel of the generated windows independent
+      of any filetype or other foldlevel settings.
+      Default is 0 for Vim's usual behavior.
+
+    Example: >
+           let g:patchreview_disable_syntax = 20    " Almost disable folding
+<
 
                                                         *g:patchreview_patch*
                                                           *patchreview_patch*
@@ -167,7 +197,7 @@ patchreview_split_right
                                                           *patchreview_wiggle*
   g:patchreview_wiggle = {string}
       Optional path to the wiggle ( http://linux.die.net/man/1/wiggle )
-      utility. If specified, |PatchReview| and |ReversePatchReview| commands
+      utility. If specified, |:PatchReview| and |:ReversePatchReview| commands
       use it to create an addition diff when a review fails with some
       conflicts/rejections.
 
@@ -203,15 +233,23 @@ The following hook functions are available:
 
       For example, the following shows a way to use this to
 
-      1. create a way to get notifications when a long review finishes on a
-         Mac OS X machine.
+      1. create an audio notifications when a long review finishes on a Linux
+         or Mac OS X machine.
       2. open the original patch file too when review is completed. >
 
       function NotifyAndOpenOriginalPatchfile(review_kind, ...)
-          system('say ' . fnameescape(a:review_kind) . ' completed.')
+          if executable('espeak') && executable('aplay')
+              call system('espeak --stdout '
+                  \ . shellescape(a:review_kind . ' completed. ')
+                  \ . ' | aplay > /dev/null 2>&1')
+          elseif executable('say')
+              call system('say ' . fnameescape(a:review_kind) . ' completed.')
+          endif
           if a:review_kind =~ 'Patch' && filereadable(a:1)
-              wincmd n
-              exe ":e " . fnameescape(a:1)
+            if expand('%') != '' || line('$') != 1 || getline(1) != '' || &modified
+                wincmd n
+            endif
+            exe 'e ' . fnameescape(a:1)
           endif
       endfunction
       let g:patchreview_postfunc = 'NotifyAndOpenOriginalPatchfile'

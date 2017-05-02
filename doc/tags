@@ -498,6 +498,7 @@ CtrlP	ctrlp.txt	/*CtrlP*
 DBI	dbext.txt	/*DBI*
 DeleteColumn_CSV	ft-csv.txt	/*DeleteColumn_CSV*
 DiffGoFile()	diffgofile.txt	/*DiffGoFile()*
+DiffReview	patchreview.txt	/*DiffReview*
 DiffSwap	reco.txt	/*DiffSwap*
 Duplicate_CSV	ft-csv.txt	/*Duplicate_CSV*
 ExtractSnips()	snipMate.txt	/*ExtractSnips()*
@@ -648,6 +649,7 @@ OmniCpp_SelectFirstItem	omnicppcomplete.txt	/*OmniCpp_SelectFirstItem*
 OmniCpp_ShowAccess	omnicppcomplete.txt	/*OmniCpp_ShowAccess*
 OmniCpp_ShowPrototypeInAbbr	omnicppcomplete.txt	/*OmniCpp_ShowPrototypeInAbbr*
 OmniCpp_ShowScopeInAbbr	omnicppcomplete.txt	/*OmniCpp_ShowScopeInAbbr*
+PatchReview	patchreview.txt	/*PatchReview*
 RDBMS	dbext.txt	/*RDBMS*
 ReloadAllSnippets()	snipMate.txt	/*ReloadAllSnippets()*
 ReloadSnippets()	snipMate.txt	/*ReloadSnippets()*
@@ -1423,6 +1425,8 @@ g:mwHistAdd	mark.txt	/*g:mwHistAdd*
 g:mwIgnoreCase	mark.txt	/*g:mwIgnoreCase*
 g:no_viewdoc_abbrev	viewdoc.txt	/*g:no_viewdoc_abbrev*
 g:no_viewdoc_maps	viewdoc.txt	/*g:no_viewdoc_maps*
+g:patchreview_disable_syntax	patchreview.txt	/*g:patchreview_disable_syntax*
+g:patchreview_foldlevel	patchreview.txt	/*g:patchreview_foldlevel*
 g:patchreview_patch	patchreview.txt	/*g:patchreview_patch*
 g:patchreview_patch_needs_crlf	patchreview.txt	/*g:patchreview_patch_needs_crlf*
 g:patchreview_postfunc	patchreview.txt	/*g:patchreview_postfunc*
@@ -1666,6 +1670,8 @@ patchreview-options	patchreview.txt	/*patchreview-options*
 patchreview-plugins	patchreview.txt	/*patchreview-plugins*
 patchreview-usage	patchreview.txt	/*patchreview-usage*
 patchreview.txt	patchreview.txt	/*patchreview.txt*
+patchreview_disable_syntax	patchreview.txt	/*patchreview_disable_syntax*
+patchreview_foldlevel	patchreview.txt	/*patchreview_foldlevel*
 patchreview_patch	patchreview.txt	/*patchreview_patch*
 patchreview_patch_needs_crlf	patchreview.txt	/*patchreview_patch_needs_crlf*
 patchreview_postfunc	patchreview.txt	/*patchreview_postfunc*
