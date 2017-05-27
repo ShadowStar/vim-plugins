@@ -83,6 +83,54 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.030	26-May-2017
+- Add escaping of additional values to ingo#option#Join() and split into
+  ingo#option#Append() and ingo#option#Prepend().
+- Offer simpler ingo#option#JoinEscaped() and ingo#option#JoinUnescaped() for
+  actual joining of values split via ingo#option#Split() /
+  ingo#option#SplitAndUnescape().
+- Add ingo#str#EndsWith() variant of ingo#fs#path#split#Contains().
+- Add ingo#regexp#comments#GetFlexibleWhitespaceAndCommentPrefixPattern().
+- Add ingo/hlgroup.vim module.
+- Add ingo#cursor#StartInsert() and ingo#cursor#StartAppend().
+- Add ingo/compat/command.vim module.
+- Add ingo#plugin#setting#Default().
+- BUG: ingo#mbyte#virtcol#GetVirtColOfCurrentCharacter() yields wrong values
+  with single-width multibyte characters, and at the beginning of the line
+  (column 1). Need to start with offset 1 (not 0), and account for that
+  (subtract 1) in the final return. Need to check that the virtcol argument
+  will be larger than 0.
+- Add ingo#format#Dict() variant of ingo#format#Format() that only handles
+  identifier placeholders and a Dict containing them.
+- ENH: ingo#format#Format(): Also handle a:fmt without any "%" items without
+  error.
+- Add ingo#compat#DictKey(), as Vim 7.4.1707 now allows using an empty
+  dictionary key.
+- Add ingo#os#IsWindowsShell().
+- Generalize functions into ingo/nary.vim and delegate ingo#binary#...()
+  functions to those. Add ingo/nary.vim module.
+- ENH: ingo#regexp#collection#LiteralToRegexp(): Support inverted collection
+  via optional a:isInvert flag.
+- Add ingo#strdisplaywidth#CutLeft() variant of ingo#strdisplaywidth#strleft()
+  that returns both parts. Same for ingo#strdisplaywidth#strright().
+- CHG: Rename ill-named ingo#strdisplaywidth#pad#Middle() to
+  ingo#strdisplaywidth#pad#Center().
+- Add "real" ingo#strdisplaywidth#pad#Middle() that inserts the padding in the
+  middle of the string / between the two passed string parts.
+- Add ingo#fs#path#split#PathAndName().
+- Add ingo#text#ReplaceChar(), a combination of ingo#text#GetChar(),
+  ingo#text#Remove(), and ingo#text#Insert().
+- Add ingo#err#Command() for an alternative way of passing back [error]
+  commands to be executed.
+- ingo#syntaxitem#IsOnSyntax(): Factor out synstack() emulation into
+  ingo#compat#synstack() and unify similar function variants.
+- ENH: ingo#syntaxitem#IsOnSyntax(): Allow optional a:stopItemPattern to avoid
+  considering syntax items at the bottom of the stack.
+- Add ingo#compat#synstack().
+- Add ingo/dict/count.vim module.
+- Add ingo/digest.vim module.
+- Add ingo#buffer#VisibleList().
+
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
   before the comment prefix. Change its implementation to just erase the

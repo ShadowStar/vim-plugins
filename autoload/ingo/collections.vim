@@ -4,7 +4,7 @@
 "   - ingo/dict.vim autoload script
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2011-2016 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -57,13 +57,16 @@ function! ingo#collections#ToDict( list, ... )
 "* INPUTS:
 "   a:list  List of keys.
 "   a:emptyValue    Optional value for items in a:list that yield an empty
-"		    string, which cannot be uses as a Dictionary key.
+"		    string, which (in Vim versions prior to 7.4.1707) cannot be
+"		    used as a Dictionary key.
 "		    If omitted, empty values are not included in the Dictionary.
 "* RETURN VALUES:
 "   A new Dictionary with keys taken from a:list.
 "* SEE ALSO:
 "   ingo#dict#FromKeys() allows to specify a default value (here hard-coded to
 "   1), but doesn't handle empty keys.
+"   ingo#dict#count#Items() also creates a Dict from a List, and additionally
+"   counts the unique values.
 "******************************************************************************
     let l:dict = {}
     for l:item in a:list
@@ -236,7 +239,8 @@ function! ingo#collections#SeparateItemsAndSeparators( expr, pattern, ... )
 "* INPUTS:
 "   a:expr	Text to be split.
 "   a:pattern	Regular expression that specifies the separator text that
-"		delimits the items.
+"		delimits the items. Will match at least one character, even if
+"		the pattern match is zero-width.
 "   a:keepempty	When the first or last item is empty it is omitted, unless the
 "		{keepempty} argument is given and it's non-zero.
 "		Other empty items are kept when {pattern} matches at least one
