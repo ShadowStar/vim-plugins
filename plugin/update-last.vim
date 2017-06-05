@@ -1,7 +1,7 @@
 " File: update-last.vim
 " Author: ShadowStar, <orphen.leiliu@gmail.com>
 " Create Time: 2013-12-04 19:36:21 CST
-" Last Change: 03/01/2017 14:03:56
+" Last Change: 06/05/2017 14:27:18
 " Description: Automatic update Last Change time & author
 
 if exists("g:loaded_update_last")
@@ -54,7 +54,7 @@ else
     let s:update_enable = g:update_last_enable
 endif
 if !exists('g:update_locale')
-    let s:update_locale = 'en_US.UTF-8'
+    let s:update_locale = Get_Locale()
 else
     let s:update_locale = g:update_locale
 endif
