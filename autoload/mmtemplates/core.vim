@@ -271,7 +271,7 @@ let s:StandardMacros = {
 			\ 'TIME_PRETTY'    : '%X',
 			\ 'YEAR'           : '%Y',
 			\ 'YEAR_PRETTY'    : '%Y',
-			\ 'TIME_LOCALE'    : 'en_US.UTF-8',
+			\ 'TIME_LOCALE'    : Get_Locale(),
 			\ }
 "
 "----------------------------------------------------------------------
