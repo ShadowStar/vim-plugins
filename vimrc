@@ -190,6 +190,17 @@ endif " has("autocmd")
 
 " vim: set fenc=utf-8 tw=80 sw=2 sts=2 et foldmethod=marker :
 
+function! Get_Locale()
+  if match($LANG, "UTF-8$") > 0
+    return 'en_US.UTF-8'
+  else
+    if !empty($LANG)
+      return $LANG
+    else
+      return 'POSIX'
+  endif
+endfunction
+
 " Find file in current directory and edit it.
 function! FindEdit(...)
   if a:0 > 1
