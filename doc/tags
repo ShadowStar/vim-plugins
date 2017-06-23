@@ -170,6 +170,12 @@
 --	tabwins.txt	/*--*
 .snippet	snipMate.txt	/*.snippet*
 .snippets	snipMate.txt	/*.snippets*
+:Ack	ack.txt	/*:Ack*
+:AckAdd	ack.txt	/*:AckAdd*
+:AckFile	ack.txt	/*:AckFile*
+:AckFromSearch	ack.txt	/*:AckFromSearch*
+:AckHelp	ack.txt	/*:AckHelp*
+:AckWindow	ack.txt	/*:AckWindow*
 :AcpDisable	acp.txt	/*:AcpDisable*
 :AcpEnable	acp.txt	/*:AcpEnable*
 :AcpLock	acp.txt	/*:AcpLock*
@@ -287,6 +293,10 @@
 :EasyAlign!	easy_align.txt	/*:EasyAlign!*
 :Errors	syntastic.txt	/*:Errors*
 :Filter	ft-csv.txt	/*:Filter*
+:LAck	ack.txt	/*:LAck*
+:LAckAdd	ack.txt	/*:LAckAdd*
+:LAckHelp	ack.txt	/*:LAckHelp*
+:LAckWindow	ack.txt	/*:LAckWindow*
 :Linediff	linediff.txt	/*:Linediff*
 :LinediffReset	linediff.txt	/*:LinediffReset*
 :LiveEasyAlign	easy_align.txt	/*:LiveEasyAlign*
@@ -420,6 +430,7 @@
 <Plug>TComment_<c-_>s	tcomment.txt	/*<Plug>TComment_<c-_>s*
 <Plug>TComment_ic	tcomment.txt	/*<Plug>TComment_ic*
 <k1>	mark.txt	/*<k1>*
+?:	ack_quick_help.txt	/*?:*
 AND	dbext.txt	/*AND*
 AddColumn_CSV	ft-csv.txt	/*AddColumn_CSV*
 Analyze_CSV	ft-csv.txt	/*Analyze_CSV*
@@ -515,6 +526,7 @@ GundoCredits	gundo.txt	/*GundoCredits*
 GundoIntro	gundo.txt	/*GundoIntro*
 GundoLicense	gundo.txt	/*GundoLicense*
 GundoUsage	gundo.txt	/*GundoUsage*
+H:	ack_quick_help.txt	/*H:*
 HeaderToggle_CSV	ft-csv.txt	/*HeaderToggle_CSV*
 Header_CSV	ft-csv.txt	/*Header_CSV*
 HiColumn_CSV	ft-csv.txt	/*HiColumn_CSV*
@@ -636,6 +648,7 @@ NERD_tree.txt	NERD_tree.txt	/*NERD_tree.txt*
 NewDelimiter_CSV	ft-csv.txt	/*NewDelimiter_CSV*
 NewRecord_CSV	ft-csv.txt	/*NewRecord_CSV*
 NrColumns_CSV	ft-csv.txt	/*NrColumns_CSV*
+O:	ack_quick_help.txt	/*O:*
 ODBC	dbext.txt	/*ODBC*
 OmniCpp_DefaultNamespaces	omnicppcomplete.txt	/*OmniCpp_DefaultNamespaces*
 OmniCpp_DisplayMode	omnicppcomplete.txt	/*OmniCpp_DisplayMode*
@@ -673,6 +686,7 @@ SudoEdit.txt	SudoEdit.txt	/*SudoEdit.txt*
 SudoRead	SudoEdit.txt	/*SudoRead*
 SudoWrite	SudoEdit.txt	/*SudoWrite*
 SumCol_CSV	ft-csv.txt	/*SumCol_CSV*
+T:	ack_quick_help.txt	/*T:*
 Table	ft-csv.txt	/*Table*
 TabwinsAddingNewBuilders	tabwins.txt	/*TabwinsAddingNewBuilders*
 TabwinsBugs	tabwins.txt	/*TabwinsBugs*
@@ -742,6 +756,11 @@ WhatColumn_CSV	ft-csv.txt	/*WhatColumn_CSV*
 ]X	ConflictMotions.txt	/*]X*
 ]x	ConflictMotions.txt	/*]x*
 a=	ConflictMotions.txt	/*a=*
+ack	ack.txt	/*ack*
+ack-author	ack.txt	/*ack-author*
+ack-configuration	ack.txt	/*ack-configuration*
+ack-mappings	ack.txt	/*ack-mappings*
+ack.txt	ack.txt	/*ack.txt*
 acp	acp.txt	/*acp*
 acp-about	acp.txt	/*acp-about*
 acp-author	acp.txt	/*acp-author*
@@ -1308,6 +1327,18 @@ g:Templates_TemplateBrowser	templatesupport.txt	/*g:Templates_TemplateBrowser*
 g:Templates_UsePersonalizationFile	templatesupport.txt	/*g:Templates_UsePersonalizationFile*
 g:ViewDocInfoIndex_{filetype}()	viewdoc.txt	/*g:ViewDocInfoIndex_{filetype}()*
 g:ViewDoc_info_search	viewdoc.txt	/*g:ViewDoc_info_search*
+g:ack_apply_lmappings	ack.txt	/*g:ack_apply_lmappings*
+g:ack_apply_qmappings	ack.txt	/*g:ack_apply_qmappings*
+g:ack_autoclose	ack.txt	/*g:ack_autoclose*
+g:ack_autofold_results	ack.txt	/*g:ack_autofold_results*
+g:ack_default_options	ack.txt	/*g:ack_default_options*
+g:ack_lhandler	ack.txt	/*g:ack_lhandler*
+g:ack_mappings	ack.txt	/*g:ack_mappings*
+g:ack_qhandler	ack.txt	/*g:ack_qhandler*
+g:ack_use_dispatch	ack.txt	/*g:ack_use_dispatch*
+g:ackhighlight	ack.txt	/*g:ackhighlight*
+g:ackpreview	ack.txt	/*g:ackpreview*
+g:ackprg	ack.txt	/*g:ackprg*
 g:acp_behavior	acp.txt	/*g:acp_behavior*
 g:acp_behavior-command	acp.txt	/*g:acp_behavior-command*
 g:acp_behavior-completefunc	acp.txt	/*g:acp_behavior-completefunc*
@@ -1524,6 +1555,7 @@ gitlog-searching	gitlog.txt	/*gitlog-searching*
 gitlog-tree	gitlog.txt	/*gitlog-tree*
 gitlog-usage	gitlog.txt	/*gitlog-usage*
 gitlog.txt	gitlog.txt	/*gitlog.txt*
+go:	ack_quick_help.txt	/*go:*
 gundo.txt	gundo.txt	/*gundo.txt*
 gundo_auto_preview	gundo.txt	/*gundo_auto_preview*
 gundo_close_on_revert	gundo.txt	/*gundo_close_on_revert*
@@ -1540,6 +1572,8 @@ gundo_return_on_revert	gundo.txt	/*gundo_return_on_revert*
 gundo_right	gundo.txt	/*gundo_right*
 gundo_tree_statusline	gundo.txt	/*gundo_tree_statusline*
 gundo_width	gundo.txt	/*gundo_width*
+gv:	ack_quick_help.txt	/*gv:*
+h:	ack_quick_help.txt	/*h:*
 hana	dbext.txt	/*hana*
 i=	ConflictMotions.txt	/*i=*
 i_<Plug>TComment_<c-_><c-_>	tcomment.txt	/*i_<Plug>TComment_<c-_><c-_>*
@@ -1641,6 +1675,7 @@ mmtoolbox#tools#Property()	toolbox.txt	/*mmtoolbox#tools#Property()*
 mmtoolbox#tools#ToolEnabled()	toolbox.txt	/*mmtoolbox#tools#ToolEnabled()*
 multi_snip	snipMate.txt	/*multi_snip*
 mysql	dbext.txt	/*mysql*
+o:	ack_quick_help.txt	/*o:*
 o_[=	ConflictMotions.txt	/*o_[=*
 o_[X	ConflictMotions.txt	/*o_[X*
 o_[x	ConflictMotions.txt	/*o_[x*
@@ -1813,6 +1848,7 @@ syntastic-vim-virtualenv	syntastic.txt	/*syntastic-vim-virtualenv*
 syntastic-ycm	syntastic.txt	/*syntastic-ycm*
 syntastic-zsh	syntastic.txt	/*syntastic-zsh*
 syntastic.txt	syntastic.txt	/*syntastic.txt*
+t:	ack_quick_help.txt	/*t:*
 tabwins.txt	tabwins.txt	/*tabwins.txt*
 taglist-commands	taglist.txt	/*taglist-commands*
 taglist-debug	taglist.txt	/*taglist-debug*
@@ -1978,6 +2014,7 @@ toolboxdoxygen.txt	toolboxdoxygen.txt	/*toolboxdoxygen.txt*
 toolboxmake.txt	toolboxmake.txt	/*toolboxmake.txt*
 trailing-whitespace.txt	trailing-whitespace.txt	/*trailing-whitespace.txt*
 ultralite	dbext.txt	/*ultralite*
+v:	ack_quick_help.txt	/*v:*
 v_<Leader>m	mark.txt	/*v_<Leader>m*
 v_<Leader>r	mark.txt	/*v_<Leader>r*
 v_<Leader>x.	ConflictMotions.txt	/*v_<Leader>x.*
