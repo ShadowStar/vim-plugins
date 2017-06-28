@@ -1586,6 +1586,7 @@ i_<Plug>TComment_<c-_>p	tcomment.txt	/*i_<Plug>TComment_<c-_>p*
 i_<Plug>TComment_<c-_>r	tcomment.txt	/*i_<Plug>TComment_<c-_>r*
 i_<Plug>TComment_<c-_>s	tcomment.txt	/*i_<Plug>TComment_<c-_>s*
 i_CTRL-R_<Tab>	snipMate.txt	/*i_CTRL-R_<Tab>*
+ingo-library-contribute	ingo-library.txt	/*ingo-library-contribute*
 ingo-library-dependencies	ingo-library.txt	/*ingo-library-dependencies*
 ingo-library-description	ingo-library.txt	/*ingo-library-description*
 ingo-library-history	ingo-library.txt	/*ingo-library-history*

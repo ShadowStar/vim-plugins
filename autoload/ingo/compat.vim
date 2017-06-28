@@ -11,6 +11,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.031.023	02-Jun-2017	Add special ingo#compat#synstack to work around
+"				missing patch 7.2.014: synstack() doesn't work
+"				in an empty line.
+"   1.031.022	31-May-2017	Minor: Add forgotten ! to function definition of
+"				ingo#compat#DictKey().
 "   1.030.021	24-May-2017	Add ingo#compat#synstack().
 "   1.030.020	19-Apr-2017	Add ingo#compat#DictKey(), as Vim 7.4.1707 now
 "				allows using an empty dictionary key.
@@ -413,25 +418,33 @@ else
 endif
 
 if exists('*synstack')
-    function! ingo#compat#synstack( lnum, col )
-	return synstack(a:lnum, a:col)
-    endfunction
+    if v:version < 702 || v:version == 702 && ! has('patch14')
+	" 7.2.014: synstack() doesn't work in an empty line
+	function! ingo#compat#synstack( lnum, col )
+	    let l:s =  synstack(a:lnum, a:col)
+	    return (empty(l:s) ? [] : l:s)
+	endfunction
+    else
+	function! ingo#compat#synstack( lnum, col )
+	    return synstack(a:lnum, a:col)
+	endfunction
+    endif
 else
     " As the synstack() function is not available, we can only try to get the
     " actual syntax ID and the one of the syntax item that determines the
     " effective color.
     function! ingo#compat#synstack( lnum, col )
-	return return [synID(a:a:lnum, a:a:col, 1), synID(a:a:lnum, a:a:col, 0)]
+	return [synID(a:lnum, a:col, 1), synID(a:lnum, a:col, 0)]
     endfunction
 endif
 
 " Patch 7.4.1707: Allow using an empty dictionary key
 if v:version == 704 && has('patch1707') || v:version > 704
-    function ingo#compat#DictKey( key )
+    function! ingo#compat#DictKey( key )
 	return a:key
     endfunction
 else
-    function ingo#compat#DictKey( key )
+    function! ingo#compat#DictKey( key )
 	return (empty(a:key) ? "\<Nul>" : a:key)
     endfunction
 endif
