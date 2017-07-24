@@ -2,13 +2,17 @@
 "
 " DEPENDENCIES:
 "   - CountJump.vim, CountJump/Mappings.vim autoload scripts
+"   - ingo/pos.vim autoload script
 "
-" Copyright: (C) 2009-2014 Ingo Karkat
+" Copyright: (C) 2009-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.86.021	16-Mar-2017	CountJump#TextObject#MakeWithJumpFunctions():
+"				Catch all exceptions and report only the text.
+"   1.85.020	30-Apr-2014	Use ingo/pos.vim.
 "   1.84.017	24-Apr-2014	FIX: There are no buffer-local functions with a
 "				b: scope prefix, and Vim 7.4.264 disallows those
 "				invalid function names now. Previously, multiple
@@ -233,8 +237,7 @@ function! CountJump#TextObject#TextObjectWithJumpFunctions( mode, isInner, isExc
 "****D echomsg '**** text object from' string(l:beginPosition) 'to' string(l:endPosition)
 		" When the end position is before the begin position, that's not
 		" a valid selection.
-		if l:endPosition[1] < l:beginPosition[1] ||
-		\   l:endPosition[1] == l:beginPosition[1] && l:endPosition[2] < l:beginPosition[2]
+		if ingo#pos#IsBefore(l:endPosition[1:2], l:beginPosition[1:2])
 		    execute "normal! \<C-\>\<C-n>\<Esc>"
 
 		    call winrestview(l:save_view)
@@ -342,7 +345,7 @@ function! CountJump#TextObject#MakeWithJumpFunctions( mapArgs, textObjectKey, ty
 	endif
 	for l:mode in ['o', 'v']
 	    execute escape(
-	    \   printf("%snoremap <silent> %s %s :<C-U>call CountJump#TextObject#TextObjectWithJumpFunctions('%s', %s, %s, '%s', %s, %s)<CR>",
+	    \   printf("%snoremap <silent> %s %s :<C-u>try<Bar>call CountJump#TextObject#TextObjectWithJumpFunctions('%s', %s, %s, '%s', %s, %s)<Bar>catch<Bar>if v:exception !~# '^\\%(Vim:\\)\\?Interrupt$'<Bar>echoerr ingo#msg#MsgFromVimException()<Bar>endif<Bar>endtry<CR>",
 	    \	    (l:mode ==# 'v' ? 'x' : l:mode),
 	    \	    a:mapArgs,
 	    \	    CountJump#Mappings#MakeTextObjectKey(tolower(l:type), a:textObjectKey),

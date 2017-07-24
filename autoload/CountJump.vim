@@ -1,14 +1,24 @@
 " CountJump.vim: Move to a buffer position via repeated jumps (or searches).
 "
 " DEPENDENCIES:
+"   - ingo/msg.vim autoload script
+"   - ingo/pos.vim autoload script
 "   - ingo/motion/helper.vim autoload script (optional)
 "
-" Copyright: (C) 2009-2014 Ingo Karkat
+" Copyright: (C) 2009-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.86.023	06-Mar-2015	Retire duplicated fallback for
+"				ingo#motion#helper#AdditionalMovement(); since
+"				version 1.85, the ingo-library is now a
+"				mandatory dependency.
+"   1.85.022	12-Jun-2014	Make test for 'virtualedit' option values also
+"				account for multiple values.
+"   1.85.021	05-May-2014	Use ingo#msg#WarningMsg().
+"   1.85.020	30-Apr-2014	Use ingo/pos.vim.
 "   1.83.019	11-Jan-2014	Factor out special treatment for visual and
 "				operator-pending motions to
 "				ingo#motion#helper#AdditionalMovement(), but
@@ -96,10 +106,7 @@
 
 function! s:WrapMessage( searchName, isBackward )
     if &shortmess !~# 's'
-	let v:warningmsg = a:searchName . ' ' . (a:isBackward ? 'hit TOP, continuing at BOTTOM' : 'hit BOTTOM, continuing at TOP')
-	echohl WarningMsg
-	echomsg v:warningmsg
-	echohl None
+	call ingo#msg#WarningMsg(a:searchName . ' ' . (a:isBackward ? 'hit TOP, continuing at BOTTOM' : 'hit BOTTOM, continuing at TOP'))
     endif
 endfunction
 function! CountJump#CountSearchWithWrapMessage( count, searchName, searchArguments )
@@ -159,9 +166,9 @@ function! CountJump#CountSearchWithWrapMessage( count, searchName, searchArgumen
 
 	" Note: No need to check s:searchArguments and 'wrapscan'; the wrapping
 	" can only occur if 'wrapscan' is actually on.
-	if ! l:isBackward && (l:prevLine > l:matchPosition[0] || l:prevLine == l:matchPosition[0] && l:prevCol >= l:matchPosition[1])
+	if ! l:isBackward && ingo#pos#IsOnOrAfter([l:prevLine, l:prevCol], l:matchPosition)
 	    let l:isWrapped = 1
-	elseif l:isBackward && (l:prevLine < l:matchPosition[0] || l:prevLine == l:matchPosition[0] && l:prevCol <= l:matchPosition[1])
+	elseif l:isBackward && ingo#pos#IsOnOrBefore([l:prevLine, l:prevCol], l:matchPosition)
 	    let l:isWrapped = 1
 	endif
 	let [l:prevLine, l:prevCol] = l:matchPosition
@@ -189,30 +196,6 @@ endfunction
 function! CountJump#CountSearch( count, searchArguments )
     return CountJump#CountSearchWithWrapMessage(a:count, '', a:searchArguments)
 endfunction
-silent! call ingo#motion#helper#DoesNotExist()	" Execute a function to force autoload.
-if exists('*ingo#motion#helper#AdditionalMovement')
-function! s:AdditionalMovement( isSpecialLastLineTreatment )
-    return ingo#motion#helper#AdditionalMovement(a:isSpecialLastLineTreatment)
-endfunction
-else
-function! s:AdditionalMovement( isSpecialLastLineTreatment )
-    let l:save_ww = &whichwrap
-    set whichwrap+=l
-    if a:isSpecialLastLineTreatment && line('.') == line('$') && &virtualedit !=# 'onemore' && &virtualedit !=# 'all'
-	" For the last line in the buffer, that still doesn't work in
-	" operator-pending mode, unless we can do virtual editing.
-	let l:save_ve = &virtualedit
-	set virtualedit=onemore
-	normal! l
-	augroup IngoLibraryTempVirtualEdit
-	    execute 'autocmd! CursorMoved * set virtualedit=' . l:save_ve . ' | autocmd! IngoLibraryTempVirtualEdit'
-	augroup END
-    else
-	normal! l
-    endif
-    let &whichwrap = l:save_ww
-endfunction
-endif
 function! CountJump#CountJumpWithWrapMessage( mode, searchName, ... )
 "*******************************************************************************
 "* PURPOSE:
@@ -255,7 +238,7 @@ function! CountJump#CountJumpWithWrapMessage( mode, searchName, ... )
 
 	if a:mode ==# 'V' && &selection ==# 'exclusive' || a:mode ==# 'O'
 	    " Special additional treatment for end patterns to end.
-	    call s:AdditionalMovement(a:mode ==# 'O')
+	    call ingo#motion#helper#AdditionalMovement(a:mode ==# 'O')
 	endif
     endif
 endfunction
@@ -326,14 +309,14 @@ function! CountJump#JumpFunc( mode, JumpFunc, ... )
 	    " line.
 	    let l:save_ww = &whichwrap
 	    set whichwrap+=l
-	    if a:mode ==# 'O' && line('.') == line('$') && &virtualedit !=# 'onemore' && &virtualedit !=# 'all'
+	    if a:mode ==# 'O' && line('.') == line('$') && ! ingo#option#ContainsOneOf(&virtualedit, ['all', 'onemore'])
 		" For the last line in the buffer, that still doesn't work,
 		" unless we can do virtual editing.
-		let l:save_ve = &virtualedit
+		let l:save_virtualedit = &virtualedit
 		set virtualedit=onemore
 		normal! l
 		augroup TempVirtualEdit
-		    execute 'autocmd! CursorMoved * set virtualedit=' . l:save_ve . ' | autocmd! TempVirtualEdit'
+		    execute 'autocmd! CursorMoved * set virtualedit=' . l:save_virtualedit . ' | autocmd! TempVirtualEdit'
 		augroup END
 	    else
 		normal! l
@@ -394,9 +377,9 @@ function! CountJump#CountJumpFuncWithWrapMessage( count, searchName, isBackward,
 	    return l:matchPosition
 	endif
 
-	if ! a:isBackward && (l:prevLine > l:matchPosition[0] || l:prevLine == l:matchPosition[0] && l:prevCol >= l:matchPosition[1])
+	if ! a:isBackward && ingo#pos#IsOnOrAfter([l:prevLine, l:prevCol], l:matchPosition)
 	    let l:isWrapped = 1
-	elseif a:isBackward && (l:prevLine < l:matchPosition[0] || l:prevLine == l:matchPosition[0] && l:prevCol <= l:matchPosition[1])
+	elseif a:isBackward && ingo#pos#IsOnOrBefore([l:prevLine, l:prevCol], l:matchPosition)
 	    let l:isWrapped = 1
 	endif
 	let [l:prevLine, l:prevCol] = l:matchPosition

@@ -55,6 +55,8 @@ vbs_movement      (vimscript #4003): Movement over VBScript classes /
 dosbatch_movement (vimscript #4004): Movement over MSDOS batch file functions
 				     / labels with ]m etc.
 SameSyntaxMotion  (vimscript #4338): Motions to the borders of the same syntax highlighting.
+JumpToVerticalBlock:		     Like W / E, but vertically in the same column.
+		  (vimscript #0000)
 JumpToVerticalOccurrence:	     Like f{char}, but searching the same
 		  (vimscript #4841)  screen column, not line.
 ErrorMotion	  (vimscript #0000): Motions to text highlighted as error.
@@ -194,7 +196,7 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES					       *CountJump-dependencies*
 
 - Requires Vim 7.0 or higher.
-- |ingo-library.vim| plugin (vimscript #4433), version 1.016 or higher
+- |ingo-library.vim| plugin (vimscript #4433), version 1.019 or higher
   (optional).
 
 ==============================================================================
@@ -253,6 +255,33 @@ IDEAS							      *CountJump-ideas*
 
 ==============================================================================
 HISTORY							    *CountJump-history*
+
+1.86	24-Jul-2017
+- CountJump#Motion#MakeBracketMotion(): The a:patternToBegin, a:patternToEnd,
+  a:searchName arguments may contain special characters that need escaping in
+  a map. Use ingo#escape#command#mapescape().
+- CountJump#Region#Motion#MakeBracketMotion(): The a:Expr argument may contain
+  special characters that need escaping in a map. Use
+  ingo#escape#command#mapescape().
+- Retire duplicated fallback for ingo#motion#helper#AdditionalMovement();
+  since version 1.85, the ingo-library is now a mandatory dependency.
+- CountJump#Motion#MakeBracketMotionWithJumpFunctions(),
+  CountJump#TextObject#MakeWithJumpFunctions(),
+  CountJump#Region#Motion#MakeBracketMotion(): Catch all exceptions and
+  report only the text. My ErrorMotion.vim plugin could be slow to find the
+  next error if there is none. Aborting with <C-c> would print a long
+  multi-line exception: "Error detected while processing function
+  ErrorMotion#Forward[1]..CountJump#JumpFunc[39]..HlgroupMotion#JumpWithWrapMessage[26]..CountJump#CountJumpFuncWithWrapMessage[35]..HlgroupMotion#SearchFirstHlgroup:
+  line   67: Interrupted". As we apparently cannot avoid the printing of "Type
+  :quit<Enter>  to exit Vim", suppress the Vim:Interrupt exception, and
+  :echoerr all others.
+
+1.85	23-Dec-2014
+- Use ingo/pos.vim.
+- Use ingo#msg#WarningMsg().
+- Make test for 'virtualedit' option values also account for multiple values.
+  *** You need to install / update to ingo-library (vimscript #4433) version
+  1.019! It is now mandatory for the plugin. ***
 
 1.84	25-Apr-2014
 - Pin down the 'virtualedit' setting (to "onemore") during
@@ -410,7 +439,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2009-2014 Ingo Karkat
+Copyright: (C) 2009-2017 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
