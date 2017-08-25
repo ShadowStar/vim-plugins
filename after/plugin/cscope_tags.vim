@@ -66,8 +66,16 @@ function! s:LoadCscope(...)
   endif
 endfunction
 
+function! s:ClearCscope()
+  set nocscopeverbose
+  exec "cs kill -1"
+  exec "set tags=''"
+  set cscopeverbose
+endfunction
+
 autocmd BufEnter /*.[chS] call s:LoadCscope(expand('%:p:h'))
 autocmd VimEnter /*.[chS] call s:LoadCscope(getcwd())
 
 command! -nargs=* -complete=dir LoadCscope call s:LoadCscope(<f-args>)
+command! ClearCscope call s:ClearCscope()
 
