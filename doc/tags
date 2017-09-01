@@ -1181,6 +1181,7 @@ drawit-usage	DrawIt.txt	/*drawit-usage*
 drawit-utf16	DrawIt.txt	/*drawit-utf16*
 drawit-utf8	DrawIt.txt	/*drawit-utf8*
 drawit-visblock	DrawIt.txt	/*drawit-visblock*
+easy!	easydir.txt	/*easy!*
 easy-align	easy_align.txt	/*easy-align*
 easy-align-1	easy_align.txt	/*easy-align-1*
 easy-align-10	easy_align.txt	/*easy-align-10*
@@ -1260,6 +1261,8 @@ easy-align-usage	easy_align.txt	/*easy-align-usage*
 easy-align-using-easyalign-in-command-line	easy_align.txt	/*easy-align-using-easyalign-in-command-line*
 easy-align-using-regular-expressions	easy_align.txt	/*easy-align-using-regular-expressions*
 easyalign	easy_align.txt	/*easyalign*
+easydir	easydir.txt	/*easydir*
+easydir.txt	easydir.txt	/*easydir.txt*
 filter-overrides	syntastic.txt	/*filter-overrides*
 firebird	dbext.txt	/*firebird*
 ft-csv.txt	ft-csv.txt	/*ft-csv.txt*
