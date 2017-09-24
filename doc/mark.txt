@@ -117,7 +117,8 @@ HIGHLIGHTING						   *mark-highlighting*
 
 								       *:Mark*
 :[N]Mark		Clear the marks represented by highlight group [N].
-:[N]Mark[!] {pattern}	Mark or unmark {pattern}. Unless [N] is given, the
+:[N]Mark[!] [/]{pattern}[/]
+			Mark or unmark {pattern}. Unless [N] is given, the
 			next free highlight group is used for marking.
 			With [N], mark {pattern} with the named highlight
 			group [N]. When that group is not empty, the word is
@@ -128,6 +129,8 @@ HIGHLIGHTING						   *mark-highlighting*
 			alternatives, it is removed.
 			For implementation reasons, {pattern} cannot use the
 			'smartcase' setting, only 'ignorecase'.
+			Without [/], only literal whole words are matched.
+			|:search-args|
 :Mark			Disable all marks, similar to |:nohlsearch|. Marks
 			will automatically re-enable when a mark is added or
 			removed, or a search for marks is performed.
@@ -135,6 +138,12 @@ HIGHLIGHTING						   *mark-highlighting*
 :MarkClear		Clear all marks. In contrast to disabling marks, the
 			actual mark information is cleared, the next mark will
 			use the first highlight group. This cannot be undone.
+								   *:MarkName*
+:[N]Mark[!] /{pattern}/ as [name]
+			Mark or unmark {pattern}, and give it [name].
+:{N}MarkName [name]
+			Give [name] to mark group {N}.
+:MarkName!		Clear names for all mark groups.
 
 
 SEARCHING						      *mark-searching*
@@ -185,6 +194,17 @@ it's not the last mark used.
 			Note that these commands only work when the "Num Lock"
 			indicator of your keyboard is ON; otherwise, the
 			keypad is used for cursor movement.
+Alternatively, you can set up mappings to search in a next / previous used
+group, see |mark-group-cycle|.
+
+					       *mark-cascaded-group-searching*
+[...]
+After a stop, retriggering the cascaded search in the same buffer and window
+moves to the next used group (you can jump inside the current buffer to choose
+a different starting point first). If you instead switch to another window or
+buffer, the current mark group continues to be searched (to allow you to
+keep searching for the current group in other locations, until those are all
+exhaused, too).
 
 MARK PERSISTENCE					    *mark-persistence*
 
@@ -218,12 +238,24 @@ You can also initialize some marks (even using particular highlight groups) to
 static values, e.g. by including this in |vimrc|: >
     runtime plugin/mark.vim
     silent MarkClear
-    5Mark foo
-    6Mark bar
+    silent 5Mark foo
+    silent 6Mark /bar/
 Or you can define custom commands that preset certain marks: >
-    command -bar MyMarks silent MarkClear | execute '5Mark foo' | execute '6Mark bar'
+    command -bar MyMarks exe '5Mark! foo' | exe '6Mark! /bar/'
 Or a command that adds to the existing marks and then toggles them: >
-    command -bar ToggleFooBarMarks execute 'Mark foo' | execute 'Mark bar'
+    command -bar ToggleFooBarMarks exe 'Mark foo' | exe 'Mark /bar/'
+The following commands help with setting these up:
+			 *:MarkYankDefinitions* *:MarkYankDefinitionsOneLiner*
+:MarkYankDefinitions [x]
+			Place definitions for all current marks into the
+			default register / [x], like this: >
+			    1Mark! /\<foo\>/
+			    2Mark! /bar/
+			    9Mark! /quux/
+:MarkYankDefinitionsOneLiner [x]
+			Like |:MarkYankDefinitions|, but place all definitions
+			into a single line, like this: >
+			exe '1Mark! /\<foo\>/' | exe '2Mark! /bar/' | exe '9Mark! /quux/'
 <
 MARK INFORMATION					    *mark-information*
 
@@ -238,7 +270,7 @@ highlight group via [N].
 			defined for them.
 			The group that will be used for the next |:Mark| or
 			|<Leader>m| command (with [N]) is shown with a ">".
-			The last mark used for a search (via |<Leader>*|) is
+			The last mark used for a search (via <Leader>*) is
 			shown with a "/".
 
 MARK HIGHLIGHTING PALETTES					*mark-palette*
@@ -259,10 +291,16 @@ and |mark-palette-define| for how to add your own custom palettes.
 ==============================================================================
 INSTALLATION						   *mark-installation*
 
-This script is packaged as a |vimball|. If you have the "gunzip" decompressor
-in your PATH, simply edit the *.vmb.gz package in Vim; otherwise, decompress
-the archive first, e.g. using WinZip. Inside Vim, install by sourcing the
-vimball or via the |:UseVimball| command. >
+The code is hosted in a Git repo at
+    https://github.com/inkarkat/vim-mark
+You can use your favorite plugin manager, or "git clone" into a directory used
+for Vim |packages|. Releases are on the "stable" branch, the latest unstable
+development snapshot on "master".
+
+This script is also packaged as a |vimball|. If you have the "gunzip"
+decompressor in your PATH, simply edit the *.vmb.gz package in Vim; otherwise,
+decompress the archive first, e.g. using WinZip. Inside Vim, install by
+sourcing the vimball or via the |:UseVimball| command. >
     vim mark*.vmb.gz
     :so %
 To uninstall, use the |:RmVimball| command.
@@ -270,6 +308,8 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES						   *mark-dependencies*
 
 - Requires Vim 7.1 with |matchadd()|, or Vim 7.2 or higher.
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.020 or
+  higher.
 
 ==============================================================================
 CONFIGURATION						  *mark-configuration*
@@ -380,7 +420,12 @@ If you need more / less groups, this can be configured via: >
     let g:mwDirectGroupJumpMappingNum = 20
 Set to 0 to completely turn off the keypad mappings. This is easier than
 remapping all <Plug>-mappings.
-
+							    *mark-group-cycle*
+As an alternative to the direct group searches, you can also define mappings
+that search a next / previous used group: >
+    nmap <Leader>+* <Plug>MarkSearchUsedGroupNext
+    nmap <Leader>-* <Plug>MarkSearchUsedGroupPrev
+<
 						 *mark-whitespace-indifferent*
 Some people like to create a mark based on the visual selection, like
 |v_<Leader>m|, but have whitespace in the selection match any whitespace when
@@ -399,9 +444,10 @@ behavior: >
 ==============================================================================
 INTEGRATION						    *mark-integration*
 
-The following functions offer (read-only) access to the number of marks and
-individual patterns:
-- mark#GetNum()
+The following functions offer (read-only) access to the number of available
+groups, number of defined marks and individual patterns:
+- mark#GetGroupNum()
+- mark#GetCount()
 - mark#GetPattern([{index}])
 
 ==============================================================================
@@ -420,8 +466,41 @@ TODO								   *mark-todo*
 
 IDEAS								  *mark-ideas*
 
+CONTRIBUTING						     *mark-contribute*
+
+Report any bugs, send patches, or suggest features via the issue tracker at
+https://github.com/inkarkat/vim-mark/issues or email (address below).
+
 ==============================================================================
 HISTORY								*mark-history*
+
+3.0.0	18-Sep-2017
+- CHG: Parse :Mark arguments as either /{pattern}/ or whole {word}. This
+  better addresses the common use case of searching for whole words, and is
+  consistent with built-in commands like :djump.
+- ENH: Keep previous (last accessed) window on :windo.
+- Consistently use :noautocmd during window iteration.
+- ENH: Add :MarkYankDefinitions and :MarkYankDefinitionsOneLiner commands.
+  These make it easier to persist marks for specific files (e.g. by putting
+  the :Mark commands into a local vimrc) or occasions (by defining a custom
+  command or mapping with these commands), and are an alternative to
+  :MarkSave/Load.
+- ENH: Add <Plug>MarkSearchUsedGroupNext and <Plug>MarkSearchUsedGroupPrev to
+  search in a next / previous used group. Suggested by Louis Pan.
+- ENH: Add <Plug>MarkSearchCascadeStartWithStop,
+  <Plug>MarkSearchCascadeNextWithStop, <Plug>MarkSearchCascadeStartNoStop,
+  <Plug>MarkSearchCascadeNextNoStop to search in cascading mark groups, i.e.
+  first all matches for group 1, then all for group 2, and so on.
+- CHG: Duplicate mark#GetNum() and mark#GetGroupNum(). Rename the former into
+  mark#GetCount() and have it return the number of actually defined (i.e.
+  non-empty) marks.
+- ENH: Allow to give names to mark groups via :MarkName and new :Mark
+  /{pattern}/ as {name} command syntax. Names will be shown during searching,
+  and persisted together with the marks. This makes it easier to handle
+  several marks and enforce custom semantics for particular groups.
+- Properly abort on error by using :echoerr.
+- Add dependency to ingo-library (vimscript #4433). *** You need to separately
+  install ingo-library (vimscript #4433) version 1.020 (or higher)! ***
 
 2.8.5	29-Oct-2014
 - ENH: Add alternative <Plug>MarkConfirmAllClear optional command that works
@@ -684,7 +763,7 @@ Last version published by Yuheng Xie on vim.org.
 Initial version published by Yuheng Xie on vim.org.
 
 ==============================================================================
-Copyright: (C) 2008-2014 Ingo Karkat
+Copyright: (C) 2008-2017 Ingo Karkat
            (C) 2005-2008 Yuheng Xie
 The VIM LICENSE applies to this plugin; see |copyright|.
 
