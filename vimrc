@@ -424,13 +424,6 @@ let g:tagbar_autoclose = 1
 highlight StatusLine term=bold,reverse cterm=bold,reverse ctermfg=green gui=bold,reverse guifg=green
 highlight StatusLineNC term=reverse cterm=reverse ctermfg=darkred gui=reverse guifg=darkred
 
-let g:loaded_signify = 1
-let g:signify_vcs_list = [ 'git' ]
-let g:signify_mapping_next_hunk = '<leader>gj'
-let g:signify_mapping_prev_hunk = '<leader>gk'
-let g:signify_mapping_toggle_highlight = '<leader>gh'
-let g:signify_mapping_toggle = '<leader>gt'
-let g:signify_sign_color_inherit_from_linenr = 1
 let g:loaded_syntastic_plugin = 1
 let g:AutoPairsMapCR = 0
 set imdisable
