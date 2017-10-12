@@ -358,8 +358,8 @@ let g:bufExplorerSplitHorzSize=10
 "inoremap '' ''<left>
 "inoremap , ,<Space>
 
-noremap <F2> :Tlist<CR>
-inoremap <F2> <ESC>:Tlist<CR><INSERT>
+noremap <F2> :TagbarToggle<CR>
+inoremap <F2> <ESC>:TagbarToggle<CR><INSERT>
 noremap <F3> :tabnext<CR>
 inoremap <F3> <ESC>:tabnext<CR>
 noremap <F4> :tabnew 
@@ -417,6 +417,9 @@ let tlist_make_settings = 'make;m:makros;t:targets'
 let tlist_qmake_settings = 'qmake;t:SystemVariables'
 set laststatus=2
 set statusline=%y%f%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v/%{strdisplaywidth(getline(\".\"))}C,%l/%LL\ --%p%%--
+
+let g:tagbar_left = 1
+let g:tagbar_autoclose = 1
 
 highlight StatusLine term=bold,reverse cterm=bold,reverse ctermfg=green gui=bold,reverse guifg=green
 highlight StatusLineNC term=reverse cterm=reverse ctermfg=darkred gui=reverse guifg=darkred
