@@ -8,14 +8,14 @@
 " |     || || |   | |   |  |__ |  _  ||  _  || |  | |
 " |____| |_||_|   |_|   |_____||_| |_||_| |_||_|  |_|
 "
-" Last Change:	2017/09/26
-" Version:		7.0
+" Last Change:	2017/10/25
+" Version:		7.1
 " Author:		Rick Howe <rdcxy754@ybb.ne.jp>
 
 if exists('g:loaded_diffchar') || !has('diff')
 	finish
 endif
-let g:loaded_diffchar = '7.0'
+let g:loaded_diffchar = '7.1'
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -48,15 +48,11 @@ nnoremap <silent> <Plug>PutDiffCharPair
 if !hasmapto('<Plug>ToggleDiffCharAllLines', 'nv')
 	if empty(maparg('<F7>', 'nv'))
 		map <silent> <F7> <Plug>ToggleDiffCharAllLines
-	else
-		map <silent> \da <Plug>ToggleDiffCharAllLines
 	endif
 endif
 if !hasmapto('<Plug>ToggleDiffCharCurrentLine', 'nv')
 	if empty(maparg('<F8>', 'nv'))
 		map <silent> <F8> <Plug>ToggleDiffCharCurrentLine
-	else
-		map <silent> \dc <Plug>ToggleDiffCharCurrentLine
 	endif
 endif
 if !hasmapto('<Plug>JumpDiffCharPrevStart', 'n')
