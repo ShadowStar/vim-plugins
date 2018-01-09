@@ -3,7 +3,7 @@
 " Vim plugin to assist in working with files under control of various Version
 " Control Systems, such as CVS, SVN, SVK, and git.
 "
-" Maintainer:    Bob Hiestand <bob.hiestand@gmail.com>
+" Maintainer:    ShadowStar, <orphen.leiliu@gmail.com>
 " License:
 " Copyright (c) Bob Hiestand
 "
@@ -965,8 +965,29 @@ function! s:VCSDiff(...)  "{{{2
 		let resultBuffer = s:ExecuteVCSCommand('Diff', a:000)
 		if resultBuffer > 0
 			let &filetype = 'diff'
+			setlocal nomodifiable
+			execute 'nmap <buffer> q :<C-u>q<CR>'
 		elseif resultBuffer == 0
 			echomsg 'No differences found'
+		endif
+		return resultBuffer
+	finally
+		call s:VCSCommandUtility.popContext()
+	endtry
+endfunction
+
+function! s:VCSLog(...)
+	call s:VCSCommandUtility.pushContext({'VCSCommandEncodeAsFile': bufnr('%')})
+	try
+		let resultBuffer = s:ExecuteVCSCommand('Log', a:000)
+		if resultBuffer > 0
+			let &filetype = 'git'
+			setlocal nomodifiable
+			execute 'nmap <buffer> q :<C-u>q<CR>'
+			execute 'nmap <buffer> d <C-d>'
+			execute 'nmap <buffer> u <C-u>'
+			execute 'nmap <buffer> f <C-f>'
+			execute 'nmap <buffer> b <C-b>'
 		endif
 		return resultBuffer
 	finally
@@ -1381,7 +1402,7 @@ com! -nargs=* VCSDiff call s:VCSDiff(<f-args>)
 com! -nargs=0 -bang VCSGotoOriginal call s:VCSGotoOriginal(<q-bang>)
 com! -nargs=* VCSInfo call s:ExecuteVCSCommand('Info', [<f-args>])
 com! -nargs=* VCSLock call s:MarkOrigBufferForSetup(s:ExecuteVCSCommand('Lock', [<f-args>]))
-com! -nargs=* VCSLog call s:ExecuteVCSCommand('Log', [<f-args>])
+com! -nargs=* VCSLog call s:VCSLog(<f-args>)
 com! -nargs=* VCSRemove call s:ExecuteVCSCommand('Delete', [<f-args>])
 com! -nargs=0 VCSRevert call s:MarkOrigBufferForSetup(s:ExecuteVCSCommand('Revert', []))
 com! -nargs=? VCSReview call s:VCSReview(<f-args>)
