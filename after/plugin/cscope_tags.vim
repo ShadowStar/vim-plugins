@@ -62,14 +62,14 @@ function! s:LoadCscope(...)
     endfor
     let g:cscope_tags_db_list += tagfile
     let taglist = join(tagfile, ",")
-    exec "set tags+=" . taglist
+    exec "setlocal tags+=" . taglist
   endif
 endfunction
 
 function! s:ClearCscope()
   set nocscopeverbose
   exec "cs kill -1"
-  exec "set tags=''"
+  exec "setlocal tags=''"
   set cscopeverbose
 endfunction
 
