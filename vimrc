@@ -122,6 +122,10 @@ if has("eval")
   let is_bash=1
 endif
 
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
 function! Get_Locale()
   if match($LANG, "UTF-8$") > 0
     return 'en_US.UTF-8'
