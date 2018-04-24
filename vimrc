@@ -103,14 +103,6 @@ if &term ==? "xterm"
   set t_Sf=^[3%dm
   set ttymouse=xterm2
 endif
-
-if &term ==? "gnome" && has("eval")
-  " Set useful keys that vim doesn't discover via termcap but are in the
-  " builtin xterm termcap. See bug #122562. We use exec to avoid having to
-  " include raw escapes in the file.
-  exec "set <C-Left>=\eO5D"
-  exec "set <C-Right>=\eO5C"
-endif
 " }}}
 
 " {{{ Filetype plugin settings
@@ -143,50 +135,6 @@ if has("eval")
 endif
 " }}}
 
-" {{{ Autocommands
-if has("autocmd")
-
-augroup gentoo
-  au!
-
-  " Gentoo-specific settings for ebuilds.  These are the federally-mandated
-  " required tab settings.  See the following for more information:
-  " http://www.gentoo.org/proj/en/devrel/handbook/handbook.xml
-  " Note that the rules below are very minimal and don't cover everything.
-  " Better to emerge app-vim/gentoo-syntax, which provides full syntax,
-  " filetype and indent settings for all things Gentoo.
-  au BufRead,BufNewFile *.e{build,class} let is_bash=1|setfiletype sh
-  au BufRead,BufNewFile *.e{build,class} set ts=4 sw=4 noexpandtab
-
-  " In text files, limit the width of text to 78 characters, but be careful
-  " that we don't override the user's setting.
-  autocmd BufNewFile,BufRead *.txt
-        \ if &tw == 0 && ! exists("g:leave_my_textwidth_alone") |
-        \     setlocal textwidth=78 |
-        \ endif
-
-  " When editing a file, always jump to the last cursor position
-  autocmd BufReadPost *
-        \ if ! exists("g:leave_my_cursor_position_alone") |
-        \     if line("'\"") > 0 && line ("'\"") <= line("$") |
-        \         exe "normal g'\"" |
-        \     endif |
-        \ endif
-
-  " When editing a crontab file, set backupcopy to yes rather than auto. See
-  " :help crontab and bug #53437.
-  autocmd FileType crontab set backupcopy=yes
-
-augroup END
-
-endif " has("autocmd")
-" }}}
-
-" {{{ vimrc.local
-"if filereadable("/opt/etc/vim/vimrc.local")
-"  source /opt/etc/vim/vimrc.local
-"endif
-" }}}
 
 " vim: set fenc=utf-8 tw=80 sw=2 sts=2 et foldmethod=marker :
 
