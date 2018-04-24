@@ -1,60 +1,80 @@
 scriptencoding utf-8
 " ^^ Please leave the above line at the start of the file.
 
-" Default configuration file for Vim
-" $Header: /var/cvsroot/gentoo-x86/app-editors/vim-core/files/vimrc-r3,v 1.1 2006/03/25 20:26:27 genstef Exp $
+filetype plugin on
+filetype indent on
+syntax on
 
-" Written by Aron Griffis <agriffis@gentoo.org>
-" Modified by Ryan Phillips <rphillips@gentoo.org>
-" Modified some more by Ciaran McCreesh <ciaranm@gentoo.org>
-" Added Redhat's vimrc info by Seemant Kulleen <seemant@gentoo.org>
-
-" You can override any of these settings on a global basis via the
-" "/etc/vim/vimrc.local" file, and on a per-user basis via "~/.vimrc". You may
-" need to create these.
-
-" {{{ General settings
-" The following are some sensible defaults for Vim for most users.
-" We attempt to change as little as possible from Vim's defaults,
-" deviating only where it makes sense
-set nocompatible        " Use Vim defaults (much better!)
-set bs=2                " Allow backspacing over everything in insert mode
-set ai                  " Always set auto-indenting on
-set history=50          " keep 50 lines of command history
-set ruler               " Show the cursor position all the time
-
-set viminfo='20,\"500   " Keep a .viminfo file.
-
+set autoindent                  " Always set auto-indenting on
+set autoread                    " read open files again when changed outside Vim
+set autowrite                   " write a modified buffer on each :next , ...
+set backspace=indent,eol,start  " backspacing over everything in insert mode
+set cindent
+set cinoptions=:0,l1,t0,g0,(0
+set completeopt=longest,menu
+set cursorline
+set formatoptions=tcqlron
+set hidden
+set history=50                  " keep 50 lines of command line history
+set hlsearch                    " highlight the last used search pattern
+set imdisable
+set iminsert=0
+set incsearch                   " do incremental searching
+set laststatus=2
+set listchars=tab:>.,eol:\$     " strings to use in 'list' mode
+set nocompatible                " Use Vim defaults (much better!)
+set nomodeline
+set path=include/,,/usr/include/
+set popt=left:8pc,right:3pc     " print options
+set ruler                       " show the cursor position all the time
+set showcmd                     " display incomplete commands
+set smartindent                 " smart autoindenting when starting a new line
+set statusline=%y%f%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v/%{strdisplaywidth(getline(\".\"))}C,%l/%LL\ --%p%%--
+set suffixes+=.info,.aux,.log,.dvi,.bbl,.out,.o,.lo
 set t_ZH=[3m
 set t_ZR=[23m
+set title
+set viminfo='20,\"500           " Keep a .viminfo file.
+set visualbell                  " visual bell instead of beeping
+set wildignore=*.bak,*.o,*.ko,*.e,*~ " wildmenu: ignore these extensions
+set wildignore+=*.tar,*.tgz,*.gz,*.bz2,*.lzma,*.zip,*.rar
+set wildignore+=*.pdf,*.ppt,*.pptx,*.doc,*.docx,*.xls,*.xlsx
+set wildignore+=*.rmvb,*.avi,*.mpg,*.mpeg,*.mp4,*.mkv,*.swf
+set wildignore+=*.mp3,*.aac,*.wav,*.flac
+set wildmenu                    " command-line completion in an enhanced mode
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
+noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
+noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
+noremap <C-h> <C-W>h
+noremap <C-j> <C-W>j
+noremap <C-k> <C-W>k
+noremap <C-l> <C-W>l
+noremap <C-c> :shell<CR>
+noremap <leader>v <C-W>v
+noremap <leader>s <C-W>s
+noremap <F3> :tabnext<CR>
+inoremap <F3> <ESC>:tabnext<CR>
+noremap <F4> :tabnew 
+inoremap <F4> <ESC>:tabnew 
 
-" When doing tab completion, give the following files lower priority. You may
-" wish to set 'wildignore' to completely ignore files, and 'wildmenu' to enable
-" enhanced tab completion. These can be done in the user vimrc file.
-set suffixes+=.info,.aux,.log,.dvi,.bbl,.out,.o,.lo
+"inoremap [] []<left>
+"inoremap {} {}<left>
+"inoremap () ()<left>
+"inoremap <> <><left>
+"inoremap "" ""<left>
+"inoremap '' ''<left>
+"inoremap , ,<Space>
 
-" When displaying line numbers, don't use an annoyingly wide number column. This
-" doesn't enable line numbers -- :set number will do that. The value given is a
-" minimum width to use for the number column, not a fixed size.
+if v:version >= 703
+  set colorcolumn=+1
+endif
+
 if v:version >= 700
   set numberwidth=3
 endif
-" }}}
 
-" {{{ Modeline settings
-" We don't allow modelines by default. See bug #14088 and bug #73715.
-" If you're not concerned about these, you can enable them on a per-user
-" basis by adding "set modeline" to your ~/.vimrc file.
-set nomodeline
-" }}}
-
-" {{{ Locale settings
-" Try to come up with some nice sane GUI fonts. Also try to set a sensible
-" value for fileencodings based upon locale. These can all be overridden in
-" the user vimrc file.
 if v:lang =~? "UTF-8$"
   set fileencodings=utf-8
 endif
@@ -74,51 +94,22 @@ elseif v:lang =~? "^zh_CN"
   set guifontset=*-r-*
 endif
 
-" If we have a BOM, always honour that rather than trying to guess.
 if &fileencodings !~? "ucs-bom"
   set fileencodings^=ucs-bom
 endif
 
-" Always check for UTF-8 when trying to determine encodings.
 if &fileencodings !~? "utf-8"
   set fileencodings+=utf-8
 endif
 
-" Make sure we have a sane fallback for encoding detection
 set fileencodings+=default
-" }}}
 
-" {{{ Syntax highlighting settings
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-  syntax on
-  set hlsearch
-endif
-" }}}
-
-" {{{ Terminal fixes
 if &term ==? "xterm"
   set t_Sb=^[4%dm
   set t_Sf=^[3%dm
   set ttymouse=xterm2
 endif
-" }}}
 
-" {{{ Filetype plugin settings
-" Enable plugin-provided filetype settings, but only if the ftplugin
-" directory exists (which it won't on livecds, for example).
-if isdirectory(expand("$VIMRUNTIME/ftplugin"))
-  filetype plugin on
-
-  " Uncomment the next line (or copy to your ~/.vimrc) for plugin-provided
-  " indent settings. Some people don't like these, so we won't turn them on by
-  " default.
-  filetype indent on
-endif
-" }}}
-
-" {{{ Fix &shell, see bug #101665.
 if "" == &shell
   if executable("/bin/bash")
     set shell=/bin/bash
@@ -126,17 +117,10 @@ if "" == &shell
     set shell=/bin/sh
   endif
 endif
-"}}}
 
-" {{{ Our default /bin/sh is bash, not ksh, so syntax highlighting for .sh
-" files should default to bash. See :help sh-syntax and bug #101819.
 if has("eval")
   let is_bash=1
 endif
-" }}}
-
-
-" vim: set fenc=utf-8 tw=80 sw=2 sts=2 et foldmethod=marker :
 
 function! Get_Locale()
   if match($LANG, "UTF-8$") > 0
@@ -202,7 +186,6 @@ function! FindEdit(...)
 endfunction
 
 command! -nargs=* -complete=file FindEdit call FindEdit(<f-args>)
-"runtime! syntax/style.vim
 
 function! KeyFollow()
   if !exists("g:KeyFollowMatch")
@@ -232,54 +215,37 @@ endfunction
 
 command! -nargs=0 KeyFollow call KeyFollowToggle()
 
-filetype plugin on
-filetype indent on
-syntax on
-set nocompatible
-
-set autoindent                  " copy indent from current line
-set autoread                    " read open files again when changed outside Vim
-set autowrite                   " write a modified buffer on each :next , ...
-set backspace=indent,eol,start  " backspacing over everything in insert mode
-"set backup                      " keep a backup file
-"set browsedir=current           " which directory to use for the file browser
-"set complete+=k                 " scan the files given with the 'dictionary' option
-set history=50                  " keep 50 lines of command line history
-set hlsearch                    " highlight the last used search pattern
-set incsearch                   " do incremental searching
-set listchars=tab:>.,eol:\$     " strings to use in 'list' mode
-"set nowrap                      " do not wrap lines
-set popt=left:8pc,right:3pc     " print options
-set ruler                       " show the cursor position all the time
-set showcmd                     " display incomplete commands
-set smartindent                 " smart autoindenting when starting a new line
-set visualbell                  " visual bell instead of beeping
-set wildignore=*.bak,*.o,*.ko,*.e,*~ " wildmenu: ignore these extensions
-set wildignore+=*.tar,*.tgz,*.gz,*.bz2,*.lzma,*.zip,*.rar
-set wildignore+=*.pdf,*.ppt,*.pptx,*.doc,*.docx,*.xls,*.xlsx
-set wildignore+=*.rmvb,*.avi,*.mpg,*.mpeg,*.mp4,*.mkv,*.swf
-set wildignore+=*.mp3,*.aac,*.wav,*.flac
-set wildmenu                    " command-line completion in an enhanced mode
-set title
-set hidden
-set cindent
-set cinoptions=:0,l1,t0,g0,(0
-set formatoptions=tcqlron
-set cul
 hi CursorLine cterm=underline
-if v:version >= 703
-  set colorcolumn=+1
-endif
-"set keywordprg=man\ -a
 
 runtime macros/matchit.vim
 
 colorscheme shadowstar
+
+hi StatusLine term=bold,reverse cterm=bold,reverse ctermfg=green gui=bold,reverse guifg=green
+hi StatusLineNC term=reverse cterm=reverse ctermfg=darkred gui=reverse guifg=darkred
+
+let c_space_errors = 1
+let c_gnu = 1
+let g:c_syntax_for_h = 1
 "set omnifunc=syntaxcomplete#Complete
-set path=include/,,/usr/include/
-set completeopt=longest,menu
-let Tlist_Ctags_Cmd = 'exuberant-ctags'
+
+noremap <F2> :TagbarToggle<CR>
+inoremap <F2> <ESC>:TagbarToggle<CR><INSERT>
+noremap <F5> :SrcExplToggle<CR>
+inoremap <F5> <ESC>:SrcExplToggle<CR>
+noremap <F6> :call GITLOG_ToggleWindows()<CR>
+inoremap <F6> <ESC>:call GITLOG_ToggleWindows()<CR>
+noremap <F7> :BufExplorerHorizontalSplit<CR>
+inoremap <F7> <ESC>:BufExplorerHorizontalSplit<CR>
+noremap <F8> :NERDTreeToggle<CR>
+inoremap <F8> <ESC>:NERDTreeToggle<CR>
+noremap <leader>f :KeyFollow<CR>
+noremap <leader>d :VCSDiff<CR>
+noremap <leader>l :VCSLog<CR>
+noremap <leader>u :GundoToggle<CR>
+
 let g:acp_ignorecaseOption = 0
+
 let g:OmniCpp_GlobalScopeSearch = 1
 "let g:OmniCpp_DefaultNamespaces = ["std"]
 let g:OmniCpp_NamespaceSearch = 1
@@ -290,49 +256,15 @@ let g:OmniCpp_ShowScopeInAbbr = 1
 let g:OmniCpp_ShowPrototypeInAbbr = 1
 let g:OmniCpp_DisplayMode = 1
 let g:OmniCpp_SelectFirstItem = 2
+
 let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
 let g:SuperTabDefaultCompletionType="context"
 let g:SuperTabCrMapping = 1
+
 "let g:bufExplorerDetailedHelp=1
 let g:bufExplorerShowRelativePath=1
 let g:bufExplorerSplitVertSize=30
 let g:bufExplorerSplitHorzSize=10
-
-"inoremap [] []<left>
-"inoremap {} {}<left>
-"inoremap () ()<left>
-"inoremap <> <><left>
-"inoremap "" ""<left>
-"inoremap '' ''<left>
-"inoremap , ,<Space>
-
-noremap <F2> :TagbarToggle<CR>
-inoremap <F2> <ESC>:TagbarToggle<CR><INSERT>
-noremap <F3> :tabnext<CR>
-inoremap <F3> <ESC>:tabnext<CR>
-noremap <F4> :tabnew 
-inoremap <F4> <ESC>:tabnew 
-noremap <F5> :SrcExplToggle<CR>
-inoremap <F5> <ESC>:SrcExplToggle<CR>
-noremap <F6> :call GITLOG_ToggleWindows()<CR>
-inoremap <F6> <ESC>:call GITLOG_ToggleWindows()<CR>
-noremap <F7> :BufExplorerHorizontalSplit<CR>
-inoremap <F7> <ESC>:BufExplorerHorizontalSplit<CR>
-noremap <F8> :NERDTreeToggle<CR>
-inoremap <F8> <ESC>:NERDTreeToggle<CR>
-noremap <leader>v <C-W>v
-noremap <leader>s <C-W>s
-noremap <leader>f :KeyFollow<CR>
-noremap <leader>d :VCSDiff<CR>
-noremap <leader>l :VCSLog<CR>
-noremap <C-h> <C-W>h
-noremap <C-j> <C-W>j
-noremap <C-k> <C-W>k
-noremap <C-l> <C-W>l
-noremap <C-c> :shell<CR>
-noremap <leader>u :GundoToggle<CR>
-noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
-noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
 
 let g:EchoFuncKeyPrev = '<C-k>'
 let g:EchoFuncKeyNext = '<C-j>'
@@ -353,9 +285,7 @@ let g:SrcExpl_isUpdateTags = 0
 let g:SrcExpl_updateTagsCmd = "exuberant-ctags --sort=foldcase -R ."
 let g:SrcExpl_updateTagsKey = "<F6>"
 
-"let c_space_errors = 1
-let c_gnu = 1
-let g:c_syntax_for_h = 1
+let Tlist_Ctags_Cmd = 'exuberant-ctags'
 let Tlist_Auto_Highlight_Tag = 1
 let Tlist_Exit_OnlyWindow = 1
 let Tlist_Highlight_Tag_On_BufEnter = 1
@@ -364,19 +294,12 @@ let Tlist_Inc_Winwidth = 0
 "let Tlist_Close_On_Select = 1
 let tlist_make_settings = 'make;m:makros;t:targets'
 let tlist_qmake_settings = 'qmake;t:SystemVariables'
-set laststatus=2
-set statusline=%y%f%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v/%{strdisplaywidth(getline(\".\"))}C,%l/%LL\ --%p%%--
 
 let g:tagbar_left = 1
 let g:tagbar_autoclose = 1
 
-highlight StatusLine term=bold,reverse cterm=bold,reverse ctermfg=green gui=bold,reverse guifg=green
-highlight StatusLineNC term=reverse cterm=reverse ctermfg=darkred gui=reverse guifg=darkred
-
 let g:loaded_syntastic_plugin = 1
 let g:AutoPairsMapCR = 0
-set imdisable
-set iminsert=0
 
 let g:update_last_time_format = '%x %X'
 let g:update_last_end_line = 30
@@ -386,7 +309,8 @@ if executable('ag')
 endif
 
 runtime simple_highlighting.vimrc
+
 "if filereadable(".vimrc")
-"	source .vimrc
+"  source .vimrc
 "endif
 
