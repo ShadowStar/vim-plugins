@@ -229,6 +229,16 @@ let c_gnu = 1
 let g:c_syntax_for_h = 1
 "set omnifunc=syntaxcomplete#Complete
 
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.vim/.plugged')
+
+call plug#end()
+
 noremap <F2> :TagbarToggle<CR>
 inoremap <F2> <ESC>:TagbarToggle<CR><INSERT>
 noremap <F5> :SrcExplToggle<CR>
