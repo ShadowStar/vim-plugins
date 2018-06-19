@@ -242,6 +242,8 @@ endif
 call plug#begin('~/.vim/.plugged')
 
 Plug 'wesleyche/SrcExpl'
+Plug 'scrooloose/nerdtree', { 'tag': '*' }
+Plug 'Xuyuanp/nerdtree-git-plugin'
 
 call plug#end()
 
