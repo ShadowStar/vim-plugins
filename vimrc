@@ -244,13 +244,14 @@ call plug#begin('~/.vim/.plugged')
 Plug 'wesleyche/SrcExpl'
 Plug 'scrooloose/nerdtree', { 'tag': '*' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'wesleyche/Trinity', { 'do': 'rm -f plugin/NERD_tree.vim' }
 
 call plug#end()
 
 noremap <F2> :TagbarToggle<CR>
 inoremap <F2> <ESC>:TagbarToggle<CR><INSERT>
-noremap <F5> :SrcExplToggle<CR>
-inoremap <F5> <ESC>:SrcExplToggle<CR>
+noremap <F5> :TrinityToggleAll<CR>
+inoremap <F5> <ESC>:TrinityToggleAll<CR>
 noremap <F6> :call GITLOG_ToggleWindows()<CR>
 inoremap <F6> <ESC>:call GITLOG_ToggleWindows()<CR>
 noremap <F7> :BufExplorerHorizontalSplit<CR>
@@ -301,7 +302,6 @@ let g:SrcExpl_pluginList = [ "__Tag_List__", "NERD_tree_1", "Source_Explorer" ]
 let g:SrcExpl_searchLocalDef = 1
 let g:SrcExpl_isUpdateTags = 0
 let g:SrcExpl_updateTagsCmd = "exuberant-ctags --sort=foldcase -R ."
-let g:SrcExpl_updateTagsKey = "<F6>"
 
 let Tlist_Ctags_Cmd = 'exuberant-ctags'
 let Tlist_Auto_Highlight_Tag = 1
