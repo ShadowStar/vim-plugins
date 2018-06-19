@@ -241,6 +241,8 @@ endif
 
 call plug#begin('~/.vim/.plugged')
 
+Plug 'wesleyche/SrcExpl'
+
 call plug#end()
 
 noremap <F2> :TagbarToggle<CR>
