@@ -10,7 +10,7 @@ endif
 
 let g:loaded_cscope_tags = 1
 
-function! s:LoadCscope(...)
+function! s:CScopeLoad(...)
   if a:0 < 1
     let l:dir = expand('%:p:h')
     if empty(l:dir)
@@ -48,15 +48,24 @@ function! s:LoadCscope(...)
   endif
 endfunction
 
-function! s:ClearCscope()
+function! s:CScopeReload()
+  set nocscopeverbose
+  let l:tags = &tags
+  exec "set tags="
+  exec "cs reset"
+  exec "set tags=" . l:tags
+endfunction
+
+function! s:CScopeClear()
   set nocscopeverbose
   exec "cs kill -1"
   exec "set tags="
   set cscopeverbose
 endfunction
 
-autocmd BufEnter /*.[chS] call s:LoadCscope(expand('%:p:h'))
+autocmd BufEnter /*.[chS] call s:CScopeLoad(expand('%:p:h'))
 
-command! -nargs=* -complete=dir LoadCscope call s:LoadCscope(<f-args>)
-command! ClearCscope call s:ClearCscope()
+command! -nargs=* -complete=dir CScopeLoad call s:CScopeLoad(<f-args>)
+command! CScopeReload call s:CScopeReload()
+command! CScopeClear call s:CScopeClear()
 
