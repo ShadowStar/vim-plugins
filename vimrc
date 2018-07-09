@@ -245,6 +245,7 @@ Plug 'wesleyche/SrcExpl'
 Plug 'scrooloose/nerdtree', { 'tag': '*' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'wesleyche/Trinity', { 'do': 'rm -f plugin/NERD_tree.vim' }
+Plug 'mhinz/vim-startify'
 
 call plug#end()
 
