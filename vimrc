@@ -246,6 +246,7 @@ Plug 'scrooloose/nerdtree', { 'tag': '*' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'wesleyche/Trinity', { 'do': 'rm -f plugin/NERD_tree.vim' }
 Plug 'mhinz/vim-startify'
+Plug 'rickhowe/diffchar.vim'
 
 call plug#end()
 
