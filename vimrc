@@ -247,6 +247,7 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'wesleyche/Trinity', { 'do': 'rm -f plugin/NERD_tree.vim' }
 Plug 'mhinz/vim-startify'
 Plug 'rickhowe/diffchar.vim'
+Plug 'junegunn/vim-easy-align', { 'tag': '*' }
 
 call plug#end()
 
