@@ -248,8 +248,13 @@ Plug 'wesleyche/Trinity', { 'do': 'rm -f plugin/NERD_tree.vim' }
 Plug 'mhinz/vim-startify'
 Plug 'rickhowe/diffchar.vim'
 Plug 'junegunn/vim-easy-align', { 'tag': '*' }
+Plug 'machakann/vim-highlightedyank'
 
 call plug#end()
+
+if !exists('##TextYankPost')
+  map y <Plug>(highlightedyank)
+endif
 
 noremap <F2> :TagbarToggle<CR>
 inoremap <F2> <ESC>:TagbarToggle<CR><INSERT>
