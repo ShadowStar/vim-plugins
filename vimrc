@@ -241,6 +241,7 @@ endif
 
 call plug#begin('~/.vim/.plugged')
 
+Plug 'inkarkat/vim-ingo-library', { 'branch': 'stable' }
 Plug 'wesleyche/SrcExpl'
 Plug 'scrooloose/nerdtree', { 'tag': '*' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
