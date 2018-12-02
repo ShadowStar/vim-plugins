@@ -36,7 +36,12 @@
 #      REVISION:  ---
 #===============================================================================
 
-set -o nounset                              # Treat unset variables as an error
+set -euxo pipefail  # Exit immediately if a command exits with a non-zero status.
+                    # Treat unset variables as an error when substituting.
+                    # Print commands and their arguments as they are executed.
+                    # The return value of a pipeline is the status of the last
+                    # command to exit with a non-zero status, or zero if no
+                    # command exited with a non-zero status
 <CURSOR>
 == ENDTEMPLATE ==
 
