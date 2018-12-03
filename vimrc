@@ -251,6 +251,7 @@ Plug 'rickhowe/diffchar.vim'
 Plug 'junegunn/vim-easy-align', { 'tag': '*' }
 Plug 'machakann/vim-highlightedyank'
 Plug 'johngrib/vim-git-msg-wheel'
+Plug 'powerman/vim-plugin-viewdoc'
 
 call plug#end()
 
