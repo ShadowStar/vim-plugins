@@ -1,8 +1,8 @@
 
 " Le mapping des touches
-map <silent> q       mZ:call ToggleComment_toggle()<CR>`Z
-map <silent> <S-q>   mZ:call ToggleComment_comment()<CR>`Z
-map <silent> <A-q>   mZ:call ToggleComment_uncomment()<CR>`Z
+nmap <silent> q       mZ:call ToggleComment_toggle()<CR>`Z
+nmap <silent> <S-q>   mZ:call ToggleComment_comment()<CR>`Z
+nmap <silent> <A-q>   mZ:call ToggleComment_uncomment()<CR>`Z
 
 command! -range Ct <line1>,<line2>call ToggleComment_toggle()
 command! -range Cc <line1>,<line2>call ToggleComment_comment()
