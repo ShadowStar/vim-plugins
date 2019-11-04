@@ -252,6 +252,7 @@ Plug 'junegunn/vim-easy-align', { 'tag': '*' }
 Plug 'machakann/vim-highlightedyank'
 Plug 'johngrib/vim-git-msg-wheel'
 Plug 'powerman/vim-plugin-viewdoc'
+Plug 'prabirshrestha/asyncomplete.vim'
 
 call plug#end()
 
@@ -273,6 +274,10 @@ noremap <leader>f :KeyFollow<CR>
 noremap <leader>d :VCSDiff<CR>
 noremap <leader>l :VCSLog<CR>
 noremap <leader>u :GundoToggle<CR>
+
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <cr>    pumvisible() ? "\<C-y>" : "\<cr>"
 
 let g:acp_ignorecaseOption = 0
 
