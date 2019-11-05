@@ -11,6 +11,7 @@ set autowrite                   " write a modified buffer on each :next , ...
 set backspace=indent,eol,start  " backspacing over everything in insert mode
 set cindent
 set cinoptions=:0,l1,t0,g0,(0
+set complete+=k
 set completeopt=longest,menu
 set cursorline
 set formatoptions=tcqlron
@@ -278,6 +279,8 @@ noremap <leader>u :GundoToggle<CR>
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 inoremap <expr> <cr>    pumvisible() ? "\<C-y>" : "\<cr>"
+
+autocmd FileType * execute 'setlocal dictionary='.expand($HOME.'/.vim/dict/'.&filetype.'.dict')
 
 let g:acp_ignorecaseOption = 0
 
