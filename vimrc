@@ -254,6 +254,10 @@ Plug 'machakann/vim-highlightedyank'
 Plug 'johngrib/vim-git-msg-wheel'
 Plug 'powerman/vim-plugin-viewdoc'
 Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'MarcWeber/vim-addon-mw-utils'
+Plug 'tomtom/tlib_vim'
+Plug 'garbas/vim-snipmate'
+Plug 'honza/vim-snippets'
 
 call plug#end()
 
