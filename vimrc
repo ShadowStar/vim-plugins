@@ -52,7 +52,15 @@ noremap <C-h> <C-W>h
 noremap <C-j> <C-W>j
 noremap <C-k> <C-W>k
 noremap <C-l> <C-W>l
-noremap <C-c> :shell<CR>
+if has('terminal')
+	noremap <C-c> :below terminal<CR>
+	tnoremap <C-h> <C-W>h
+	tnoremap <C-j> <C-W>j
+	tnoremap <C-k> <C-W>k
+	tnoremap <C-l> <C-W>l
+else
+	noremap <C-c> :shell<CR>
+endif
 noremap <leader>v <C-W>v
 noremap <leader>s <C-W>s
 noremap <F3> :tabnext<CR>
