@@ -53,11 +53,32 @@ noremap <C-j> <C-W>j
 noremap <C-k> <C-W>k
 noremap <C-l> <C-W>l
 if has('terminal')
-	noremap <C-c> :below terminal<CR>
 	tnoremap <C-h> <C-W>h
 	tnoremap <C-j> <C-W>j
 	tnoremap <C-k> <C-W>k
 	tnoremap <C-l> <C-W>l
+
+	autocmd BufEnter,WinEnter * if &buftype == 'terminal' | silent! normal i | endif
+
+	let g:term_key = "<C-c>"
+	let g:term_buf_nr = -1
+
+	function! ToggleTerminal()
+		if g:term_buf_nr == -1 || bufloaded(g:term_buf_nr) != 1
+			execute "bot term"
+			let g:term_buf_nr = bufnr("$")
+		else
+			let g:term_win_nr = bufwinnr(g:term_buf_nr)
+			if g:term_win_nr == -1
+				execute "bot sbuffer " . g:term_buf_nr
+			else
+				execut g:term_win_nr . 'wincmd w'
+			endif
+		endif
+	endfunction
+
+	execute 'nnoremap ' . g:term_key . ' :call ToggleTerminal()<CR>'
+	execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:q<CR>'
 else
 	noremap <C-c> :shell<CR>
 endif
