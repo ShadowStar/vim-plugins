@@ -288,6 +288,7 @@ Plug 'tomtom/tlib_vim'
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets'
 Plug 'vim-airline/vim-airline'
+Plug 'jiangmiao/auto-pairs', { 'tag': '*' }
 
 call plug#end()
 
