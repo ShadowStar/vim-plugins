@@ -58,7 +58,7 @@ if has('terminal')
 	tnoremap <C-k> <C-W>k
 	tnoremap <C-l> <C-W>l
 
-	autocmd BufEnter,WinEnter * if &buftype == 'terminal' | silent! normal i | endif
+	autocmd BufWinEnter * if &buftype == 'terminal' | silent! normal i | endif
 
 	let g:term_key = "<C-c>"
 	let g:term_buf_nr = -1
