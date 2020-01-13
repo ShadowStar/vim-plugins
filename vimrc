@@ -65,7 +65,8 @@ if has('terminal')
 
 	function! ToggleTerminal()
 		if g:term_buf_nr == -1 || bufloaded(g:term_buf_nr) != 1
-			execute "bot term"
+			let b:win_h = winheight('%') / 3
+			execute "bot term ++rows=" . b:win_h
 			let g:term_buf_nr = bufnr("$")
 		else
 			let g:term_win_nr = bufwinnr(g:term_buf_nr)
