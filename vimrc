@@ -58,7 +58,13 @@ if has('terminal')
 	tnoremap <C-k> <C-W>k
 	tnoremap <C-l> <C-W>l
 
-	autocmd BufWinEnter * if &buftype == 'terminal' | silent! normal i | endif
+	function! Term_insert()
+		if &buftype == 'terminal'
+			execute 'silent! normal i'
+		endif
+	endfunction
+
+	autocmd BufWinEnter * :call Term_insert()
 
 	let g:term_key = "<C-c>"
 	let g:term_buf_nr = -1
