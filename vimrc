@@ -64,20 +64,20 @@ if has('terminal')
 		endif
 	endfunction
 
-	autocmd BufWinEnter * :call Term_insert()
+	autocmd BufEnter * :call Term_insert()
 
 	let g:term_key = "<C-c>"
 	let g:term_buf_nr = -1
 
 	function! ToggleTerminal()
+		let b:win_h = winheight('%') / 3
 		if g:term_buf_nr == -1 || bufloaded(g:term_buf_nr) != 1
-			let b:win_h = winheight('%') / 3
 			execute "bot term ++rows=" . b:win_h
 			let g:term_buf_nr = bufnr("$")
 		else
 			let g:term_win_nr = bufwinnr(g:term_buf_nr)
 			if g:term_win_nr == -1
-				execute "bot sbuffer " . g:term_buf_nr
+				execute "bot sbuffer " . g:term_buf_nr . '| resize ' . b:win_h
 			else
 				execut g:term_win_nr . 'wincmd w'
 			endif
