@@ -86,6 +86,7 @@ if has('terminal')
 
 	execute 'nnoremap ' . g:term_key . ' :call ToggleTerminal()<CR>'
 	execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:q<CR>'
+	execute 'tnoremap <ESC> <C-\><C-N>'
 else
 	noremap <C-c> :shell<CR>
 endif
