@@ -281,6 +281,18 @@ endif
 call plug#begin('~/.vim/.plugged')
 
 Plug 'inkarkat/vim-ingo-library', { 'branch': 'stable' }
+Plug 'inkarkat/vim-CountJump', { 'branch': 'stable' }
+Plug 'inkarkat/vim-ConflictMotions', { 'branch': 'stable' }
+Plug 'inkarkat/vim-ConflictDetection', { 'branch': 'stable' }
+Plug 'inkarkat/vim-SyntaxRange', { 'branch': 'stable' }
+Plug 'inkarkat/vim-LogViewer', { 'branch': 'stable' }
+Plug 'powerman/vim-plugin-AnsiEsc'
+Plug 'ctrlpvim/ctrlp.vim', { 'tag': '*' }
+Plug 'lilydjwg/colorizer'
+Plug 'sjl/gundo.vim', { 'tag': '*' }
+Plug 'christianrondeau/vim-base64'
+Plug 'chrisbra/csv.vim'
+Plug 'junkblocker/patchreview-vim', { 'tag': '*' }
 Plug 'wesleyche/SrcExpl'
 Plug 'scrooloose/nerdtree', { 'tag': '*' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
