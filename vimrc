@@ -292,11 +292,9 @@ Plug 'lilydjwg/colorizer'
 Plug 'sjl/gundo.vim', { 'tag': '*' }
 Plug 'christianrondeau/vim-base64'
 Plug 'chrisbra/csv.vim'
-Plug 'junkblocker/patchreview-vim', { 'tag': '*' }
-Plug 'wesleyche/SrcExpl'
+Plug 'junkblocker/patchreview-vim'
 Plug 'scrooloose/nerdtree', { 'tag': '*' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'wesleyche/Trinity', { 'do': 'rm -f plugin/NERD_tree.vim' }
 Plug 'mhinz/vim-startify'
 Plug 'rickhowe/diffchar.vim'
 Plug 'junegunn/vim-easy-align', { 'tag': '*' }
@@ -319,8 +317,6 @@ endif
 
 noremap <F2> :TagbarToggle<CR>
 inoremap <F2> <ESC>:TagbarToggle<CR><INSERT>
-noremap <F5> :TrinityToggleAll<CR>
-inoremap <F5> <ESC>:TrinityToggleAll<CR>
 noremap <F6> :call GITLOG_ToggleWindows()<CR>
 inoremap <F6> <ESC>:call GITLOG_ToggleWindows()<CR>
 noremap <F7> :BufExplorerHorizontalSplit<CR>
@@ -360,8 +356,6 @@ let g:bufExplorerShowRelativePath=1
 let g:bufExplorerSplitVertSize=30
 let g:bufExplorerSplitHorzSize=10
 
-let g:EchoFuncKeyPrev = '<C-k>'
-let g:EchoFuncKeyNext = '<C-j>'
 let g:VCSCommandDeleteOnHide = 1
 let g:C_Dictionary_File = $HOME.'/.vim/c-support/wordlists/std-keywords.list'
 let g:C_Ctrl_j = 'off'
@@ -369,29 +363,10 @@ let g:BASH_Ctrl_j = 'off'
 let g:Awk_Ctrl_j = 'off'
 let g:Vim_Ctrl_j = 'off'
 
-let g:SrcExpl_winHeight = 8
-let g:SrcExpl_refreshTime = 100
-let g:SrcExpl_jumpKey = "<ENTER>"
-let g:SrcExpl_gobackKey = "<SPACE>"
-let g:SrcExpl_pluginList = [ "__Tag_List__", "NERD_tree_1", "Source_Explorer" ]
-let g:SrcExpl_searchLocalDef = 1
-let g:SrcExpl_isUpdateTags = 0
-let g:SrcExpl_updateTagsCmd = "exuberant-ctags --sort=foldcase -R ."
-
-let Tlist_Ctags_Cmd = 'exuberant-ctags'
-let Tlist_Auto_Highlight_Tag = 1
-let Tlist_Exit_OnlyWindow = 1
-let Tlist_Highlight_Tag_On_BufEnter = 1
-let Tlist_GainFocus_On_ToggleOpen = 1
-let Tlist_Inc_Winwidth = 0
-"let Tlist_Close_On_Select = 1
-let tlist_make_settings = 'make;m:makros;t:targets'
-let tlist_qmake_settings = 'qmake;t:SystemVariables'
-
+let NERDTreeWinPos = "right"
 let g:tagbar_left = 1
 let g:tagbar_autoclose = 1
 
-let g:loaded_syntastic_plugin = 1
 let g:AutoPairsMapCR = 0
 
 let g:update_last_time_format = '%x %X'
