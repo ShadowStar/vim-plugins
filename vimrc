@@ -87,7 +87,10 @@ if has('terminal')
 
 	execute 'nnoremap ' . g:term_key . ' :call ToggleTerminal()<CR>'
 	execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:q<CR>'
-	execute 'tnoremap <ESC> <C-\><C-N>'
+	execute 'tnoremap <Esc> <C-\><C-N>'
+	execute 'tnoremap <Esc><Esc> <C-\><C-N>'
+	execute 'set timeout timeoutlen=100'
+	execute 'set ttimeout ttimeoutlen=100'
 else
 	noremap <C-c> :shell<CR>
 endif
