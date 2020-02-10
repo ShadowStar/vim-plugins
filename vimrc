@@ -89,7 +89,7 @@ if has('terminal')
 	execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:q<CR>'
 	execute 'tnoremap <Esc> <C-\><C-N>'
 	execute 'tnoremap <Esc><Esc> <C-\><C-N>'
-	execute 'set timeout timeoutlen=100'
+	execute 'set timeout timeoutlen=500'
 	execute 'set ttimeout ttimeoutlen=100'
 else
 	noremap <C-c> :shell<CR>
