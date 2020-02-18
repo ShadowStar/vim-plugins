@@ -311,6 +311,7 @@ Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets'
 Plug 'vim-airline/vim-airline'
 Plug 'jiangmiao/auto-pairs', { 'tag': '*' }
+Plug 'duggiefresh/vim-easydir'
 
 call plug#end()
 
