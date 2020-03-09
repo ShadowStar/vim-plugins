@@ -43,6 +43,7 @@ set wildignore+=*.pdf,*.ppt,*.pptx,*.doc,*.docx,*.xls,*.xlsx
 set wildignore+=*.rmvb,*.avi,*.mpg,*.mpeg,*.mp4,*.mkv,*.swf
 set wildignore+=*.mp3,*.aac,*.wav,*.flac
 set wildmenu                    " command-line completion in an enhanced mode
+set notagbsearch
 "set mouse=a
 
 " Don't use Ex mode, use Q for formatting
