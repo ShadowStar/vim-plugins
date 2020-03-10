@@ -292,7 +292,6 @@ Plug 'inkarkat/vim-SyntaxRange', { 'branch': 'stable' }
 Plug 'inkarkat/vim-LogViewer', { 'branch': 'stable' }
 Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'ctrlpvim/ctrlp.vim', { 'tag': '*' }
-Plug 'lilydjwg/colorizer'
 Plug 'sjl/gundo.vim', { 'tag': '*' }
 Plug 'christianrondeau/vim-base64'
 Plug 'chrisbra/csv.vim'
@@ -305,7 +304,6 @@ Plug 'junegunn/vim-easy-align', { 'tag': '*' }
 Plug 'machakann/vim-highlightedyank'
 Plug 'johngrib/vim-git-msg-wheel'
 Plug 'powerman/vim-plugin-viewdoc'
-Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'tomtom/tlib_vim'
 Plug 'garbas/vim-snipmate'
