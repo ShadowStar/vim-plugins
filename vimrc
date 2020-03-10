@@ -274,7 +274,7 @@ hi StatusLineNC term=reverse cterm=reverse ctermfg=darkred gui=reverse guifg=dar
 let c_space_errors = 1
 let c_gnu = 1
 let g:c_syntax_for_h = 1
-"set omnifunc=syntaxcomplete#Complete
+set omnifunc=syntaxcomplete#Complete
 
 if empty(glob('~/.vim/autoload/plug.vim'))
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
