@@ -375,10 +375,6 @@ let g:AutoPairsMapCR = 0
 let g:update_last_time_format = '%x %X'
 let g:update_last_end_line = 30
 
-if executable('ag')
-  let g:ackprg = 'ag --vimgrep'
-endif
-
 runtime simple_highlighting.vimrc
 
 "if filereadable(".vimrc")
