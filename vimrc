@@ -377,8 +377,6 @@ let g:AutoPairsMapCR = 0
 let g:update_last_time_format = '%x %X'
 let g:update_last_end_line = 30
 
-runtime simple_highlighting.vimrc
-
 "if filereadable(".vimrc")
 "  source .vimrc
 "endif
