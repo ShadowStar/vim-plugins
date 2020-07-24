@@ -331,6 +331,7 @@ inoremap <F8> <ESC>:NERDTreeToggle<CR>
 noremap <leader>f :KeyFollow<CR>
 noremap <leader>d :VCSDiff<CR>
 noremap <leader>l :VCSLog<CR>
+noremap <leader>b :VCSBlame<CR>
 noremap <leader>u :GundoToggle<CR>
 
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
