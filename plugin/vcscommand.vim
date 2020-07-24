@@ -797,6 +797,8 @@ function! s:VCSAnnotate(bang, ...)
 		if annotateBuffer == -1
 			return -1
 		endif
+		setlocal nomodifiable
+		execute 'nmap <buffer> q :<C-u>q<CR>'
 		if a:bang == '!' && VCSCommandGetOption('VCSCommandDisableSplitAnnotate', 0) == 0
 			let vcsType = VCSCommandGetVCSType(annotateBuffer)
 			let functionMap = s:plugins[vcsType][1]
