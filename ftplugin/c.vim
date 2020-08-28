@@ -69,7 +69,7 @@ inoremap <expr> :<CR>  <sid>Comp_Case()
 "-------------------------------------------------------------------------------
 " additional mapping : complete a classical C comment: '/*' => '/* | */'
 "-------------------------------------------------------------------------------
-inoremap  <buffer>  /*       /*<Space><Space>*/<Left><Left><Left>
+inoremap  <buffer>  /*      /**<Space><Space>*/<Left><Left><Left>
 vnoremap  <buffer>  /*      s/*<Space><Space>*/<Left><Left><Left><Esc>p
 "
 "-------------------------------------------------------------------------------
@@ -78,7 +78,8 @@ vnoremap  <buffer>  /*      s/*<Space><Space>*/<Left><Left><Left><Esc>p
 "                                    * |
 "                                    */
 "-------------------------------------------------------------------------------
-inoremap  <buffer>  /*<CR>  /*<CR><CR>/<Esc>kA<Space>
+inoremap  <buffer>  /*<CR>  /**<CR><CR>/<Esc>kA<Space>
+inoremap  <buffer>  //      //!<Space>
 "
 "-------------------------------------------------------------------------------
 " additional mapping : {<CR> always opens a block
