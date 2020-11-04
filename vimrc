@@ -69,7 +69,7 @@ if has('terminal')
 
 	autocmd BufEnter * :call Term_insert()
 
-	let g:term_key = "<C-c>"
+	let g:term_key = "<leader>c"
 	let g:term_buf_nr = -1
 
 	function! ToggleTerminal()
@@ -94,7 +94,7 @@ if has('terminal')
 	execute 'set timeout timeoutlen=500'
 	execute 'set ttimeout ttimeoutlen=100'
 else
-	noremap <C-c> :shell<CR>
+	noremap <leader>c :shell<CR>
 endif
 noremap <leader>v <C-W>v
 noremap <leader>s <C-W>s
