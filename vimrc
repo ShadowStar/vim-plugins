@@ -313,7 +313,7 @@ Plug 'vim-airline/vim-airline'
 Plug 'jiangmiao/auto-pairs', { 'tag': '*' }
 Plug 'duggiefresh/vim-easydir'
 Plug 'lfv89/vim-interestingwords'
-Plug 'mbbill/code_complete'
+Plug 'ShadowStar/code_complete'
 Plug 'mbbill/echofunc'
 
 call plug#end()
