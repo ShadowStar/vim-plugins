@@ -315,6 +315,7 @@ Plug 'duggiefresh/vim-easydir'
 Plug 'lfv89/vim-interestingwords'
 Plug 'ShadowStar/code_complete'
 Plug 'mbbill/echofunc'
+Plug 'embear/vim-localvimrc'
 
 call plug#end()
 
