@@ -316,6 +316,7 @@ Plug 'lfv89/vim-interestingwords'
 Plug 'ShadowStar/code_complete'
 Plug 'mbbill/echofunc'
 Plug 'embear/vim-localvimrc'
+Plug 'voldikss/vim-floaterm'
 
 call plug#end()
 
@@ -344,7 +345,8 @@ inoremap <expr> <cr>    pumvisible() ? "\<C-y>" : "\<cr>"
 autocmd FileType * execute 'setlocal dictionary='.expand($HOME.'/.vim/dict/'.&filetype.'.dict')
 
 let g:acp_ignorecaseOption = 0
-
+let g:floaterm_autoclose = 2
+let g:floaterm_keymap_toggle = '<leader>c'
 let g:OmniCpp_GlobalScopeSearch = 1
 "let g:OmniCpp_DefaultNamespaces = ["std"]
 let g:OmniCpp_NamespaceSearch = 1
