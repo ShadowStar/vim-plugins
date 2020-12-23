@@ -77,13 +77,27 @@ if has('terminal')
 	let s:term_win_nr = -1
 
 	function! ToggleTerminal()
+		if g:has_popup
+			let b:win_h = winheight('%') / 3 * 2
+			let b:win_w = winwidth('%') / 3 * 2
+			let s:term_ops = {
+			\ 'maxwidth': b:win_w,
+			\ 'minwidth': b:win_w,
+			\ 'maxheight': b:win_h,
+			\ 'minheight': b:win_h,
+			\ 'title': &shell,
+			\ 'border': [1, 1, 1, 1],
+			\ 'borderchars': ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
+			\ 'borderhighlight': ['Normal']
+			\ }
+		else
+			let b:win_h = winheight('%') / 3
+		endif
+
 		if s:term_buf_nr == -1 || bufloaded(s:term_buf_nr) != 1
 			if g:has_popup
-				let b:win_h = winheight('%') / 3 * 2
-				let b:win_w = winwidth('%') / 3 * 2
-				hi link Terminal Search
 				let s:term_buf_nr = term_start(&shell, #{hidden: 1, term_finish: 'close'})
-				let s:term_win_nr = popup_create(s:term_buf_nr, #{maxwidth: b:win_w, minwidth: b:win_w, maxheight: b:win_h, minheight: b:win_h, title: &shell})
+				let s:term_win_nr = popup_create(s:term_buf_nr, s:term_ops)
 			else
 				let b:win_h = winheight('%') / 3
 				execute "bot term ++rows=" . b:win_h
@@ -91,16 +105,13 @@ if has('terminal')
 			endif
 		else
 			if g:has_popup
-				let b:win_h = winheight('%') / 3 * 2
-				let b:win_w = winwidth('%') / 3 * 2
 				if s:term_win_nr == -1
-					let s:term_win_nr = popup_create(s:term_buf_nr, #{maxwidth: b:win_w, minwidth: b:win_w, maxheight: b:win_h, minheight: b:win_h, title: &shell})
+					let s:term_win_nr = popup_create(s:term_buf_nr, s:term_ops)
 				else
 					call popup_close(s:term_win_nr)
 					let s:term_win_nr = -1
 				endif
 			else
-				let b:win_h = winheight('%') / 3
 				let s:term_win_nr = bufwinnr(s:term_buf_nr)
 				if s:term_win_nr == -1
 					execute "bot sbuffer " . s:term_buf_nr . '| resize ' . b:win_h
@@ -111,6 +122,8 @@ if has('terminal')
 		endif
 	endfunction
 
+	execute 'set timeout timeoutlen=500'
+	execute 'set ttimeout ttimeoutlen=100'
 	execute 'nnoremap ' . g:term_key . ' :call ToggleTerminal()<CR>'
 	if g:has_popup
 		execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:call ToggleTerminal()<CR>'
@@ -118,8 +131,6 @@ if has('terminal')
 		execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:q<CR>'
 		execute 'tnoremap <Esc> <C-\><C-N>'
 		execute 'tnoremap <Esc><Esc> <C-\><C-N>'
-		execute 'set timeout timeoutlen=500'
-		execute 'set ttimeout ttimeoutlen=100'
 	endif
 else
 	execute 'noremap ' . g:term_key . ' :shell<CR>'
