@@ -55,6 +55,10 @@ noremap <C-h> <C-W>h
 noremap <C-j> <C-W>j
 noremap <C-k> <C-W>k
 noremap <C-l> <C-W>l
+
+let g:term_key = '<leader>c'
+let g:has_popup = has('textprop') && has('patch-8.2.0286')
+
 if has('terminal')
 	tnoremap <C-h> <C-W>h
 	tnoremap <C-j> <C-W>j
@@ -69,32 +73,56 @@ if has('terminal')
 
 	autocmd BufEnter * :call Term_insert()
 
-	let g:term_key = "<leader>c"
-	let g:term_buf_nr = -1
+	let s:term_buf_nr = -1
+	let s:term_win_nr = -1
 
 	function! ToggleTerminal()
-		let b:win_h = winheight('%') / 3
-		if g:term_buf_nr == -1 || bufloaded(g:term_buf_nr) != 1
-			execute "bot term ++rows=" . b:win_h
-			let g:term_buf_nr = bufnr("$")
-		else
-			let g:term_win_nr = bufwinnr(g:term_buf_nr)
-			if g:term_win_nr == -1
-				execute "bot sbuffer " . g:term_buf_nr . '| resize ' . b:win_h
+		if s:term_buf_nr == -1 || bufloaded(s:term_buf_nr) != 1
+			if g:has_popup
+				let b:win_h = winheight('%') / 3 * 2
+				let b:win_w = winwidth('%') / 3 * 2
+				hi link Terminal Search
+				let s:term_buf_nr = term_start(&shell, #{hidden: 1, term_finish: 'close'})
+				let s:term_win_nr = popup_create(s:term_buf_nr, #{maxwidth: b:win_w, minwidth: b:win_w, maxheight: b:win_h, minheight: b:win_h, title: &shell})
 			else
-				execut g:term_win_nr . 'wincmd w'
+				let b:win_h = winheight('%') / 3
+				execute "bot term ++rows=" . b:win_h
+				let s:term_buf_nr = bufnr("$")
+			endif
+		else
+			if g:has_popup
+				let b:win_h = winheight('%') / 3 * 2
+				let b:win_w = winwidth('%') / 3 * 2
+				if s:term_win_nr == -1
+					let s:term_win_nr = popup_create(s:term_buf_nr, #{maxwidth: b:win_w, minwidth: b:win_w, maxheight: b:win_h, minheight: b:win_h, title: &shell})
+				else
+					call popup_close(s:term_win_nr)
+					let s:term_win_nr = -1
+				endif
+			else
+				let b:win_h = winheight('%') / 3
+				let s:term_win_nr = bufwinnr(s:term_buf_nr)
+				if s:term_win_nr == -1
+					execute "bot sbuffer " . s:term_buf_nr . '| resize ' . b:win_h
+				else
+					execut s:term_win_nr . 'wincmd w'
+				endif
 			endif
 		endif
 	endfunction
 
 	execute 'nnoremap ' . g:term_key . ' :call ToggleTerminal()<CR>'
-	execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:q<CR>'
-	execute 'tnoremap <Esc> <C-\><C-N>'
-	execute 'tnoremap <Esc><Esc> <C-\><C-N>'
-	execute 'set timeout timeoutlen=500'
-	execute 'set ttimeout ttimeoutlen=100'
+	if g:has_popup
+		execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:call ToggleTerminal()<CR>'
+	else
+		execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:q<CR>'
+		execute 'tnoremap <Esc> <C-\><C-N>'
+		execute 'tnoremap <Esc><Esc> <C-\><C-N>'
+		execute 'set timeout timeoutlen=500'
+		execute 'set ttimeout ttimeoutlen=100'
+	endif
 else
-	noremap <leader>c :shell<CR>
+	execute 'noremap ' . g:term_key . ' :shell<CR>'
 endif
 noremap <leader>v <C-W>v
 noremap <leader>s <C-W>s
