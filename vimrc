@@ -78,8 +78,8 @@ if has('terminal')
 
 	function! ToggleTerminal()
 		if g:has_popup
-			let b:win_h = winheight('%') / 3 * 2
-			let b:win_w = winwidth('%') / 3 * 2
+			let b:win_h = &lines / 3 * 2
+			let b:win_w = &columns / 3 * 2
 			let s:term_ops = {
 			\ 'maxwidth': b:win_w,
 			\ 'minwidth': b:win_w,
@@ -91,7 +91,7 @@ if has('terminal')
 			\ 'borderhighlight': ['Normal']
 			\ }
 		else
-			let b:win_h = winheight('%') / 3
+			let b:win_h = &lines / 3
 		endif
 
 		if s:term_buf_nr == -1 || bufloaded(s:term_buf_nr) != 1
@@ -99,7 +99,6 @@ if has('terminal')
 				let s:term_buf_nr = term_start(&shell, #{hidden: 1, term_finish: 'close'})
 				let s:term_win_nr = popup_create(s:term_buf_nr, s:term_ops)
 			else
-				let b:win_h = winheight('%') / 3
 				execute "bot term ++rows=" . b:win_h
 				let s:term_buf_nr = bufnr("$")
 			endif
