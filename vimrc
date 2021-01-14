@@ -381,6 +381,7 @@ inoremap <expr> <cr>    pumvisible() ? "\<C-y>" : "\<cr>"
 
 autocmd FileType * execute 'setlocal dictionary='.expand($HOME.'/.vim/dict/'.&filetype.'.dict')
 
+let g:snipMate = { 'snippet_version' : 1 }
 let g:acp_ignorecaseOption = 0
 let g:OmniCpp_GlobalScopeSearch = 1
 "let g:OmniCpp_DefaultNamespaces = ["std"]
