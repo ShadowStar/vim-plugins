@@ -30,7 +30,7 @@ set popt=left:8pc,right:3pc     " print options
 set ruler                       " show the cursor position all the time
 set showcmd                     " display incomplete commands
 set smartindent                 " smart autoindenting when starting a new line
-set statusline=%y%f%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v/%{strdisplaywidth(getline(\".\"))}C,%l/%LL\ --%p%%--
+set statusline=%{toupper(mode(1))}%y%f%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v/%{strdisplaywidth(getline(\".\"))}C,%l/%LL\ --%p%%--
 set suffixes+=.info,.aux,.log,.dvi,.bbl,.out,.o,.lo
 set t_ZH=[3m
 set t_ZR=[23m
@@ -300,6 +300,22 @@ function! KeyFollowToggle()
 endfunction
 
 command! -nargs=0 KeyFollow call KeyFollowToggle()
+
+function! SearchCount()
+  let keyString=@/
+  let pos=getpos('.')
+  try
+    redir => nth
+      silent exe '0,.s/' . keyString . '//ne'
+    redir => cnt
+      silent exe '%s/' . keyString . '//ne'
+    redir END
+    return matchstr( nth, '\d\+' ) . '/' . matchstr( cnt, '\d\+' )
+  finally
+    call setpos('.', pos)
+  endtry
+endfunction
+set statusline+=[%{SearchCount()}] " Nth of N when searching
 
 hi CursorLine cterm=underline
 
