@@ -45,6 +45,7 @@ set wildignore+=*.mp3,*.aac,*.wav,*.flac
 set wildmenu                    " command-line completion in an enhanced mode
 set notagbsearch
 set nofileignorecase
+set shortmess-=S
 "set mouse=a
 
 " Don't use Ex mode, use Q for formatting
@@ -300,22 +301,6 @@ function! KeyFollowToggle()
 endfunction
 
 command! -nargs=0 KeyFollow call KeyFollowToggle()
-
-function! SearchCount()
-  let keyString=@/
-  let pos=getpos('.')
-  try
-    redir => nth
-      silent exe '0,.s/' . keyString . '//ne'
-    redir => cnt
-      silent exe '%s/' . keyString . '//ne'
-    redir END
-    return matchstr( nth, '\d\+' ) . '/' . matchstr( cnt, '\d\+' )
-  finally
-    call setpos('.', pos)
-  endtry
-endfunction
-set statusline+=[%{SearchCount()}] " Nth of N when searching
 
 hi CursorLine cterm=underline
 
