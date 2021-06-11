@@ -354,6 +354,7 @@ Plug 'lfv89/vim-interestingwords'
 Plug 'ShadowStar/code_complete'
 Plug 'mbbill/echofunc'
 Plug 'embear/vim-localvimrc'
+Plug 'rickhowe/spotdiff.vim'
 
 call plug#end()
 
