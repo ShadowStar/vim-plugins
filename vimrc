@@ -30,7 +30,7 @@ set popt=left:8pc,right:3pc     " print options
 set ruler                       " show the cursor position all the time
 set showcmd                     " display incomplete commands
 set smartindent                 " smart autoindenting when starting a new line
-set statusline=%{toupper(mode(1))}%y%f%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v/%{strdisplaywidth(getline(\".\"))}C,%l/%LL\ --%p%%--
+set statusline=%{toupper(mode(1))}\|\ %y%f%m%=[%{&ff},%{&fenc}]\ 0x%B\ %v/%{strdisplaywidth(getline(\".\"))}C,%l/%LL\ --%p%%--
 set suffixes+=.info,.aux,.log,.dvi,.bbl,.out,.o,.lo
 set t_ZH=[3m
 set t_ZR=[23m
