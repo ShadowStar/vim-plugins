@@ -355,6 +355,7 @@ Plug 'ShadowStar/code_complete'
 Plug 'mbbill/echofunc'
 Plug 'embear/vim-localvimrc'
 Plug 'rickhowe/spotdiff.vim'
+Plug 'rhysd/git-messenger.vim'
 
 call plug#end()
 
