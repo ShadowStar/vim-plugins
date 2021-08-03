@@ -356,6 +356,7 @@ Plug 'mbbill/echofunc'
 Plug 'embear/vim-localvimrc'
 Plug 'rickhowe/spotdiff.vim'
 Plug 'rhysd/git-messenger.vim'
+Plug 'markonm/traces.vim'
 
 call plug#end()
 
