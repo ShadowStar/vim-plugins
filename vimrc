@@ -135,6 +135,9 @@ if has('terminal')
 else
 	execute 'noremap ' . g:term_key . ' :shell<CR>'
 endif
+
+noremap <C-c> :shell<CR>
+inoremap <C-c> <ESC>:shell<CR>
 noremap <leader>v <C-W>v
 noremap <leader>s <C-W>s
 noremap <F3> :tabnext<CR>
