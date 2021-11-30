@@ -360,6 +360,7 @@ Plug 'embear/vim-localvimrc'
 Plug 'rickhowe/spotdiff.vim'
 Plug 'rhysd/git-messenger.vim'
 Plug 'markonm/traces.vim'
+Plug 'shirk/vim-gas'
 
 call plug#end()
 
