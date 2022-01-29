@@ -1,5 +1,5 @@
 "============================================================================
-"    Copyright: Copyright (c) 2001-2018, Jeff Lanzarotta
+"    Copyright: Copyright (c) 2001-2022, Jeff Lanzarotta
 "               All rights reserved.
 "
 "               Redistribution and use in source and binary forms, with or
@@ -35,8 +35,8 @@
 "               EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 " Name Of File: bufexplorer.vim
 "  Description: Buffer Explorer Vim Plugin
-"   Maintainer: Jeff Lanzarotta (delux256-vim at outlook dot com)
-" Last Changed: Saturday, 08 December 2018
+"   Maintainer: Jeff Lanzarotta (my name at gmail dot com)
+" Last Changed: Thursday, 27 January 2022
 "      Version: See g:bufexplorer_version for version number.
 "        Usage: This file should reside in the plugin directory and be
 "               automatically sourced.
@@ -74,7 +74,7 @@ endif
 "1}}}
 
 " Version number
-let g:bufexplorer_version = "7.4.21"
+let g:bufexplorer_version = "7.4.23"
 
 " Plugin Code {{{1
 " Check for Vim version {{{2
@@ -132,6 +132,7 @@ let s:originBuffer = 0
 let s:running = 0
 let s:sort_by = ["number", "name", "fullpath", "mru", "extension"]
 let s:splitMode = ""
+let s:didSplit = 0
 let s:types = {"fullname": ':p', "path": ':p:h', "relativename": ':~:.', "relativepath": ':~:.:h', "shortname": ':t'}
 
 " Setup the autocommands that handle the MRUList and other stuff. {{{2
@@ -361,6 +362,7 @@ function! s:Cleanup()
 
     let s:running = 0
     let s:splitMode = ""
+    let s:didSplit = 0
 
     delmarks!
 endfunction
@@ -392,12 +394,14 @@ endfunction
 function! BufExplorerHorizontalSplit()
     let s:splitMode = "sp"
     execute "BufExplorer"
+    let s:splitMode = ""
 endfunction
 
 " BufExplorerVerticalSplit {{{2
 function! BufExplorerVerticalSplit()
     let s:splitMode = "vsp"
     execute "BufExplorer"
+    let s:splitMode = ""
 endfunction
 
 " ToggleBufExplorer {{{2
@@ -425,7 +429,6 @@ function! BufExplorer()
             execute "drop" name
         endif
 
-        exec "wincmd c"
         return
     endif
 
@@ -452,6 +455,9 @@ function! BufExplorer()
 
         " Restore the original settings.
         let [&splitbelow, &splitright] = [_splitbelow, _splitright]
+
+        " Remember that a split was triggered
+        let s:didSplit = 1
     endif
 
     if !exists("b:displayMode") || b:displayMode != "winmanager"
@@ -474,6 +480,7 @@ function! s:DisplayBufferList()
     " the buffer using CTRL-^.
     setlocal buftype=nofile
     setlocal modifiable
+    setlocal noreadonly
     setlocal noswapfile
     setlocal nowrap
 
@@ -920,7 +927,7 @@ function! s:SelectBuffer(...)
             endif
 
             " Switch to the selected buffer.
-            execute "keepalt silent b!" _bufNbr
+            execute "keepjumps keepalt silent b!" _bufNbr
         endif
 
         " Make the buffer 'listed' again.
@@ -957,12 +964,6 @@ function! s:RemoveBuffer(mode)
     endif
 
     let mode = a:mode
-
-    " Do not allow this buffer to be deleted if it is the last one.
-    if len(s:MRUList) == 1
-        call s:Error("Sorry, you are not allowed to delete the last buffer")
-        return
-    endif
 
     " These commands are to temporarily suspend the activity of winmanager.
     if exists("b:displayMode") && b:displayMode == "winmanager"
@@ -1043,7 +1044,7 @@ function! s:Close()
     endif
 
     " If we needed to split the main window, close the split one.
-    if s:splitMode != "" && bufwinnr(s:originBuffer) != -1
+    if s:didSplit == 1 && bufwinnr(s:originBuffer) != -1
         execute "wincmd c"
     endif
 
