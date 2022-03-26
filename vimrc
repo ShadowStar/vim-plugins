@@ -57,87 +57,93 @@ noremap <C-j> <C-W>j
 noremap <C-k> <C-W>k
 noremap <C-l> <C-W>l
 
-let g:term_key = '<leader>c'
-let g:has_popup = has('textprop') && has('patch-8.2.0286')
+tnoremap <C-h> <C-W>h
+tnoremap <C-j> <C-W>j
+tnoremap <C-k> <C-W>k
+tnoremap <C-l> <C-W>l
 
-if has('terminal')
-	tnoremap <C-h> <C-W>h
-	tnoremap <C-j> <C-W>j
-	tnoremap <C-k> <C-W>k
-	tnoremap <C-l> <C-W>l
+function! Term_insert()
+  if &buftype == 'terminal'
+    execute 'silent! normal i'
+  endif
+endfunction
 
-	function! Term_insert()
-		if &buftype == 'terminal'
-			execute 'silent! normal i'
-		endif
-	endfunction
+autocmd BufEnter * :call Term_insert()
 
-	autocmd BufEnter * :call Term_insert()
+let s:term_buf_nr = -1
+let s:term_win_nr = -1
 
-	let s:term_buf_nr = -1
-	let s:term_win_nr = -1
+function! ToggleTerminal(m, k)
+  if has('textprop') && has('patch-8.2.0286') && a:m == 'p'
+    let l:m = 'p'
+  else
+    let l:m = 'b'
+  endif
 
-	function! ToggleTerminal()
-		if g:has_popup
-			let b:win_h = &lines / 3 * 2
-			let b:win_w = &columns / 3 * 2
-			let s:term_ops = {
-			\ 'maxwidth': b:win_w,
-			\ 'minwidth': b:win_w,
-			\ 'maxheight': b:win_h,
-			\ 'minheight': b:win_h,
-			\ 'title': &shell,
-			\ 'border': [1, 1, 1, 1],
-			\ 'borderchars': ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
-			\ 'borderhighlight': ['Normal']
-			\ }
-		else
-			let b:win_h = &lines / 3
-		endif
+  if has('terminal')
+    if l:m == 'p'
+      let b:win_h = &lines / 3 * 2
+      let b:win_w = &columns / 3 * 2
+      let s:term_ops = {
+            \ 'maxwidth': b:win_w,
+            \ 'minwidth': b:win_w,
+            \ 'maxheight': b:win_h,
+            \ 'minheight': b:win_h,
+            \ 'title': &shell,
+            \ 'border': [1, 1, 1, 1],
+            \ 'borderchars': ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
+            \ 'borderhighlight': ['Normal']
+            \ }
+    else
+      let b:win_h = &lines / 3
+    endif
 
-		if s:term_buf_nr == -1 || bufloaded(s:term_buf_nr) != 1
-			if g:has_popup
-				let s:term_buf_nr = term_start(&shell, #{hidden: 1, term_finish: 'close'})
-				let s:term_win_nr = popup_create(s:term_buf_nr, s:term_ops)
-			else
-				execute "bot term ++rows=" . b:win_h
-				let s:term_buf_nr = bufnr("$")
-			endif
-		else
-			if g:has_popup
-				if s:term_win_nr == -1
-					let s:term_win_nr = popup_create(s:term_buf_nr, s:term_ops)
-				else
-					call popup_close(s:term_win_nr)
-					let s:term_win_nr = -1
-				endif
-			else
-				let s:term_win_nr = bufwinnr(s:term_buf_nr)
-				if s:term_win_nr == -1
-					execute "bot sbuffer " . s:term_buf_nr . '| resize ' . b:win_h
-				else
-					execut s:term_win_nr . 'wincmd w'
-				endif
-			endif
-		endif
-	endfunction
+    if s:term_buf_nr == -1 || bufloaded(s:term_buf_nr) != 1
+      if l:m == 'p'
+        let s:term_buf_nr = term_start(&shell, #{hidden: 1, term_finish: 'close'})
+        let s:term_win_nr = popup_create(s:term_buf_nr, s:term_ops)
+      else
+        execute "bot term ++rows=" . b:win_h
+        let s:term_buf_nr = bufnr("$")
+      endif
+    else
+      if l:m == 'p'
+        if s:term_win_nr == -1
+          let s:term_win_nr = popup_create(s:term_buf_nr, s:term_ops)
+        else
+          call popup_close(s:term_win_nr)
+          let s:term_win_nr = -1
+        endif
+      else
+        let s:term_win_nr = bufwinnr(s:term_buf_nr)
+        if s:term_win_nr == -1
+          execute "bot sbuffer " . s:term_buf_nr . '| resize ' . b:win_h
+        else
+          execut s:term_win_nr . 'wincmd w'
+        endif
+      endif
+    endif
 
-	execute 'set timeout timeoutlen=500'
-	execute 'set ttimeout ttimeoutlen=100'
-	execute 'nnoremap ' . g:term_key . ' :call ToggleTerminal()<CR>'
-	if g:has_popup
-		execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:call ToggleTerminal()<CR>'
-	else
-		execute 'tnoremap ' . g:term_key . ' <C-\><C-N>:q<CR>'
-		execute 'tnoremap <Esc> <C-\><C-N>'
-		execute 'tnoremap <Esc><Esc> <C-\><C-N>'
-	endif
-else
-	execute 'noremap ' . g:term_key . ' :shell<CR>'
-endif
+    if l:m != 'p'
+      execute 'tnoremap ' . a:k . ' <C-\><C-N>:q<CR>'
+      execute 'tnoremap <Esc> <C-\><C-N>'
+      execute 'tnoremap <Esc><Esc> <C-\><C-N>'
+    endif
+  else
+    echom "Do NOT support feature 'terminal'"
+  endif
+endfunction
 
-noremap <C-c> :shell<CR>
+set timeout timeoutlen=500
+set ttimeout ttimeoutlen=100
+
+nnoremap <leader>c :call ToggleTerminal('p', '<leader>c')<CR>
+tnoremap <leader>c <C-\><C-N>:call ToggleTerminal('p', '<leader>c')<CR>
+nnoremap <leader>x :call ToggleTerminal('b', '<leader>x')<CR>
+
+nnoremap <C-c> :shell<CR>
 inoremap <C-c> <ESC>:shell<CR>
+
 noremap <leader>v <C-W>v
 noremap <leader>s <C-W>s
 noremap <F3> :tabnext<CR>
