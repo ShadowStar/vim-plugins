@@ -139,7 +139,7 @@ set ttimeout ttimeoutlen=100
 
 nnoremap <leader>c :call ToggleTerminal('p', '<leader>c')<CR>
 tnoremap <leader>c <C-\><C-N>:call ToggleTerminal('p', '<leader>c')<CR>
-nnoremap <leader>x :call ToggleTerminal('b', '<leader>x')<CR>
+nnoremap <C-s> :call ToggleTerminal('b', '<leader>x')<CR>
 
 nnoremap <C-c> :shell<CR>
 inoremap <C-c> <ESC>:shell<CR>
