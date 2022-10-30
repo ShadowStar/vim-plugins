@@ -46,7 +46,7 @@ set wildmenu                    " command-line completion in an enhanced mode
 set notagbsearch
 set nofileignorecase
 set shortmess-=S
-"set mouse=a
+set mouse-=a
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
