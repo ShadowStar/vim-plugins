@@ -396,7 +396,7 @@ autocmd InsertLeave,WinEnter * set cursorline
 autocmd InsertEnter,WinLeave * set nocursorline
 autocmd FileType * execute 'setlocal dictionary='.expand($HOME.'/.vim/dict/'.&filetype.'.dict')
 
-set rtp+=/usr/local/opt/fzf
+set rtp+=/opt/homebrew/opt/fzf
 let g:snipMate = { 'snippet_version' : 1 }
 let g:acp_ignorecaseOption = 0
 let g:OmniCpp_GlobalScopeSearch = 1
