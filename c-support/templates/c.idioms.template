@@ -57,8 +57,7 @@ void __init_daemon(void)
  *  Description:  
  * =====================================================================================
  */
-int
-main ( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {<CURSOR>
 <SPLIT>	return EXIT_SUCCESS;
 }				/* ----------  end of function main  ---------- */
