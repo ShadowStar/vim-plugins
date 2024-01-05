@@ -16,32 +16,32 @@
 #       RETURNS:  
 #-------------------------------------------------------------------------------
 == Comments.file header == start, map:ch ==
-#!/bin/bash - 
+#!/bin/bash -
 #===============================================================================
 #
-#          FILE: |FILENAME|
-# 
-#         USAGE: ./|FILENAME| 
-# 
-#   DESCRIPTION: 
-# 
-#       OPTIONS: ---
-#  REQUIREMENTS: ---
-#          BUGS: ---
-#         NOTES: ---
-#        AUTHOR: |AUTHOR| (|AUTHORREF|), |EMAIL|
-#  ORGANIZATION: |ORGANIZATION|
-#       CREATED: |DATE| |TIME|
-#   LAST CHANGE:
+#          FILE:  |FILENAME|
+#
+#         USAGE:  ./|FILENAME|
+#
+#   DESCRIPTION:  
+#
+#       OPTIONS:  ---
+#  REQUIREMENTS:  ---
+#          BUGS:  ---
+#         NOTES:  ---
+#        AUTHOR:  |AUTHOR| (|AUTHORREF|), |EMAIL|
+#  ORGANIZATION:  |ORGANIZATION|
+#       CREATED:  |DATE| |TIME|
+#   LAST CHANGE:  
 #      REVISION:  ---
 #===============================================================================
 
-set -euxo pipefail  # Exit immediately if a command exits with a non-zero status.
-                    # Treat unset variables as an error when substituting.
-                    # Print commands and their arguments as they are executed.
-                    # The return value of a pipeline is the status of the last
-                    # command to exit with a non-zero status, or zero if no
-                    # command exited with a non-zero status
+set -eux -o pipefail # (e) Exit immediately if a command exits with a non-zero status.
+                     # (u) Treat unset variables as an error when substituting.
+                     # (x) Print commands and their arguments as they are executed.
+                     # (pipefail) The return value of a pipeline is the status of the last
+                     # command to exit with a non-zero status, or zero if no
+                     # command exited with a non-zero status
 <CURSOR>
 == ENDTEMPLATE ==
 
