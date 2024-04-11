@@ -50,17 +50,73 @@ void __init_daemon(void)
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <getopt.h>
+#include <errno.h>
 
-/*
- * ===  FUNCTION  ======================================================================
- *         Name:  main
- *  Description:  
- * =====================================================================================
- */
+static int __daemon;
+static int __verbose;
+
+static void usage(void)
+{
+    printf("|BASENAME| V%s usage:\n"
+        "\t--help|-h            Usage\n"
+        "\t--version|-V         Version\n"
+        "\t--verbose|-v         Verbose\n"
+        "\t--daemon|-D          Daemon mode\n"
+        "\t--xxxx|-x <xxx>      XXXXXXXXXXX\n"
+        "\t--yyyy|-y <yyy>      YYYYYYYYYYY\n"
+        , PRJ_VERSION);
+   exit(-1);
+}
+
+static void parse_options(int argc, char **argv)
+{
+    int c;
+    struct option longopts[] = {
+        { "help", no_argument, NULL, 'h' },
+        { "version", no_argument, NULL, 'V' },
+        { "verbose", no_argument, NULL, 'v' },
+        { "daemon", no_argument, NULL, 'D' },
+        { "xxxx", required_argument, 'x' },
+        { "yyyy", optional_argument, 'y' },
+        { NULL, 0, NULL, 0 }
+    };
+
+    while ((c = getopt_long(argc, argv, "hVvDx:y::", longopts, NULL)) != -1) {
+        switch (c) {
+        case 'x':
+            break;
+        case 'y':
+            break;
+        case 'D':
+            __daemon = 1;
+            break;
+        case 'v':
+            __verbose = 1;
+            break;
+        case 'V':
+            printf("|BASENAME| Version: %s\n", PRJ_VERSION);
+            exit(0);
+        default:
+        case 'h':
+            usage();
+            break;
+        }
+    }
+}
+
 int main(int argc, char *argv[])
-{<CURSOR>
-<SPLIT>	return EXIT_SUCCESS;
-}				/* ----------  end of function main  ---------- */
+{
+    if (argc < 2)
+        usage();
+    parse_options(argc, argv);
+    if (__daemon)
+        daemon(0, 0);
+<CURSOR>
+<SPLIT>
+    return EXIT_SUCCESS;
+}
 == Idioms.enum == map:ie, shortcut:e  ==
 enum |?ENUM_NAME| {<CURSOR>
 <SPLIT>};				/* ----------  end of enum |ENUM_NAME|  ---------- */
