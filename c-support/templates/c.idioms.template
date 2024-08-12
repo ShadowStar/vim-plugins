@@ -78,8 +78,8 @@ static void parse_options(int argc, char **argv)
         { "version", no_argument, NULL, 'V' },
         { "verbose", no_argument, NULL, 'v' },
         { "daemon", no_argument, NULL, 'D' },
-        { "xxxx", required_argument, 'x' },
-        { "yyyy", optional_argument, 'y' },
+        { "xxxx", required_argument, NULL, 'x' },
+        { "yyyy", optional_argument, NULL, 'y' },
         { NULL, 0, NULL, 0 }
     };
 
