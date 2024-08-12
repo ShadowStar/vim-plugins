@@ -1,5 +1,5 @@
 " Vim color file:  colorful256.vim
-" Last Change: 10/10/2016 14:01:35
+" Last Change: 08/12/2024 18:32:32
 " License: public domain
 " Maintainer: ShadowStar, <orphen.leiliu@gmail.com>
 "
@@ -56,7 +56,7 @@ hi TabLineSel term=bold cterm=bold
 hi TabLineFill term=reverse cterm=reverse
 hi CursorColumn term=reverse ctermbg=7
 hi CursorLine term=underline cterm=underline
-hi ColorColumn term=reverse,bold cterm=reverse,bold ctermbg=0
+hi ColorColumn term=reverse,bold cterm=reverse,bold ctermfg=7
 hi MatchParen term=reverse ctermbg=6
 hi Comment term=bold cterm=bold ctermfg=4
 hi Constant term=underline ctermfg=1
