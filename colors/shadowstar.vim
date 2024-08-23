@@ -1,5 +1,5 @@
 " Vim color file:  colorful256.vim
-" Last Change: 08/12/2024 18:32:32
+" Last Change: 08/23/2024 17:39:41
 " License: public domain
 " Maintainer: ShadowStar, <orphen.leiliu@gmail.com>
 "
@@ -31,7 +31,7 @@ hi LineNr term=underline ctermfg=3
 hi Question term=standout ctermfg=2
 hi StatusLine term=bold,reverse cterm=bold,reverse
 hi StatusLineNC term=reverse cterm=reverse
-hi VertSplit term=reverse cterm=reverse
+hi VertSplit term=reverse cterm=reverse ctermfg=8
 hi Title term=bold ctermfg=5
 hi Visual term=reverse cterm=reverse
 hi WarningMsg term=standout ctermfg=1
