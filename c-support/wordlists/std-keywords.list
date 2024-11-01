@@ -11,6 +11,13 @@ INT8_C
 INT_MAX
 INT_MIN
 
+STDOUT_FILENO
+STDERR_FILENO
+STDIN_FILENO
+stdin
+stderr
+stdout
+
 __u8
 __u16
 __u32
