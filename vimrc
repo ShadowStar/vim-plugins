@@ -369,6 +369,7 @@ Plug 'rickhowe/spotdiff.vim'
 Plug 'rhysd/git-messenger.vim'
 Plug 'markonm/traces.vim'
 Plug 'shirk/vim-gas'
+Plug 'skywind3000/vim-dict'
 
 call plug#end()
 
