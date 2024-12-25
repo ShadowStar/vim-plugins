@@ -1,5 +1,5 @@
 "============================================================================
-"    Copyright: Copyright (c) 2001-2022, Jeff Lanzarotta
+"    Copyright: Copyright (c) 2001-2024, Jeff Lanzarotta
 "               All rights reserved.
 "
 "               Redistribution and use in source and binary forms, with or
@@ -36,7 +36,7 @@
 " Name Of File: bufexplorer.vim
 "  Description: Buffer Explorer Vim Plugin
 "   Maintainer: Jeff Lanzarotta (my name at gmail dot com)
-" Last Changed: Thursday, 27 January 2022
+" Last Changed: Tuesday, 13 August 2024
 "      Version: See g:bufexplorer_version for version number.
 "        Usage: This file should reside in the plugin directory and be
 "               automatically sourced.
@@ -74,7 +74,7 @@ endif
 "1}}}
 
 " Version number
-let g:bufexplorer_version = "7.4.23"
+let g:bufexplorer_version = "7.4.28"
 
 " Plugin Code {{{1
 " Check for Vim version {{{2
@@ -138,6 +138,9 @@ let s:types = {"fullname": ':p', "path": ':p:h', "relativename": ':~:.', "relati
 " Setup the autocommands that handle the MRUList and other stuff. {{{2
 autocmd VimEnter * call s:Setup()
 
+" Reset MRUList and buffer->tab associations after loading a session. {{{2
+autocmd SessionLoadPost * call s:Reset()
+
 " Setup {{{2
 function! s:Setup()
     call s:Reset()
@@ -156,8 +159,9 @@ endfunction
 " Reset {{{2
 function! s:Reset()
     " Build initial MRUList. This makes sure all the files specified on the
-    " command line are picked up correctly.
-    let s:MRUList = range(1, bufnr('$'))
+    " command line are picked up correctly. Check buffers exist so this also
+    " works after wiping buffers and loading a session (e.g. sessionman.vim)
+    let s:MRUList = filter(range(1, bufnr('$')), 'bufexists(v:val)')
 
     " Initialize the association of buffers to tabs for any buffers
     " that have been created prior to now, e.g., files specified as
@@ -313,7 +317,7 @@ endfunction
 " ShouldIgnore {{{2
 function! s:ShouldIgnore(buf)
     " Ignore temporary buffers with buftype set.
-    if empty(getbufvar(a:buf, "&buftype") == 0)
+    if empty(getbufvar(a:buf, "&buftype")) == 0
         return 1
     endif
 
@@ -429,7 +433,6 @@ function! BufExplorer()
             execute "drop" name
         endif
 
-        exec "wincmd c"
         return
     endif
 
@@ -477,13 +480,12 @@ endfunction
 
 " DisplayBufferList {{{2
 function! s:DisplayBufferList()
-    " Do not set bufhidden since it wipes out the data if we switch away from
-    " the buffer using CTRL-^.
     setlocal buftype=nofile
     setlocal modifiable
     setlocal noreadonly
     setlocal noswapfile
     setlocal nowrap
+    setlocal bufhidden=wipe
 
     call s:SetupSyntax()
     call s:MapKeys()
@@ -535,6 +537,8 @@ function! s:MapKeys()
     nnoremap <script> <silent> <nowait> <buffer> u             :call <SID>ToggleShowUnlisted()<CR>
     nnoremap <script> <silent> <nowait> <buffer> v             :call <SID>SelectBuffer("split", "vr")<CR>
     nnoremap <script> <silent> <nowait> <buffer> V             :call <SID>SelectBuffer("split", "vl")<CR>
+    nnoremap <script> <silent> <nowait> <buffer> H             :call <SID>ToggleShowTerminal()<CR>
+
 
     for k in ["G", "n", "N", "L", "M", "H"]
         execute "nnoremap <buffer> <silent>" k ":keepjumps normal!" k."<CR>"
@@ -621,6 +625,7 @@ function! s:GetHelpStatus()
     let ret .= ((g:bufExplorerOnlyOneTab == 0) ? "" : " | One tab/buffer")
     let ret .= ' | '.((g:bufExplorerShowRelativePath == 0) ? "Absolute" : "Relative")
     let ret .= ' '.((g:bufExplorerSplitOutPathName == 0) ? "Full" : "Split")." path"
+    let ret .= ((g:bufExplorerShowTerminal == 0) ? "" : " | Show terminal")
 
     return ret
 endfunction
@@ -707,6 +712,11 @@ function! s:GetBufferInfo(bufnr)
             let name = "[No Name]"
         endif
 
+        " Filter out term:// buffers if g:bufExplorerShowTerminal is 0
+        if !g:bufExplorerShowTerminal && name =~ '^term://'
+            continue
+        endif
+
         for [key, val] in items(s:types)
             let b[key] = fnamemodify(name, val)
         endfor
@@ -768,12 +778,12 @@ function! s:BuildBufferList()
         " Are we to split the path and file name?
         if g:bufExplorerSplitOutPathName
             let type = (g:bufExplorerShowRelativePath) ? "relativepath" : "path"
-            let path = buf[type]
+            let path = substitute( buf[type], $HOME."\\>", "~", "" )
             let pad  = (g:bufExplorerShowUnlisted) ? s:allpads.shortname : s:listedpads.shortname
             let line .= buf.shortname." ".strpart(pad.path, s:StringWidth(buf.shortname))
         else
             let type = (g:bufExplorerShowRelativePath) ? "relativename" : "fullname"
-            let path = buf[type]
+            let path = substitute( buf[type], $HOME."\\>", "~", "" )
             let line .= path
         endif
 
@@ -1066,6 +1076,13 @@ function! s:Close()
     echo
 endfunction
 
+" ToggleShowTerminal {{{2
+function! s:ToggleShowTerminal()
+    let g:bufExplorerShowTerminal = !g:bufExplorerShowTerminal
+    call s:RebuildBufferList()
+    call s:UpdateHelpStatus()
+endfunction
+
 " ToggleSplitOutPathName {{{2
 function! s:ToggleSplitOutPathName()
     let g:bufExplorerSplitOutPathName = !g:bufExplorerSplitOutPathName
@@ -1354,6 +1371,7 @@ call s:Set("g:bufExplorerSplitOutPathName", 1)          " Split out path and fil
 call s:Set("g:bufExplorerSplitRight", &splitright)      " Should vertical splits be on the right or left of current window?
 call s:Set("g:bufExplorerSplitVertSize", 0)             " Height for a vertical split. If <=0, default Vim size is used.
 call s:Set("g:bufExplorerSplitHorzSize", 0)             " Height for a horizontal split. If <=0, default Vim size is used.
+call s:Set("g:bufExplorerShowTerminal", 1)              " Show terminal buffers?
 
 " Default key mapping {{{2
 if !hasmapto('BufExplorer') && g:bufExplorerDisableDefaultKeyMapping == 0
