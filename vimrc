@@ -370,6 +370,7 @@ Plug 'rhysd/git-messenger.vim'
 Plug 'markonm/traces.vim'
 Plug 'shirk/vim-gas'
 Plug 'skywind3000/vim-dict'
+Plug 'ludovicchabant/vim-gutentags'
 
 call plug#end()
 
@@ -398,6 +399,22 @@ inoremap <expr> <cr>    pumvisible() ? "\<C-y>" : "\<cr>"
 autocmd InsertLeave,WinEnter * set cursorline
 autocmd InsertEnter,WinLeave * set nocursorline
 autocmd FileType * execute 'setlocal dictionary='.expand($HOME.'/.vim/dict/'.&filetype.'.dict')
+
+let g:gutentags_modules = [ 'ctags', 'gtags_cscope' ]
+
+" gutentags 搜索工程目录的标志，碰到这些文件/目录名就停止向上一级目录递归
+let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
+
+" 所生成的数据文件的名称
+let g:gutentags_ctags_tagfile = '.tags'
+
+" 将自动生成的 tags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
+let g:gutentags_cache_dir = expand('~/.cache/tags')
+
+" 配置 ctags 的参数
+let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
+let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
+let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 
 set rtp+=/opt/homebrew/opt/fzf
 let g:snipMate = { 'snippet_version' : 1 }
