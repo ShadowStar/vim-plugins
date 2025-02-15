@@ -56,8 +56,8 @@ noremap <C-h> <C-W>h
 noremap <C-j> <C-W>j
 noremap <C-k> <C-W>k
 noremap <C-l> <C-W>l
-noremap <leader><leader> :wa<CR>
-inoremap <leader><leader> <ESC>:wa<CR>
+noremap <leader><leader> :silent wa<CR>
+inoremap <leader><leader> <ESC>:silent wa<CR>
 
 tnoremap <C-h> <C-W>h
 tnoremap <C-j> <C-W>j
