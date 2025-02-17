@@ -42,6 +42,8 @@ set wildignore+=*.tar,*.tgz,*.gz,*.bz2,*.lzma,*.zip,*.rar
 set wildignore+=*.pdf,*.ppt,*.pptx,*.doc,*.docx,*.xls,*.xlsx
 set wildignore+=*.rmvb,*.avi,*.mpg,*.mpeg,*.mp4,*.mkv,*.swf
 set wildignore+=*.mp3,*.aac,*.wav,*.flac
+set wildignore+=*.obj,*.elf,*.lib,*.so,*.a,*.la,*.lo,*.dll,*.dylib
+set wildignore+=*.out,*.exe
 set wildmenu                    " command-line completion in an enhanced mode
 set notagbsearch
 set nofileignorecase
