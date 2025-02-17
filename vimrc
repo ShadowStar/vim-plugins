@@ -402,6 +402,12 @@ autocmd FileType * execute 'setlocal dictionary='.expand($HOME.'/.vim/dict/'.&fi
 
 let g:gutentags_modules = [ 'ctags', 'cscope' ]
 
+let g:gutentags_file_list_command = {
+      \ 'markers': {
+      \ '.git': 'find $(git ls-files|xargs -n 1 dirname|\grep -v "^\.$"|cut -d"/" -f 1|sort -u) \( -name "*.[chS]" -o -name "*.[ch]pp" \) -type f -print',
+      \ },
+      \ 'default': 'find . \( -name "*.[chS]" -o -name "*.[ch]pp" \) -type f'
+      \ }
 " gutentags 搜索工程目录的标志，碰到这些文件/目录名就停止向上一级目录递归
 let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
 
