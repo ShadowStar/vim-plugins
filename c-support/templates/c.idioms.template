@@ -54,6 +54,10 @@ void __init_daemon(void)
 #include <getopt.h>
 #include <errno.h>
 
+#ifndef PRJ_VERSION
+#define PRJ_VERSION     "(Build "__DATE__" "__TIME__")"
+#endif
+
 static int __daemon;
 static int __verbose;
 
@@ -111,10 +115,10 @@ int main(int argc, char *argv[])
     if (argc < 2)
         usage();
     parse_options(argc, argv);
-    if (__daemon)
+    if (__daemon) {
         daemon(0, 0);
+    }
 <CURSOR>
-<SPLIT>
     return EXIT_SUCCESS;
 }
 == Idioms.enum == map:ie, shortcut:e  ==
