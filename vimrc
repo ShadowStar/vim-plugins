@@ -406,7 +406,7 @@ let g:gutentags_modules = [ 'ctags', 'cscope' ]
 
 let g:gutentags_file_list_command = {
       \ 'markers': {
-      \ '.git': 'find $(git ls-files|xargs -n 1 dirname|\grep -v "^\.$"|cut -d"/" -f 1|sort -u) \( -name "*.[chS]" -o -name "*.[ch]pp" \) -type f -print',
+      \ '.git': 'find $(git ls-files|grep -E "\.(c|h|S|cpp|hpp)$"|xargs -n 1 dirname|cut -d"/" -f 1|sort -u) \( -name "*.[chS]" -o -name "*.[ch]pp" \) -type f',
       \ },
       \ 'default': 'find . \( -name "*.[chS]" -o -name "*.[ch]pp" \) -type f'
       \ }
