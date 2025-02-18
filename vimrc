@@ -35,7 +35,7 @@ set suffixes+=.info,.aux,.log,.dvi,.bbl,.out,.o,.lo
 set t_ZH=[3m
 set t_ZR=[23m
 set title
-set viminfo='20,\"500           " Keep a .viminfo file.
+set viminfo='20,\"500,n/~/.cache/viminfo      " Keep a .viminfo file.
 set visualbell                  " visual bell instead of beeping
 set wildignore=*.bak,*.o,*.ko,*.e,*~ " wildmenu: ignore these extensions
 set wildignore+=*.tar,*.tgz,*.gz,*.bz2,*.lzma,*.zip,*.rar
