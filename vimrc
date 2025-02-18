@@ -402,6 +402,7 @@ autocmd InsertLeave,WinEnter * set cursorline
 autocmd InsertEnter,WinLeave * set nocursorline
 autocmd FileType * execute 'setlocal dictionary='.expand($HOME.'/.vim/dict/'.&filetype.'.dict')
 
+let VCSCommandSplit='vertical'
 let g:gutentags_modules = [ 'ctags', 'cscope' ]
 
 let g:gutentags_file_list_command = {

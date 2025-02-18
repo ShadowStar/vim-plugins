@@ -555,7 +555,7 @@ function! s:EditFile(command, originalBuffer, statusText)
 			if VCSCommandGetOption('VCSCommandSplit', 'horizontal') == 'horizontal'
 				rightbelow split
 			else
-				vert rightbelow split
+				vert leftabove split
 			endif
 		endif
 
