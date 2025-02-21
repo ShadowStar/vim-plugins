@@ -373,6 +373,7 @@ Plug 'markonm/traces.vim'
 Plug 'shirk/vim-gas'
 Plug 'skywind3000/vim-dict'
 Plug 'ludovicchabant/vim-gutentags'
+Plug 'andymass/vim-matchup'
 
 call plug#end()
 
