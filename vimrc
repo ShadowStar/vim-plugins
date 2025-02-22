@@ -102,7 +102,13 @@ function! ToggleTerminal(m, k)
       let b:win_h = &lines / 3
     endif
 
-    if s:term_buf_nr == -1 || bufloaded(s:term_buf_nr) != 1 || term_getstatus(s:term_buf_nr) == 'finished'
+    if s:term_buf_nr != -1 && term_getstatus(s:term_buf_nr) == 'finished'
+      execute "bdelete " . s:term_buf_nr
+      let s:term_buf_nr = -1
+      let s:term_win_nr = -1
+    endif
+
+    if s:term_buf_nr == -1 || bufloaded(s:term_buf_nr) != 1
       if l:m == 'p'
         let s:term_buf_nr = term_start(&shell, #{hidden: 1, term_finish: 'close'})
         let s:term_win_nr = popup_create(s:term_buf_nr, s:term_ops)
