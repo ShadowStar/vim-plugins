@@ -351,7 +351,7 @@ Plug 'inkarkat/vim-SyntaxRange', { 'branch': 'stable' }
 Plug 'inkarkat/vim-LogViewer', { 'branch': 'stable' }
 Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'ctrlpvim/ctrlp.vim', { 'tag': '*' }
-Plug 'sjl/gundo.vim', { 'tag': '*' }
+Plug 'mbbill/undotree'
 Plug 'christianrondeau/vim-base64'
 Plug 'chrisbra/csv.vim'
 Plug 'junkblocker/patchreview-vim'
@@ -399,7 +399,7 @@ noremap <leader>f :KeyFollow<CR>
 noremap <leader>d :VCSDiff<CR>
 noremap <leader>l :VCSLog<CR>
 noremap <leader>b :VCSBlame<CR>
-noremap <leader>u :GundoToggle<CR>
+noremap <leader>u :UndotreeToggle<CR>
 
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
