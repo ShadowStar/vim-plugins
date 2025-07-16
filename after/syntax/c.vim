@@ -1,8 +1,8 @@
 " Vim syntax file
 " Language:	C Additions
-" Maintainer:	Mikhail Wolfson <mywolfson@gmail.com>
+" Maintainer:	ShadowStar, <orphen.leiliu@gmail.com>
 " URL: http://web.mit.edu/wolfsonm
-" Last Change:	2010 Dec. 3
+" Last Change:	07/15/2025 04:33:25
 " Version: 0.4
 "
 " Changelog:
@@ -234,6 +234,55 @@ syn keyword	cAnsiName	STDC FP_CONTRACT
 syn keyword	cAnsiName	and bitor not_eq xor
 syn keyword	cAnsiName	and_eq compl or xor_eq
 syn keyword	cAnsiName	bitand not or_eq
+
+"
+"	Standard C Library Functions Table, By Name
+"	Put in by Mark Manning @ markem@sim1.us on July 12th, 2025.
+"
+syn keyword cFunction	abort abs acos asctime asctime_r asin assert atan
+syn keyword cFunction	atexit atof atoi atol bsearch btowc calloc catclose
+syn keyword cFunction	catgets catopen ceil clearerr clock cos cosh ctime
+syn keyword cFunction	ctime64 ctime_r ctime64_r difftime difftime64 div
+syn keyword cFunction	erf erfc exit exp fabs fclose fdopen feof ferror
+syn keyword cFunction	fflush fgetc fgetpos fgets fgetwc fgetws fileno
+syn keyword cFunction	floor fmod fopen fprintf fputc fputs fputwc fputws
+syn keyword cFunction	fread free freopen frexp fscanf fseek fsetpos
+syn keyword cFunction	ftell fwide fwprintf fwrite fwscanf gamma getc
+syn keyword cFunction	getchar getenv gets getwc getwchar gmtime gmtime64
+syn keyword cFunction	gmtime_r gmtime64_r hypot isalnum isalpha isascii
+syn keyword cFunction	isblank iscntrl isdigit isgraph islower isprint
+syn keyword cFunction	ispunct isspace isupper iswalnum iswalpha iswblank
+syn keyword cFunction	iswcntrl iswctype iswdigit iswgraph iswlower iswprint
+syn keyword cFunction	iswpunct iswspace iswupper iswxdigit isxdigit
+syn keyword cFunction	j0 j1 jn labs ldexp ldiv localeconv localtime localtime64
+syn keyword cFunction	localtime_r localtime64_r log log10 longjmp malloc
+syn keyword cFunction	mblen mbrlen mbrtowc mbsinit mbsrtowcs mbstowcs mbtowc
+syn keyword cFunction	memchr memcmp memcpy memmove memset mktime mktime64
+syn keyword cFunction	modf nextafter nextafterl nexttoward nexttowardl
+syn keyword cFunction	nl_langinfo perror pow printf putc putchar putenv puts
+syn keyword cFunction	putwc putwchar qsort quantexpd32 quantexpd64 quantexpd128
+syn keyword cFunction	quantized32 quantized64 quantized128 samequantumd32
+syn keyword cFunction	samequantumd64 samequantumd128 raise rand rand_r
+syn keyword cFunction	realloc regcomp regerror regexec regfree remove
+syn keyword cFunction	rename rewind scanf setbuf setjmp setlocale setvbuf
+syn keyword cFunction	signal sin sinh snprintf sprintf sqrt srand sscanf
+syn keyword cFunction	strcasecmp strcat strchr strcmp strcoll strcpy strcspn
+syn keyword cFunction	strerror strfmon4 strftime strlen strncasecmp strncat
+syn keyword cFunction	strncmp strncpy strpbrk strptime4 strrchr strspn strstr
+syn keyword cFunction	strtod strtod32 strtod64 strtod128 strtof strtok strtok_r
+syn keyword cFunction	strtol strtold strtoul strxfrm swprintf swscanf system
+syn keyword cFunction	tan tanh time time64 tmpfile tmpnam toascii tolower toupper
+syn keyword cFunction	towctrans towlower towupper ungetc ungetwc va_arg va_copy
+syn keyword cFunction	va_end va_start vfprintf vfscanf vfwprintf vfwscanf
+syn keyword cFunction	vprintf vscanf vsprintf vsnprintf vsscanf vswprintf
+syn keyword cFunction	vswscanf vwprintf vwscanf wcrtomb wcscat wcschr wcscmp
+syn keyword cFunction	wcscoll wcscpy wcscspn wcsftime wcslen wcslocaleconv
+syn keyword cFunction	wcsncat wcsncmp wcsncpy wcspbrk wcsptime wcsrchr
+syn keyword cFunction	wcsrtombs wcsspn wcsstr wcstod wcstod32 wcstod64 wcstod128
+syn keyword cFunction	wcstof wcstok wcstol wcstold wcstombs wcstoul wcsxfrm4
+syn keyword cFunction	wctob wctomb wctrans wctype wcwidth wmemchr wmemcmp
+syn keyword cFunction	wmemcpy wmemmove wmemset wprintf wscanf y0 y1 yn
+syn match	cFunction	"\<[a-zA-Z_][a-zA-Z0-9_]*\>\s*("me=e-1,he=e-1
 
 hi def link cAnsiFunction cFunction
 hi def link cAnsiName cIdentifier
