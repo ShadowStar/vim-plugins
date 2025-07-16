@@ -383,6 +383,7 @@ Plug 'andymass/vim-matchup'
 Plug 'PAntoine/vimgitlog'
 Plug 'habamax/vim-shout'
 Plug 'girishji/vimsuggest'
+Plug 'rickhowe/diffunitsyntax'
 
 call plug#end()
 
