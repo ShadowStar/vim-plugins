@@ -1,6 +1,6 @@
 " autoload/hexx.vim
 "
-" HexX - Richard Bentley-Green, 10/01/2024
+" HexX - Richard Bentley-Green, 03/09/2025
 "
 " Hex editing of binary files
 "

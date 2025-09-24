@@ -2,23 +2,23 @@
 *hexx*
 
 Author:  Richard Bentley-Green
-Version: 10/01/2024
+Version: 03/09/2025
 
 ==============================================================================
-CONTENTS                                                       *hexx-contents*
+CONTENTS                                                         *hexx-contents*
 
 Introduction                 |hexx-introduction|
 REALLY IMPORTANT             |hexx-binary-mode|
 Commands                     |hexx-commands|
 Common mapping features      |hexx-mapping-features|
   Pre-operation count        |hexx-pre-operation-count|
-  Numeric data entry         |hexx-numeric-data-entey|
-  Character data entry       |hexx-character-data-entey|
+  Numeric data entry         |hexx-numeric-data-entry|
+  Character data entry       |hexx-character-data-entry|
   Undo                       |hexx-undo|
 Mappings                     |hexx-mappings|
 
 ==============================================================================
-INTRODUCTION                                              *hexx-introduction*
+INTRODUCTION                                                 *hexx-introduction*
 
 `This document is a summary of the full README and is intended to just give`
 `the details needed to use the commands and mappings. Some sections (such as`
@@ -36,7 +36,7 @@ Once started, HexX 'takes over' normal Vim operation and will continue to do
 so until you suspend it with the `s` (suspend) mapping or exit it with the
 `<esc>` (exit) mapping (the last mappings described below)
 
-Here is a very small annotated example of how the `HexX mode` looks editing
+Here is a very small annotated example of how the {HexX} mode looks editing
 (in this case) a short text file;-
 
 Address/Byte offset         `Hex` display                   `ASCII` display
@@ -55,7 +55,7 @@ The first byte is at offset 0 (zero); not 1 as is the convention with text
 (and the standard Vim normally follows)
 
 ==============================================================================
-REALLY IMPORTANT - ALWAYS LOAD FILES IN BINARY MODE        *hexx-binary mode*
+REALLY IMPORTANT - ALWAYS LOAD FILES IN BINARY MODE           *hexx-binary-mode*
 
 It is `VERY VERY VERY IMPORTANT` that you load your binary files into Vim in
 'binary' mode. This is especially important (add another couple of `VERYs` to
@@ -67,39 +67,328 @@ Note that a random binary file may well happen to contain a DOS end of line
 byte sequence in it (0x0d 0x0a) and if it does, this will be interpreted by
 Vim as such and it WILL corrupt the file
 
-You can ensure that 'binary' mode is set by either of the following two
+You can ensure that `binary` mode is set by either of the following two
 methods;-
 
   - Invoke Vim with the `-b` command line flag
 
-  - Set 'binary' mode with the Vim command `:set binary` or `:setlocal binary`
+  - Set `binary` mode with the Vim command `:set binary` or `:setlocal binary`
+
+Take care - once {binary} mode is set, it is likely to get applied to any new
+files you load or buffers that are subsequently opened, whether or not you
+actually want it to be set for those; use `:setlocal nobinary` to revert
+back to "normal" (text) mode for a particular buffer
+
+Having {binary} mode set for a buffer/file that it should not be set for can
+also be a problem; again, especially if the file contains DOS line endings
+
+See also the TECHNICAL NOTES section below
 
 ==============================================================================
-COMMANDS                                                      *hexx-commands*
+OPTIONS AND CONFIGURATION                                         *hexx-options*
+
+There are a number of options that may be set in `.vimrc` that alter the
+standard behaviour of HexX
+
+Note that all of these options are read when HexX is first invoked; changing
+any of the after this time will have no effect
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Start HexX or return from 'suspended' mode~
+`g:Hexx_xxdExe` (defaults to `xxd`)
+
+The external utility to use to perform conversion between Binary and Hex
+modes. The default `xxd` is the conversion utility provided as standard with
+Vim
+
+It's very unlikely that you will want to change this, and if you do, and the
+alternative application does not exactly follow the functionality of `xxd`
+then you will almost certainly have to modify HexX to work with it
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_removeLineWrap` (defaults to 1)
+
+If enabled (set to 1), then the buffer will be set to `nowrap` when {HexX} mode
+is enabled. Otherwise, this setting shall be left as-is
+
+If changed, the setting shall be changed back to its original state when HexX
+exits
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_bytesPerLine` (defaults to 16)
+`g:Hexx_byteGrouping` (defaults to 1)
+
+These two values control how Hex mode is displayed. These control how many
+bytes to display per line, and how the bytes are grouped
+
+Bytes per line should be obvious. It may be set to any sensible value that
+is a power of 2. It also must be a multiple of `g:Hexx_byteGrouping`
+
+The grouping specifies how bytes are grouped together and may be set to a
+power of 2; 1, 2, 4, 8, etc. A value of 1 will place whitespace between each
+byte displayed; ie, "01 02 03 04 05 06 ...". A value of 2 will place whitespace
+between pairs of bytes; "0202 0304 0506 ...". A value of 4 will place
+whitespace between each group of 4 bytes bytes; "02020304 05060708 ...", and so
+on
+
+The display format does not in any way effect any of HexX's commands or
+mappings, and does not effect how any editing commands work
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_hexCase` (defaults to 'l')
+
+This controls whether hexadecimal byte data displayed using lower or upper case
+characters (a-f or A-F). Valid values are 'l' or 'u'
+
+Note that data entry accepts only lower case, but the display will always
+follow this option
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+`g:Hexx_showHexDiv` (defaults to 1)
+
+This is used by the syntax script. If set to 1, then separator lines are
+placed at intervals in the hex part of the displayed buffer to aid
+navigation
+
+See SYNTAX DEFINITION section below for more details
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_newByteValue` (defaults to 0x00)
+
+The byte value (8 bits ONLY) to set for inserted or appended bytes
+
+Note: A setting of 0x0a will be ignored (0x00 will be used instead) as this
+will break things!
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_xDoesNotYank` (defaults to 1)
+
+If this is set to 0 (zero) then the 'x' (delete) operation will also set the
+yank buffer to the value deleted. This is similar to the default behaviour of
+the normal Vim 'x' operation
+
+If this is set to 1 then the 'x' operation will not alter the yank buffer
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_convertNewline` (defaults to 1)
+
+This is used by the `C` operation. If enabled (set to 1), then any 'carriage
+return' (ASCII 0x0d) characters entered via the `C` operation are converted
+to `newline` (ASCII 0x0a) characters. The 'carriage return' character is
+usually generated when the `return` key is hit
+
+If this is disabled (set to 0) then no conversion is performed
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_exitWithEsc` (defaults to 1)
+
+This is used by the `C` operation. If enabled (set to 1) then `<esc>` (ASCII
+0x1b) entered via the `C` operation will not be interpreted as a character
+to edit the buffer with, but as an indication to exit the `C` operation (ie -
+`<esc>` will work like it does for other operations such as `r`)
+
+If this is disabled (set to 0) then any `<esc>` key entry shall be used to
+edit the buffer (ie, the current byte position shall be changed to 0x1b). In
+this case, the only way to exit `C` mode is to reach the end of the buffer or
+enter a cursor movement (arrow) key (not h, j, k, or l)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_utfEncoding` (defaults to '8')
+
+The `C` mapping allows multi-byte characters to be written to the buffer and
+the `U` mapping allows the same with explicit Unicode code points. This option
+controls the format of that data. This may be set to 8 (UTF-8), 16
+(UTF-16) or 32 (UTF-32). See the `C` and `U` mappings for more details
+
+This option can also be modified via the `:HexxUTF` command
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_utfEndian` (defaults to 'b')
+
+This specifies the endian of any UTF-16 or UTF-32 values written by the `C`
+and `U` operations/mappings. This may be set to 'b' (big endian - MS byte
+written first) or 'l' (little endian - LS byte written first)
+
+This option can also be modified via the `:HexxUTF` command
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_cursorHex` (defaults to `'Search'`)
+
+This sets the overall highlight colour of the byte (ie, 2 hex character
+positions) that the cursor is positioned over in the Hex part of the display
+
+A value of '' (empty string) will default to `'Search'`
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_cursorNibbleHex` (defaults to '')
+
+If this is set to '' (empty string) then it is ignored. Otherwise, it
+specifies the highlight colour of the nibble that the cursor is positioned
+over, superseding the colour specified by `g:Hexx_cursorHex` for the nibble
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_cursorASCII` (defaults to `'Search'`)
+
+This sets the overall highlight colour of the single character that the cursor
+is positioned over in the ASCII part of the display
+
+A value of '' (empty string) will default to `'Search'`
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_suspendCursor` (defaults to 0)
+
+This setting indicates whether or not to leave the byte cursor highlighted or
+not when HexX is {suspended} (see mapping `s`). 0 = Do not leave highlighted,
+1 = leave highlighted
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_countLimit` (defaults to 256)
+
+This is a maximum [N] count to allow for the mappings/operations `r`, `R` `i`,
+`A`, `x`, and `S`
+
+This is a safety measure to prevent accidentally adding or deleting massive
+amounts of data to/from the buffer, or (in the case of `r` , `R`, and `S`),
+modifying a huge amount of data. A value of 0 (zero) will disable this check
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_leaderBase` (defaults to `'<leader>7'`)
+
+There are a number of internal key mappings defined. These are mappings
+that the user never directly uses. This setting specifies the prefix to use
+for all these mappings. This may need to be changed if it conflicts with
+some other (non-standard) mappings
+
+Note: If you change this, use single quotes and specify a non-escaped string.
+Do not use double quotes and backslash escape sequences; ie, specify
+`'<leader>7'` and NOT `"\<leader>7"`
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_suspendEdit` (defaults to 's')
+
+The key mapping to use to suspend {HexX} mode. See operation/mapping `s` for
+more details
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_exitEdit` (defaults to `"\<esc>"`)
+
+The key mapping to exit {HexX} mode and return to a normal (binary) file format
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_allowYankAndPaste` (defaults to 0)
+
+This controls whether or not the `y` (yank) and `p`/`P` (paste) mappings/
+operations are enabled or not
+
+READ THIS BEFORE ENABLING THIS OPTION
+
+Some instances of vim and nvim misbehave and make it impossible to use yank
+and paste on data that contains nul (0x00) bytes (and possibly other
+non-printable characters as well). The problem seems to be strongly related to
+the type of terminal being used, but I'm still very unsure on the exact cause
+and details; maybe the type of clipboard utility also plays a part; I don't
+know. I do not know if the GUI versions of vim/nvim can also be affected
+
+The problem results in nul (0x00) characters being converted to newline (0x0a)
+or space (0x20) characters. I have also observed other strange behaviour
+
+For this reason, yank and paste are disabled by default by this option to
+prevent them being used by someone unaware of this issue and thus accidentally
+corrupting their files
+
+If you enable this, then be sure to test for yourself that yank and paste
+are able to correctly handle non-printable (especially nul (0x00)) bytes
+
+I strongly suggest you at least check that yanking and pasting of the
+following sequences works correctly;-
+
+1/ A single 0x00 byte - this can be especially problematic!
+2/ Two 0x00 bytes (and maybe three)
+3/ The byte sequence 0x00 0x01 0x02 0x03
+4/ The byte sequence 0x01 0x02 0x03 0x00
+5/ The byte sequence 0x01 0x00 0x02
+6/ A mixture of 0x00 bytes and printable ASCII range values such as
+   ab<00>, ab<00>cd, ab<00><00>cd<00>
+
+If you use different terminal types or environments, test each one
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`g:Hexx_printEditModeChange` (defaults to 1)
+
+This option specified whether or not to print a message to the command line
+when the edit mode changes (1 = print, 0 no not print). This can be especially
+useful if the status line is not modified to keep the user informed of the
+mode (see STATUS LINE section below)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+COLOURS
+
+Three colours are used for status line output; `StatusMsg`, `ModeMsg`,  and
+`WarningMsg`. `ModeMsg` and `WarningMsg` are both vim standard colours so
+should already be defined. `StatusMsg` is not a standard colour though and if
+not already defined is linked to the colour 'Normal'
+
+==============================================================================
+SYNTAX DEFINITION                                                  *hexx-syntax*
+
+A syntax highlight definition file is included and can be found in
+`.../hexx/syntax`
+
+Only two colour groups are defined. If you don't like the defaults then
+either modify the file as required, or define the two colours prior to HexX
+starting
+
+The two of the colour names are as follows;-
+
+  hexxAddr  - The colour of the "address" at the start of each line
+  hexxAscii - The colour of the "ASCII" part of the display
+
+A third colour group that is used by the syntx file is 'Conceal'. This is used
+when the `g:Hexx_showHexDiv` option is set. This option will display division
+lines at intervals in the hex part of the display to aid navigation
+
+If you do not want syntax highlighting at all, then just delete the
+`.../hexx/syntax` directory
+
+==============================================================================
+COMMANDS                                                         *hexx-commands*
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Start HexX or return from {suspended} mode ~
 
 `Hexx`
 
-     Given a 'binary' buffer, which may be empty or may contain data, `:Hexx`
-     will start HexX, convert the 'binary' file to a 'hex' format and then
-     drop into the 'HexX mode'. From this point on, the command line will
+     Given a `binary` buffer, which may be empty or may contain data, `:Hexx`
+     will start HexX, convert the binary file to a "hex" format and then
+     drop into the {HexX} mode. From this point on, the command line will
      not be usable and the only mappings that will work are those defined by
      HexX; see the MAPPINGS section for details
 
-     Given a buffer that was in 'HexX mode' but is now 'suspended', `:Hexx`
-     will return to 'HexX mode' where you may continue editing the buffer
+     Given a buffer that was in {HexX} mode but is now {suspended}, `:Hexx`
+     will return to {HexX} mode where you may continue editing the buffer
 
-     When the 'HexX mode' is exited (see the `<esc>` mapping), the buffer
-     shall revert back to its original 'binary' state, whereupon normal Vim
+     When the {HexX} mode is exited (see the `<esc>` mapping), the buffer
+     shall revert back to its original "binary" state, whereupon normal Vim
      operation recommences (normal Vim operation is also active when the
-     buffer is 'suspended')
+     buffer is {suspended})
 
-     See also operation/mapping `s` for more details of 'suspend' mode
+     See also operation/mapping `s` for more details of {suspend} mode
+
+     There is also a mapping defined called `HexxStart`. This is not assigned
+     to a key by default though. If you want to assign it to a key then you
+     need to add something like the following to `.vimrc`;-
+
+        `nmap {your mapping} <plug>(HexxStart)`
+
+     When enabled, this mapping will act the same as the `:Hexx` command
+
+     See also operation/mapping `s` for more details of {suspend} mode
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Set Unicode encoding method~
+
+Set Unicode encoding method ~
 
 `HexxUTF <8|16|32> {l|b}`
 
@@ -119,11 +408,11 @@ Set Unicode encoding method~
       See the `C` and `U` mappings for more details
 
 ==============================================================================
-COMMON MAPPING FEATURES                               *hexx-mapping-features*
+COMMON MAPPING FEATURES                                  *hexx-mapping-features*
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                   *hexx-pre-operation-count*
-PRE-OPERATION COUNT~
+
+PRE-OPERATION COUNT                                  *hexx-pre-operation-count*
 
 A number of the operation accept a count before being executed. This is
 entered in the same way as for a standard Vim operation/mapping, but its use
@@ -141,9 +430,9 @@ this limit, and one of the mappings/operations `r`, `R`, `i`, `A` or `x` is
 attempted then a warning message shall be printed, the operation ignored, and
 the count reset to its default value
 
-`Note: The count is ALWAYS entered in hexdecimal, is always positive, and is`
-      `limited to a 32 bit range. Some operations may place further limits`
-      `on the value`
+Note: The count is ALWAYS entered in hexdecimal, is always positive, and is
+      limited to a 32 bit range. Some operations may place further limits
+      on the value
 
 Examples;-
 
@@ -154,27 +443,27 @@ Examples;-
 `15fG` -  Go to the byte at offset 0x15f (the buffer data starts at offset
         zero)
 `1234U` - Replace as many bytes as necessary from the current cursor position
-        onwards with the UTF-8/16/32 (depending on settings) representation of
-        the Unicode code point 0x1234
+        onwards with the UTF-8/16/32 (depending on settings) representation
+        of the Unicode code point 0x1234
 
 The count input is always lower-case (mostly to avoid confusion with the `A`
-(append) mapping) but this will be converted to upper case where necessary and
-if specified by the option `g:Hexx_hexCase`
+(append) mapping) but this will be converted to upper case where necessary
+and if specified by the option `g:Hexx_hexCase`
 
 The count will be cleared (reset to default) if `<esc>` is entered. Several
 mappings/operations will also clear the count after (or before!) use; see
 each mapping's description for details
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                    *hexx-numeric-data-entey*
-NUMERIC DATA ENTRY~
 
-The following mappings/operations implement a 'numeric data entry' mode;-
+NUMERIC DATA ENTRY                                    *hexx-numeric-data-entry*
+
+The following mappings/operations implement a {numeric data entry} mode;-
 
   `r` (nibble replace), `R` (byte replace), `i` (insert bytes), `A` (append
   bytes)
 
-`Numeric data entry` mode refers to entering hexadecimal numbers that directly
+{Numeric data entry} mode refers to entering hexadecimal numbers that directly
 modify the buffer data. This mode is entered after the operation (`r`, `R`,
 `i`, or `A`) has been specified
 
@@ -183,7 +472,7 @@ zero or more hexadecimal characters input
 
 The simplest command to explain that uses this is `r` (replace);-
 
-`r<hex>` This will enter 'replace' mode and any subsequent hexadecimal input
+`r<hex>` This will enter {replace} mode and any subsequent hexadecimal input
        will modify each successive nibble in the data from the original cursor
        position onwards
 
@@ -197,36 +486,36 @@ The `R` operation actually reverts to the `r` operation whenever `numeric data`
 The `i` and `A` operations operate slightly differently;-
 
 `i<hex>` This will insert a single bytes into the buffer data. It shall then
-       enter 'replace' mode which will work exactly as for the `r` example. If
-       `i` is entered while in 'replace' mode then another byte shall be
-       inserted, after which 'replace' mode shall be reinstated again
+       enter {replace} mode which will work exactly as for the `r` example. If
+       `i` is entered while in {replace} mode then another byte shall be
+       inserted, after which {replace} mode shall be reinstated again
 
-       Note that the 'replace' mode takes no account of how many bytes were
+       Note that the {replace} mode takes no account of how many bytes were
        inserted; it shall continue to the end of the buffer (just like the `r`
        operation) if not exited beforehand
 
 `A<hex>` This will operate exactly as for `i`, except it performs an append
        rather than an insert operation. Take care though! Because this is an
-       append operation, if you enter `A` after 'replacing' the last byte
+       append operation, if you enter `A` after "replacing" the last byte
        previously entered, an existing byte will be skipped which may or may
        not be what you want; try it if this doesn't make sense
 
-In all cases, `numeric data entry` mode will exit on a cursor move, on
+In all cases, {numeric data entry} mode will exit on a cursor move, on
 entering `<esc>` or a non (lower case) hexadecimal character (except where
 described above for successive `i` and `A` operations), or if the progressing
 cursor reaches the end of the buffer. After exiting this mode, HexX shall
 await a new operation/mapping
 
 As a tip, it's probably best to get into the habbit of breaking out of
-`numeric data entry` mode by entering `<esc>`
+{numeric data entry} mode by entering `<esc>`
 
 The numeric data input is always lower-case (mostly to avoid confusion with
 the `A` (append) mapping) but this will be converted to upper case where
 necessary and if specified by the option `g:Hexx_hexCase`
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                  *hexx-character-data-entey*
-CHARACTER DATA ENTRY~
+
+CHARACTER DATA ENTRY                                *hexx-character-data-entry*
 
 `Character data entry` mode refers to entering alpha-numeric characters that
 are converted to the Unicode (UTF) format specified by `g:Hexx_utfEncoding`
@@ -238,14 +527,14 @@ In the following description, `<chars>` indicates zero or more keystrokes
 
 This mode is used by the operation/mapping `C` (replace with character)
 
-`C<chars>` This will enter 'replace' mode and any subsequent characters
+`C<chars>` This will enter {replace} mode and any subsequent characters
          (keystrokes) shall be converted to their Unicode (UTF) representation
          and the resulting bytes written to successive bytes in the buffer.
          Other than the interpretation of `<chars>` rather than `<hex>`, this
          operates in much the same way as the `r` operation described above
 
 If the number of bytes required to encode a character would extend beyond the
-end of the buffer, then a warning is output and `character data entry` mode
+end of the buffer, then a warning is output and {character data entry} mode
 will exit
 
 `Character data entry` mode will exit on a cursor move, on entering `<esc>`
@@ -257,14 +546,14 @@ See also `g:Hexx_convertNewline`, `g:Hexx_exitWithEsc`, `g:Hexx_utfEncoding`
 and `g:Hexx_utfEndian`
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                                  *hexx-undo*
-UNDO~
+
+UNDO                                                                *hexx-undo*
 
 HexX implements a very limited undo feature which maintains the byte position
 and the previous value of the single byte at that position
 
-This undo data is only set when a byte is modified during 'numeric data entry'
-or `character data entry` mode, or with the `U` operation, and (as only a
+This undo data is only set when a byte is modified during {numeric data entry}
+or {character data entry} mode, or with the `U` operation, and (as only a
 single byte is recorded) only the most recently modified byte is recorded
 
 So, if entering a multi-byte character, only the last byte of the encoded
@@ -277,7 +566,7 @@ the undo data is not changed. So, if (say) the ms nibble of a byte is changed,
 then the undo data will (typically) be saved. If the ls nibble of the same
 byte is then modified, then the undo data retains its original value
 
-The actual 'undo' operation is performed with the mapping `u`. See that
+The actual `undo` operation is performed with the mapping `u`. See that
 operation's details below for details
 
 As you can see, the undo feature really is very limited. It was mostly
@@ -294,26 +583,27 @@ The undo data is cleared;-
     Note that operations `r`, `R`, `i`, `A` and `x` are only considered to
     have commenced  if the setting `g:Hexx_countLimit` does not prevent it)
 
-  - When exiting `HexX` and returning the buffer to 'binary' format
+  - When exiting `HexX` and returning the buffer to `binary` format
 
 ==============================================================================
-MAPPINGS                                                      *hexx-mappings*
+MAPPINGS                                                         *hexx-mappings*
 
-Note: None of the mappings support any kind of 'visual' selection
+Note: None of the mappings support any kind of `visual` selection
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Cursor Movement (Byte)~
+
+Cursor Movement (Byte) ~
 
 [N]`h` or [N]`<left>`
 [N]`l` or [N]`<right>`
 [N]`k` or [N]`<up>`
 [N]`j` or [N]`<down>`
 
-The 'left' and 'right' cursor movements will move to the previous or next byte
+The `left` and `right` cursor movements will move to the previous or next byte
 of the buffer
 
-The 'up' and 'down' cursor movements will move to the previous/next displayed
-line of the 'hex' display. The number of bytes traversed depends on the
+The `up` and `down` cursor movements will move to the previous/next displayed
+line of the "hex" display. The number of bytes traversed depends on the
 setting `g:Hexx_bytesPerLine`
 
 Entering an [N] value allows relative movements of the cursor. Absolute
@@ -323,7 +613,8 @@ The keys `h`, `j`, `k`, and `l` will not operate as cursor movement whilst the
 `C` (replace with characters) operation is being performed
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Cursor Movement (Nibble)~
+
+Cursor Movement (Nibble) ~
 
 [N]`H` or [N]`<C-left>`
 [N]`L` or [N]`<C-right>`
@@ -335,7 +626,8 @@ The keys `H`, and `L` will not operate as cursor movement whilst the `C`
 (replace with characters) operation is being performed
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Cursor Movement (Page)~
+
+Cursor Movement (Page) ~
 
 [N]`PageUp` or [N]`<S-Up>`
 [N]`PageDown` or [N]`<S-Down>`
@@ -343,32 +635,34 @@ Cursor Movement (Page)~
 Move the cursor up/down a page (or multiple pages, if [N] specified) at a
 time. This operates in a very similar way to the standard vim operation
 
-A 'page' is the window height displaying the buffer - 1
+A "page" is the window height displaying the buffer - 1
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Replace nibbles with Hexadecimal Values~
+
+Replace nibbles with Hexadecimal Values ~
 
 [N]`r<hex>`
 
 Replace existing nibbles with subsequently entered hexadecimal values. For
-details of how this works, see the above section 'NUMERIC DATA ENTRY'
+details of how this works, see the above section NUMERIC DATA ENTRY
 
 If [N] is specified then the first `<hex>` value entered is written to that
 number of successive nibbles, and the count is then reset to its default
-value of 1. `numeric data entry` mode then continues to operate as normal (with
+value of 1. {numeric data entry} mode then continues to operate as normal (with
 any further `<hex>` values being applied only once each). Also, if [N] is
 specified, no undo data is recorded for the initial multi-nibble edit
 
 See also `g:Hexx_countLimit`
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Replace bytes with Hexadecimal Values~
+
+Replace bytes with Hexadecimal Values ~
 
 [N]`R<hex>`
 [N]`R<hex><hex>`
 
 Replace existing bytes with subsequently entered hexadecimal values. For
-details of how this works, see the above section 'NUMERIC DATA ENTRY'
+details of how this works, see the above section NUMERIC DATA ENTRY
 
 If [N] is not specified, then this operation reverts to the `r` operation and
 operates exactly as described previously
@@ -383,13 +677,14 @@ no undo data is recorded for the initial multi-byte edit
 See also `g:Hexx_countLimit`
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Replace with Character Values~
+
+Replace with Character Values ~
 
 `C<chars>`
 
 Replace existing bytes with the Unicode (UTF) representation of the entered
-characters. For details of how this works, see the above section
-'CHARACTER DATA ENTRY'
+characters. For details of how this works, see the above CHARACTER DATA ENTRY
+section
 
 The keys `h`, `j`, `k`, `l`, `H`, and `L` will not operate as cursor movement
 whilst this operation is being performed
@@ -398,7 +693,8 @@ See also `g:Hexx_convertNewline`, `g:Hexx_exitWithEsc`, `g:Hexx_utfEncoding`,
 `g:Hexx_utfEndian`, and the command `:HexxUTF`
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Replace With Unicode Code Point Value~
+
+Replace With Unicode Code Point Value ~
 
 [N]`U`
 
@@ -439,19 +735,20 @@ Note: There are a number of ranges in the UTF specification that are illegal
       to know what he/she is doing
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Insert Bytes~
+
+Insert Bytes ~
 
 [N]`i<hex>`
 
 Insert [N] number of bytes (or 1 byte if [N] is not specified or is zero) at
 the current cursor position
 
-HexX will then switch to the `numeric data entry` mode to allow convenient
+HexX will then switch to the {numeric data entry} mode to allow convenient
 editing of the bytes just inserted, as well as additional `i` operations; for
-details of how this works, see the above section 'NUMERIC DATA ENTRY'
+details of how this works, see the above section NUMERIC DATA ENTRY
 
 Immediately after executing the `i` operation and before entering
-`numeric data entry` mode, the count will be reset to its default value
+{numeric data entry} mode, the count will be reset to its default value
 
 The value of the newly inserted bytes is controlled by the configuration option
 `g:Hexx_newByteValue`
@@ -459,7 +756,8 @@ The value of the newly inserted bytes is controlled by the configuration option
 See also `g:Hexx_countLimit`
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Append Bytes~
+
+Append Bytes ~
 
 [N]`A<hex>`
 
@@ -470,7 +768,8 @@ Apart from this adding bytes after the cursor position rather than at the
 cursor position, this works exactly like the `i` (insert) operation
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Delete Bytes~
+
+Delete Bytes ~
 
 [N]`x`
 
@@ -487,7 +786,8 @@ is entered again)
 See also `g:Hexx_xDoesNotYank`
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Swap Bytes~
+
+Swap Bytes ~
 
 [N]`S`
 
@@ -498,7 +798,8 @@ would extend beyond the end of the buffer then the operation is not performed
 and a warning is output
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Undo~
+
+Undo ~
 
 `u`
 
@@ -509,10 +810,11 @@ will also move the cursor to that position
 Because `u` performs a swap, a further `u` (assuming the undo data does not
 change or get deleted in the meantime) will actually perform a redo, and so on
 
-See the above section 'UNDO' for details of the undo buffer operation
+See the above section UNDO for details of the undo buffer operation
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Goto Absolute Byte~~
+
+Goto Absolute Byte ~
 
 [N]`G`
 
@@ -527,18 +829,19 @@ The cursor operation/mappings described above facilitate moving relatively to
 the current cursor position, rather than to an absolute position
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Yank Bytes~
+
+Yank Bytes ~
 
 [N]`y`
 
 Yank [N] number of bytes (or 1 byte if [N] is not specified or is zero) from
-the current cursor position onwards into the 'clipboard' register specified by
+the current cursor position onwards into the `clipboard` register specified by
 the Vim global `v:register`
 
 If the number of bytes specified would extend beyond the end of the buffer
 then yank all bytes from the cursor position up to the last byte
 
-Note: The contents of the 'clipboard' register is in raw binary form; NOT
+Note: The contents of the `clipboard` register is in raw binary form; NOT
       HexX's Hex format. The clipboard data can be readily shared between
       different buffers, regardless of whether HexX is being used on them or
       not
@@ -551,11 +854,12 @@ This operation is only available if `g:Hexx_allowYankAndPaste` is enabled.
 See that configuration setting for details
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Paste Bytes at Cursor Position~
+
+Paste Bytes at Cursor Position ~
 
 `P` (upper case)
 
-Paste (insert) any data from the 'clipboard' register into the buffer at the
+Paste (insert) any data from the `clipboard` register into the buffer at the
 cursor position. After the operation, the cursor shall remain in the same
 position; ie, on the first of the bytes just pasted
 
@@ -565,11 +869,12 @@ This operation is only available if `g:Hexx_allowYankAndPaste` is enabled.
 See that configuration setting for details
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Paste Bytes after Cursor Position~
+
+Paste Bytes after Cursor Position ~
 
 `p` (lower case)
 
-Paste (insert) any data from the 'clipboard' register into the buffer at the
+Paste (insert) any data from the `clipboard` register into the buffer at the
 byte immediately after the cursor position. After the operation, the cursor
 shall remain in the same position; ie, on the byte immediately before the
 byte(s) just pasted
@@ -580,30 +885,33 @@ This operation is only available if `g:Hexx_allowYankAndPaste` is enabled.
 See that configuration setting for details
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Write Buffer~
+
+Write Buffer ~
 
 `w`
 
 (`w` actually has to be pressed twice to operate. This is to protect against
 an accidental key press)
 
-Write file in a 'binary' format. This works just like the standard Vim
+Write file in a `binary` format. This works just like the standard Vim
 `:write` command but only if the buffer already has a filename associated with
 it; there is no option to provide a filename
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Horizontal scroll~
+
+Horizontal scroll ~
 
 `zl`, `z<right>`, `zL`, `zh`, `z<left>`, `zH`
 
 The standard Vim horizontal scroll operations are supported. See `:help zl`
 for details
 
-Note that if HexX is in `numeric data entry` or `character data entry` mode,
+Note that if HexX is in {numeric data entry} or {character data entry} mode,
 you will need to break out of that mode first (eg, `<esc>zl`)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Redraw Display~
+
+Redraw Display ~
 
 `<C-l>` or `\`
 
@@ -615,14 +923,15 @@ of the display
 
 This mapping will force a redraw, which should put everything back to normal
 
-Note that if HexX is in `numeric data entry` or `character data entry` mode,
+Note that if HexX is in {numeric data entry} or {character data entry} mode,
 you will need to break out of that mode first (eg, `<esc><C-l>`)
 
 Technical note: I tried to fix this with various autocmd methods, but couldn't
 get a good result, hence the manual key mapping
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Suspend HexX Editing Mode~
+
+Suspend HexX Editing Mode ~
 
 `s`
 
@@ -630,27 +939,28 @@ Suspend HexX Editing Mode~
 an accidental key press)
 
 Suspend HexX. This will exit HexX and return to the normal Vim environment,
-but it will keep the buffer in the 'hex' format, and it will continue to
+but it will keep the buffer in the `hex` format, and it will continue to
 maintain the state of the HexX editing session
 
-The buffer shall be set 'readonly' and 'nomodifiable' to protect against
-accidentally writing the 'hex' formatted file back to any 'binary' file it was
-originally read from, and from accidentally modifying the 'hex' data outside
+The buffer shall be set `readonly` and `nomodifiable` to protect against
+accidentally writing the `hex` formatted file back to any `binary` file it was
+originally read from, and from accidentally modifying the `hex` data outside
 of the HexX editing mode
 
 The user can, of course, circumvent these protections, but if you do and
 things go wrong (and they likely will), don't blame HexX!
 
-These protections do not prevent the 'hex' formatted buffer being written to
+These protections do not prevent the `hex` formatted buffer being written to
 another file, and do not prevent text being yanked (copied) from the buffer
 
-When 'suspended', entering the `:Hexx` command will return to HexX editing
+When {suspended}, entering the `:Hexx` command will return to HexX editing
 mode, which will continue from where you left off
 
 If set, the count shall be reset by this operation
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Exit HexX~
+
+Exit HexX ~
 
 `<esc>`
 
@@ -658,7 +968,7 @@ Exit HexX~
 against an accidental key press)
 
 Exit HexX. This will exit HexX and return to the normal Vim environment. The
-buffer will be left in a 'binary' format and all HexX state information for
+buffer will be left in a `binary` format and all HexX state information for
 the buffer shall be deleted
 
 The buffer should then be in the same state it was before HexX was started,
@@ -667,3 +977,5 @@ treated in a normal Vim way
 
 If set, the count shall be reset by this operation
 
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:
