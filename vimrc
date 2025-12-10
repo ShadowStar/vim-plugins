@@ -49,7 +49,11 @@ set notagbsearch
 set nofileignorecase
 set shortmess-=S
 set mouse-=a
-set clipboard=unnamed
+"set clipboard=unnamed
+
+nnoremap y "+y
+nnoremap yy "+yy
+vnoremap y "+y
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
